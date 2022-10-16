@@ -2,6 +2,7 @@ package io.github.depromeet.knockknockbackend.global.security.auth;
 
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.domain.user.domain.repository.UserRepository;
+import io.github.depromeet.knockknockbackend.global.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -17,7 +18,7 @@ public class AuthDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String id) throws UsernameNotFoundException {
         User user = userRepository.findById(Long.valueOf(id))
-                .orElseThrow(); //TODO UserNotFound Exception
+                .orElseThrow(() -> UserNotFoundException.EXCEPTION);
         return new AuthDetails(user.getId().toString(), user.getRole());
     }
 
