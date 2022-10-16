@@ -1,6 +1,7 @@
 package io.github.depromeet.knockknockbackend.global.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.depromeet.knockknockbackend.global.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -11,6 +12,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
+    private final JwtTokenProvider jwtTokenProvider;
     private final ObjectMapper objectMapper;
 
     @Bean
@@ -26,7 +28,7 @@ public class SecurityConfig {
                 .anyRequest().authenticated();
 
         http
-                .apply(new FilterConfig(objectMapper));
+                .apply(new FilterConfig(jwtTokenProvider, objectMapper));
 
         return http.build();
     }
