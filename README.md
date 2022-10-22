@@ -2,7 +2,7 @@
 
 디프만 12기 칠면조 KnockKnock Backend입니다.
 
-# XQUARE 프로젝트를 시작하기전
+# KnockKnock 프로젝트를 시작하기전
 
 ## 목차
 
