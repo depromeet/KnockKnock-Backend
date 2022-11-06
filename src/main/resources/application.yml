@@ -26,7 +26,12 @@ auth:
     refreshExp: ${JWT_REFRESH_EXP:3600}
     header: ${JWT_HEADER:Authorization}
     prefix: ${JWT_PREFIX:Bearer}
+  kakao:
+
 
 
 fcm:
-  value: ${}
+  value: ${fcm.value}
+
+
+
