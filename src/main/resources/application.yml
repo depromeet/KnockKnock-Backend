@@ -6,6 +6,8 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       maxLifetime: 580000
+    password: ${MYSQL_PASSWORD}
+    username: ${MYSQL_USERNAME}
   redis:
     host: ${REDIS_HOST:localhost}
     port: ${REDIS_PORT:6379}
@@ -24,3 +26,7 @@ auth:
     refreshExp: ${JWT_REFRESH_EXP:3600}
     header: ${JWT_HEADER:Authorization}
     prefix: ${JWT_PREFIX:Bearer}
+
+
+fcm:
+  value: ${}
