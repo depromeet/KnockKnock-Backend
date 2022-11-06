@@ -1,11 +1,13 @@
 package io.github.depromeet.knockknockbackend.global.utils.api.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Getter
+//@Getter
 @NoArgsConstructor
+@Data
 public class KakaoInformationResponse {
 
     private Properties properties;
