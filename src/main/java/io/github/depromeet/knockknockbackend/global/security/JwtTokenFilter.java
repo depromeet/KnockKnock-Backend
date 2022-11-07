@@ -19,7 +19,9 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        if(request.getServletPath().equals("/credentials/kakao") || request.getServletPath().equals("/credentials/register") || request.getServletPath().equals("/credentials/google")  ) {
+        if(request.getServletPath().equals("/credentials/verify/kakao")
+            || request.getServletPath().equals("/credentials/register")
+            || request.getServletPath().equals("/credentials/verify/google")  ) {
 
             filterChain.doFilter(request, response);
             return;

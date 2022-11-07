@@ -9,18 +9,17 @@ import io.github.depromeet.knockknockbackend.global.utils.api.dto.response.Kakao
 import io.github.depromeet.knockknockbackend.global.utils.api.dto.response.KakaoInformationResponse;
 import io.github.depromeet.knockknockbackend.global.utils.api.dto.response.KakaoInformationResponse.KakaoAccount;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-@Service
 @RequiredArgsConstructor
-public class KakaoAuthService {
+@Component("kakao")
+public class KakaoAuthStrategy implements OauthStrategy{
 
 	private static final String PREFIX = "Bearer ";
 	private final KakaoInfoClient kakaoInfoClient;
-	private final UserRepository userRepository;
 
-	public OauthCommonUserInfoDto getKakaoUserInfo(String oauthAccessToken) {
-		this.checkKakaoOauthTokenValid(oauthAccessToken);
+
+	public OauthCommonUserInfoDto getUserInfo(String oauthAccessToken) {
 
 		KakaoInformationResponse response = kakaoInfoClient.kakaoUserInfo(PREFIX + oauthAccessToken);
 
@@ -36,13 +35,11 @@ public class KakaoAuthService {
 				oauthCommonUserInfoDtoBuilder.email(email);
 			}
 		}
-		boolean isRegistered = userRepository.findByOauthIdAndOauthProvider(oauthId, "kakao").isPresent();
-		oauthCommonUserInfoDtoBuilder.isRegistered(isRegistered);
 
 		return oauthCommonUserInfoDtoBuilder.build();
 	}
 
-	public void checkKakaoOauthTokenValid(String oauthAccessToken){
+	public void checkOauthTokenValid(String oauthAccessToken){
 		KakaoAccessTokenInfoResponse response = kakaoInfoClient.kakaoAccessTokenInfo(PREFIX + oauthAccessToken);
 
 

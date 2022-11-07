@@ -17,6 +17,5 @@ public class OauthCommonUserInfoDto {
     // oauth 제공자
     private String oauthProvider;
 
-    private Boolean isRegistered;
 
 }

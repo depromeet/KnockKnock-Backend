@@ -2,10 +2,12 @@ package io.github.depromeet.knockknockbackend.domain.credential.service;
 
 import io.github.depromeet.knockknockbackend.domain.credential.exception.AlreadySignUpUserException;
 import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.request.LoginRequest;
+import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.request.OauthTokenRequest;
 import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.request.RegisterRequest;
 import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.response.RegisterResponse;
 import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.response.TokenResponse;
 import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.response.UserProfileDto;
+import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.response.VerifyOauthTokenResponse;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.domain.user.domain.repository.UserRepository;
 import java.util.Optional;
@@ -20,33 +22,61 @@ public class CredentialService {
 
 
      private final UserRepository userRepository;
-     private final KakaoAuthService kakaoAuthService;
+     private final OauthFactory oauthFactory;
 
-    // 회원가입 시키기
+     public VerifyOauthTokenResponse getUserInfo(OauthProvider strategy , OauthTokenRequest oauthTokenRequest){
+
+         // oauth 공급자에서 전략 가져온다.
+         OauthStrategy oauthStrategy = oauthFactory.getOauthstrategy(strategy.getValue());
+         String oauthAccessToken = oauthTokenRequest.getOauthAccessToken();
+
+         // app id 가 같은지 비교 ( 똑똑 앱 어세스토큰인지 확인 )
+         oauthStrategy.checkOauthTokenValid(oauthAccessToken);
+
+         // oauth 유저정보 가져오기
+         OauthCommonUserInfoDto oauthInfo = oauthStrategy.getUserInfo(oauthAccessToken);
+
+         // 이미 회원가입 되었는지 체크 ( 클라이언트가 없으면 login 쏘고 있으면 reigster 쏘기 )
+         boolean isRegistered = userRepository
+             .findByOauthIdAndOauthProvider(oauthInfo.getOauthId(), strategy.getValue())
+             .isPresent();
+
+         return VerifyOauthTokenResponse.builder()
+             .oauthId(oauthInfo.getOauthId())
+             .oauthProvider(oauthInfo.getOauthProvider())
+             .isRegistered(isRegistered).build();
+     }
+
     public RegisterResponse registerUser(RegisterRequest registerRequest){
-        //TODO : 전략패턴으로 전환
-//        oauthProvider.getOauthProvider();
 
-        OauthCommonUserInfoDto oauthCommonUserInfoDto = kakaoAuthService.getKakaoUserInfo(
-            registerRequest.getOauthAccessToken());
+        String oauthProviderName = registerRequest.getOauthProvider().getValue();
+        String oauthAccessToken = registerRequest.getOauthAccessToken();
+
+        OauthStrategy oauthStrategy = oauthFactory.getOauthstrategy(
+            oauthProviderName);
+        // app id 가 같은지 비교 ( 똑똑 앱 어세스토큰인지 확인 )
+        oauthStrategy.checkOauthTokenValid(oauthAccessToken);
+
+        // oauth 유저정보 가져오기
+        OauthCommonUserInfoDto oauthCommonUserInfoDto = oauthStrategy.getUserInfo(
+            oauthAccessToken);
 
         String oauthId = oauthCommonUserInfoDto.getOauthId();
         String nickName = registerRequest.getNickName();
         String email = oauthCommonUserInfoDto.getEmail();
 
-        Optional<User> checkUser = userRepository.findByOauthIdAndOauthProvider(oauthId, "kakao");
+        Optional<User> checkUser = userRepository.findByOauthIdAndOauthProvider(oauthId, oauthProviderName);
 
         if(checkUser.isPresent())
             throw AlreadySignUpUserException.EXCEPTION;
+
         //널값있을수 있음 email
         User user = User.builder().oauthProvider("kakao").oauthId(oauthId).nickName(nickName)
             .email(email).build();
 
         userRepository.save(user);
 
-
         return new RegisterResponse("access","refresh",new UserProfileDto(user));
-
     }
 
 
