@@ -5,6 +5,7 @@ import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.
 import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.request.OauthTokenRequest;
 import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.request.RegisterRequest;
 import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.response.RegisterResponse;
+import io.github.depromeet.knockknockbackend.domain.credential.service.CredentialService;
 import io.github.depromeet.knockknockbackend.domain.credential.service.KakaoAuthService;
 import io.github.depromeet.knockknockbackend.domain.credential.service.OauthCommonUserInfoDto;
 import lombok.RequiredArgsConstructor;
@@ -20,31 +21,32 @@ public class CredentialController {
 
 
     private final KakaoAuthService kakaoAuthService;
+    private final CredentialService credentialService;
 
 
     @PostMapping("/verify/kakao")
     public OauthCommonUserInfoDto kakaoAccessTokenVerify(@RequestBody OauthTokenRequest oauthTokenRequest){
         System.out.println(oauthTokenRequest.getOauthAccessToken());
 
-        return kakaoAuthService.getKakaoUserInfo(oauthTokenRequest);
+        return kakaoAuthService.getKakaoUserInfo(oauthTokenRequest.getOauthAccessToken());
     }
 
     @PostMapping("/verify/google")
     public OauthCommonUserInfoDto GoogleAccessTokenVerify(@RequestBody OauthTokenRequest oauthTokenRequest){
         System.out.println(oauthTokenRequest.getOauthAccessToken());
 
-        return kakaoAuthService.getKakaoUserInfo(oauthTokenRequest);
+        return kakaoAuthService.getKakaoUserInfo(oauthTokenRequest.getOauthAccessToken());
     }
 
 
     //TODO : 프로바이더 쿼리 스트링으로 받기 ( 스웨거 끼고 나서 )
     @PostMapping("/register")
-    public void registerUser(@RequestBody RegisterRequest registerRequest){
+    public RegisterResponse registerUser(@RequestBody RegisterRequest registerRequest){
         kakaoAuthService.checkKakaoOauthTokenValid(registerRequest.getOauthAccessToken());
         System.out.println(registerRequest.getOauthAccessToken());
 
         //회원가입 시켜야함
-//        return kakaoAuthService.checkOauthTokenValid(oauthTokenRequest);
+        return credentialService.registerUser(registerRequest);
     }
     //TODO : 구글 낄때 프로바이더도 인자로받아야함!
     @PostMapping("/login")

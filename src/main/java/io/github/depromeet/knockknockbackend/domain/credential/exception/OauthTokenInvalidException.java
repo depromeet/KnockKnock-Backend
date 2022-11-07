@@ -1,4 +1,4 @@
-package io.github.depromeet.knockknockbackend.global.exception;
+package io.github.depromeet.knockknockbackend.domain.credential.exception;
 
 
 import io.github.depromeet.knockknockbackend.global.error.exception.ErrorCode;

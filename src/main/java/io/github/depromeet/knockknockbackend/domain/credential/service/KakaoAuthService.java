@@ -1,11 +1,9 @@
 package io.github.depromeet.knockknockbackend.domain.credential.service;
 
 
-import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.request.OauthTokenRequest;
 import io.github.depromeet.knockknockbackend.domain.credential.service.OauthCommonUserInfoDto.OauthCommonUserInfoDtoBuilder;
 import io.github.depromeet.knockknockbackend.domain.user.domain.repository.UserRepository;
-import io.github.depromeet.knockknockbackend.global.exception.OauthTokenInvalidException;
-import io.github.depromeet.knockknockbackend.global.security.JwtTokenProvider;
+import io.github.depromeet.knockknockbackend.domain.credential.exception.OauthTokenInvalidException;
 import io.github.depromeet.knockknockbackend.global.utils.api.client.KakaoInfoClient;
 import io.github.depromeet.knockknockbackend.global.utils.api.dto.response.KakaoAccessTokenInfoResponse;
 import io.github.depromeet.knockknockbackend.global.utils.api.dto.response.KakaoInformationResponse;
@@ -21,10 +19,10 @@ public class KakaoAuthService {
 	private final KakaoInfoClient kakaoInfoClient;
 	private final UserRepository userRepository;
 
-	public OauthCommonUserInfoDto getKakaoUserInfo(OauthTokenRequest oauthTokenRequest) {
-		this.checkKakaoOauthTokenValid(oauthTokenRequest.getOauthAccessToken());
+	public OauthCommonUserInfoDto getKakaoUserInfo(String oauthAccessToken) {
+		this.checkKakaoOauthTokenValid(oauthAccessToken);
 
-		KakaoInformationResponse response = kakaoInfoClient.kakaoUserInfo(PREFIX + oauthTokenRequest.getOauthAccessToken());
+		KakaoInformationResponse response = kakaoInfoClient.kakaoUserInfo(PREFIX + oauthAccessToken);
 
 		KakaoAccount kakaoAccount = response.getKakaoAccount();
 		String oauthId = response.getId();
