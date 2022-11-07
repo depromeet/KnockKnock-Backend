@@ -1,11 +1,11 @@
 package io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.request;
 
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor
-public class OauthTokenRequest {
-    private String oauthAccessToken;
+@AllArgsConstructor
+public class OauthCodeRequest {
+    private String code;
 }

@@ -13,8 +13,8 @@ public class OauthFactory {
     private final Map<String, OauthStrategy> oauthStrategyMap ;
 
 
-    public OauthStrategy getOauthstrategy(String strategyName){
+    public OauthStrategy getOauthstrategy(OauthProvider oauthProvider){
 
-        return oauthStrategyMap.get(strategyName);
+        return oauthStrategyMap.get(oauthProvider.getValue());
     }
 }

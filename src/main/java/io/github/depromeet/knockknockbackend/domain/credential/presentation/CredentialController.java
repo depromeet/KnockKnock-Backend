@@ -1,18 +1,13 @@
 package io.github.depromeet.knockknockbackend.domain.credential.presentation;
 
 
-import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.request.LoginRequest;
-import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.request.OauthTokenRequest;
-import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.request.RegisterRequest;
-import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.response.RegisterResponse;
-import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.response.VerifyOauthTokenResponse;
+import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.request.OauthCodeRequest;
+import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.response.OauthLoginLinkResponse;
+import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.response.UserProfileDto;
 import io.github.depromeet.knockknockbackend.domain.credential.service.CredentialService;
-import io.github.depromeet.knockknockbackend.domain.credential.service.KakaoAuthStrategy;
-import io.github.depromeet.knockknockbackend.domain.credential.service.OauthCommonUserInfoDto;
 import io.github.depromeet.knockknockbackend.domain.credential.service.OauthProvider;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,30 +19,19 @@ public class CredentialController {
 
     private final CredentialService credentialService;
 
-
-    @PostMapping("/verify/kakao")
-    public VerifyOauthTokenResponse kakaoAccessTokenVerify(@RequestBody OauthTokenRequest oauthTokenRequest){
-        System.out.println(oauthTokenRequest.getOauthAccessToken());
-
-        return credentialService.getUserInfo(OauthProvider.KAKAO, oauthTokenRequest);
+    @GetMapping("/oauth/link/kakao")
+    public OauthLoginLinkResponse getKakaoOauthLink(){
+      return new OauthLoginLinkResponse(credentialService.getOauthLink(OauthProvider.KAKAO));
     }
 
-    @PostMapping("/verify/google")
-    public VerifyOauthTokenResponse GoogleAccessTokenVerify(@RequestBody OauthTokenRequest oauthTokenRequest){
-        return credentialService.getUserInfo(OauthProvider.GOOGLE, oauthTokenRequest);
+    @GetMapping("/oauth/kakao")
+    public UserProfileDto kakaoAuth(OauthCodeRequest oauthCodeRequest){
+        //TODO : 사용자가 로그인 취소시에 code 안넘어옴 별도 처리 필요.
+        //TODO : 리프레쉬토큰 , 어세스 토큰 발급
+        //TODO : 최초 회원가입 일때 유저 닉네임 업데이트 해야하는 조건
+
+        return credentialService.oauthCodeToUser(OauthProvider.KAKAO, oauthCodeRequest);
     }
 
 
-
-    @PostMapping("/register")
-    public RegisterResponse registerUser(@RequestBody RegisterRequest registerRequest){
-
-        //회원가입 시켜야함
-        return credentialService.registerUser(registerRequest);
-    }
-    @PostMapping("/login")
-    public void loginUser(@RequestBody LoginRequest loginRequest){
-        //회원가입 시켜야함
-//        return kakaoAuthService.checkOauthTokenValid(oauthTokenRequest);
-    }
 }

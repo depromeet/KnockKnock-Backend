@@ -6,10 +6,8 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class RegisterResponse {
+public class OauthLoginLinkResponse {
 
-    private String accessToken;
-    private String refreshToken;
-    private UserProfileDto userProfileDto;
+    private String link;
 
 }
