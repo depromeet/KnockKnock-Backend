@@ -18,4 +18,14 @@ public class User {
 
     private String role;
 
+
+    private String nickName;
+
+    private String oauthProvider;
+
+    private String oauthId;
+
+    private String email;
+
+
 }

@@ -18,6 +18,8 @@ spring:
       hibernate:
         format_sql: ${FORMAT_SQL:true}
     open-in-view: false
+    hibernate:
+      ddl-auto: create
 
 auth:
   jwt:
@@ -27,7 +29,7 @@ auth:
     header: ${JWT_HEADER:Authorization}
     prefix: ${JWT_PREFIX:Bearer}
   kakao:
-
+    appId : ${KAKAO_APPID}
 
 
 fcm:
