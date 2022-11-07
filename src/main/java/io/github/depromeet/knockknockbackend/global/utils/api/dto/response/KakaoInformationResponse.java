@@ -13,7 +13,6 @@ public class KakaoInformationResponse {
     private Properties properties;
     private String id;
 
-    @JsonProperty("kakao_account")
     private KakaoAccount kakaoAccount;
 
     @Getter
