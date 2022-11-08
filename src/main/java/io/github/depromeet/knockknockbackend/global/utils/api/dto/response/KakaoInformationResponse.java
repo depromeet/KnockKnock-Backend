@@ -5,9 +5,8 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-//@Getter
+@Getter
 @NoArgsConstructor
-@Data
 public class KakaoInformationResponse {
 
     private Properties properties;

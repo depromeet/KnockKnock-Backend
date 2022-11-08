@@ -6,7 +6,7 @@ public interface OauthStrategy {
 
 
     OauthCommonUserInfoDto getUserInfo(String oauthAccessToken);
-     String getOauthLink();
+    String getOauthLink();
 
     String getAccessToken(String code);
 }

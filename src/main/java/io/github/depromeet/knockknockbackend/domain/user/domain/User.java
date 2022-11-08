@@ -20,16 +20,12 @@ public class User {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column
-    private String role ;
 
-    @Column
+    private String role;
+
     private String nickName;
-    @Column
     private String oauthProvider;
-    @Column
     private String oauthId;
-    @Column
     private String email;
 
     @Builder
