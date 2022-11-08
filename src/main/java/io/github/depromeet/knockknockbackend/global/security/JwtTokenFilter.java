@@ -19,16 +19,14 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        if(request.getServletPath().startsWith("/credentials")) {
 
-            filterChain.doFilter(request, response);
-            return;
-        }
         String token = jwtTokenProvider.resolveToken(request);
 
         if(token != null) {
             SecurityContextHolder.getContext().setAuthentication(jwtTokenProvider.getAuthentication(token));
         }
+
+        filterChain.doFilter(request, response);
 
     }
 
