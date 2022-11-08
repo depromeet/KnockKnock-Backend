@@ -25,10 +25,10 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests()
                 .antMatchers("/").permitAll()
+                .antMatchers("/credentials/**").permitAll()
                 .anyRequest().authenticated();
-
         http
-                .apply(new FilterConfig(jwtTokenProvider, objectMapper));
+            .apply(new FilterConfig(jwtTokenProvider, objectMapper));
 
         return http.build();
     }
