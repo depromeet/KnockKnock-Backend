@@ -30,7 +30,7 @@ public class CredentialController {
         //TODO : 리프레쉬토큰 , 어세스 토큰 발급
         //TODO : 최초 회원가입 일때 유저 닉네임 업데이트 해야하는 조건
 
-        return credentialService.oauthCodeToUser(OauthProvider.KAKAO, oauthCodeRequest);
+        return credentialService.oauthCodeToUser(OauthProvider.KAKAO, oauthCodeRequest.getCode());
     }
 
 

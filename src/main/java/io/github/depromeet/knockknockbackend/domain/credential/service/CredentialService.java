@@ -25,9 +25,9 @@ public class CredentialService {
         OauthStrategy oauthStrategy = oauthFactory.getOauthstrategy(oauthProvider);
         return  oauthStrategy.getOauthLink();
     }
-    public UserProfileDto oauthCodeToUser(OauthProvider oauthProvider ,OauthCodeRequest oauthCodeRequest){
+    public UserProfileDto oauthCodeToUser(OauthProvider oauthProvider ,String code){
         OauthStrategy oauthStrategy = oauthFactory.getOauthstrategy(oauthProvider);
-        String accessToken = oauthStrategy.getAccessToken(oauthCodeRequest);
+        String accessToken = oauthStrategy.getAccessToken(code);
        // 어세스토큰 처음부터 회원가입 테스트 할려면 여기서 얻어야함!
         //        System.out.println(accessToken);
         OauthCommonUserInfoDto oauthUserInfo = oauthStrategy.getUserInfo(accessToken);

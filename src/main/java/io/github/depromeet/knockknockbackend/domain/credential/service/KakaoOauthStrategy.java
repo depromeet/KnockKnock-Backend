@@ -29,11 +29,14 @@ public class KakaoOauthStrategy implements OauthStrategy{
     }
 
     // 어세스토큰 발급
-    public String getAccessToken(OauthCodeRequest oauthCodeRequest){
+    public String getAccessToken(String code){
 
-        return kakaoOauthClient.kakaoAuth(oauthProperties.getKakaoClientId(),
-                oauthProperties.getKakaoRedirectUrl(), oauthCodeRequest.getCode() , oauthProperties.getKakaoClientSecret())
-            .getAccessToken();
+        return kakaoOauthClient.kakaoAuth(
+                oauthProperties.getKakaoClientId(),
+                oauthProperties.getKakaoRedirectUrl(),
+                code ,
+                oauthProperties.getKakaoClientSecret()
+            ).getAccessToken();
     }
 
     // 발급된 어세스 토큰으로 유저정보 조회
