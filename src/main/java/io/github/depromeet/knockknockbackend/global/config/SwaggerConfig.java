@@ -42,7 +42,7 @@ public class SwaggerConfig {
             .consumes(getConsumeContentTypes())
             .produces(getProduceContentTypes())
             .select()
-            .apis(RequestHandlerSelectors.basePackage("io.github.knockknockbackend"))
+            .apis(RequestHandlerSelectors.basePackage("io.github.depromeet.knockknockbackend"))
             .paths(PathSelectors.any())
             .build();
     }
