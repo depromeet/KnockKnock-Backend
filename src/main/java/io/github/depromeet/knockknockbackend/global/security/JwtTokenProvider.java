@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.global.security;
 
+import io.github.depromeet.knockknockbackend.global.error.exception.ErrorCode;
 import io.github.depromeet.knockknockbackend.global.exception.ExpiredTokenException;
 import io.github.depromeet.knockknockbackend.global.exception.InvalidTokenException;
 import io.github.depromeet.knockknockbackend.global.property.JwtProperties;
@@ -8,7 +9,9 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -55,6 +58,60 @@ public class JwtTokenProvider {
 
     private Key getSecretKey() {
         return Keys.hmacShaKeyFor(jwtProperties.getSecretKey().getBytes(StandardCharsets.UTF_8));
+    }
+
+    public String generateAccessToken(Long id) {
+        final Key encodedKey = getSecretKey();
+        final Date now = new Date();
+        final Date accessTokenExpiresIn = new Date(now.getTime() + jwtProperties.getAccessExp());
+        return Jwts.builder()
+            .setIssuer("knockknock")
+            .setIssuedAt(now)
+            .setSubject(id.toString())
+            .claim("type", "access_token")
+            .setExpiration(accessTokenExpiresIn)
+            .signWith(encodedKey)
+            .compact();
+    }
+
+
+    //TODO : 리프레쉬 토큰 생성후에 레디스 저장하는 로직 필요 ( credential 서비스에..? )
+    public String generateRefreshToken(Long id) {
+        final Key encodedKey = getSecretKey();
+        final Date now = new Date();
+        final Date refreshTokenExpiresIn = new Date(now.getTime() + jwtProperties.getRefreshExp());
+        return Jwts.builder()
+            .setIssuer("knockknock")
+            .setIssuedAt(now)
+            .setSubject(id.toString())
+            .claim("type", "refresh_token")
+            .setExpiration(refreshTokenExpiresIn)
+            .signWith(encodedKey)
+            .compact();
+    }
+
+    public boolean isAccessToken(String token) {
+        return getJws(token).getBody().get("type").equals("refresh_token");
+    }
+
+    public boolean isRefreshToken(String token) {
+        return getJws(token).getBody().get("type").equals("refresh_token");
+    }
+
+    public Long parseAccessToken(String token) {
+        Claims claims = getJws(token).getBody();
+        if (claims.get("type").equals("access_token")) {
+            return Long.parseLong(claims.getSubject());
+        }
+        throw InvalidTokenException.EXCEPTION;
+    }
+
+    public Long parseRefreshToken(String token) {
+        Claims claims = getJws(token).getBody();
+        if (claims.get("type").equals("refresh_token")) {
+            return Long.parseLong(claims.getSubject());
+        }
+        throw InvalidTokenException.EXCEPTION;
     }
 
 }
