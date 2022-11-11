@@ -15,6 +15,13 @@ public class SecurityConfig {
     private final JwtTokenProvider jwtTokenProvider;
     private final ObjectMapper objectMapper;
 
+    private static final String[] SwaggerPatterns = {
+        "/swagger-resources/**",
+        "/swagger-ui/**",
+        "/v2/api-docs",
+        "/webjars/**"
+    };
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -25,6 +32,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests()
                 .antMatchers("/").permitAll()
+                .antMatchers(SwaggerPatterns).permitAll()
                 .antMatchers("/credentials/**").permitAll()
                 .anyRequest().authenticated();
         http
