@@ -39,7 +39,7 @@ public class CredentialService {
 
         if(checkUser.isEmpty()){
             //널값있을수 있음 email
-            User user = User.builder().oauthProvider("kakao").oauthId(oauthId).email(email).build();
+            User user = User.builder().oauthProvider(oauthProvider.getValue()).oauthId(oauthId).email(email).build();
             userRepository.save(user);
             return new UserProfileDto(user);
         }
