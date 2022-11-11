@@ -33,5 +33,19 @@ public class CredentialController {
         return credentialService.oauthCodeToUser(OauthProvider.KAKAO, oauthCodeRequest.getCode());
     }
 
+    @GetMapping("/oauth/link/google")
+    public OauthLoginLinkResponse getGoogleOauthLink(){
+        return new OauthLoginLinkResponse(credentialService.getOauthLink(OauthProvider.GOOGLE));
+    }
+
+    @GetMapping("/oauth/google")
+    public UserProfileDto googleAuth(OauthCodeRequest oauthCodeRequest){
+        //TODO : 사용자가 로그인 취소시에 code 안넘어옴 별도 처리 필요.
+        //TODO : 리프레쉬토큰 , 어세스 토큰 발급
+        //TODO : 최초 회원가입 일때 유저 닉네임 업데이트 해야하는 조건
+
+        return credentialService.oauthCodeToUser(OauthProvider.GOOGLE, oauthCodeRequest.getCode());
+    }
+
 
 }
