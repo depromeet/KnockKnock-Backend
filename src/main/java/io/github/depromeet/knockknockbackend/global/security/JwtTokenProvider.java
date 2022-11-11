@@ -89,7 +89,7 @@ public class JwtTokenProvider {
     }
 
     public boolean isAccessToken(String token) {
-        return getJws(token).getBody().get("type").equals("refresh_token");
+        return getJws(token).getBody().get("type").equals("access_token");
     }
 
     public boolean isRefreshToken(String token) {
