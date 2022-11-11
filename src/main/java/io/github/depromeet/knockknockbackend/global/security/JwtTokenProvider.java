@@ -1,6 +1,5 @@
 package io.github.depromeet.knockknockbackend.global.security;
 
-import io.github.depromeet.knockknockbackend.global.error.exception.ErrorCode;
 import io.github.depromeet.knockknockbackend.global.exception.ExpiredTokenException;
 import io.github.depromeet.knockknockbackend.global.exception.InvalidTokenException;
 import io.github.depromeet.knockknockbackend.global.property.JwtProperties;
@@ -9,7 +8,6 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import java.util.Date;
 import lombok.RequiredArgsConstructor;
