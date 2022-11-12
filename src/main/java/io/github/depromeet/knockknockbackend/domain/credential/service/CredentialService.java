@@ -1,5 +1,7 @@
 package io.github.depromeet.knockknockbackend.domain.credential.service;
 
+import io.github.depromeet.knockknockbackend.domain.credential.domain.RefreshTokenRedisEntity;
+import io.github.depromeet.knockknockbackend.domain.credential.domain.repository.RefreshTokenRedisEntityRepository;
 import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.request.OauthCodeRequest;
 import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.response.AfterOauthResponse;
 import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.response.TokenResponse;
@@ -7,6 +9,7 @@ import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.domain.user.domain.repository.UserRepository;
 import io.github.depromeet.knockknockbackend.global.security.JwtTokenProvider;
+import java.util.Date;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,6 +24,8 @@ public class CredentialService {
      private final UserRepository userRepository;
      private final OauthFactory oauthFactory;
      private final JwtTokenProvider jwtTokenProvider;
+
+     private final RefreshTokenRedisEntityRepository refreshTokenRedisEntityRepository;
 
     public String getOauthLink(OauthProvider oauthProvider) {
         OauthStrategy oauthStrategy = oauthFactory.getOauthstrategy(oauthProvider);
@@ -48,8 +53,8 @@ public class CredentialService {
             userId = checkUser.get().getId();
         }
 
-        String refreshToken = jwtTokenProvider.generateRefreshToken(userId);
         String accessToken = jwtTokenProvider.generateAccessToken(userId);
+        String refreshToken = generateRefreshToken(userId);
 
         return AfterOauthResponse.builder()
             .isRegistered(isRegistered)
@@ -62,8 +67,16 @@ public class CredentialService {
     // 리프레쉬 토큰 만들기
     // 레디스 끼기
     // 레디스 ttl
-    public void generateRefreshToken(){
-
+    private String generateRefreshToken(Long userId){
+        String refreshToken = jwtTokenProvider.generateRefreshToken(userId);
+        Date tokenExpiredAt = jwtTokenProvider.getTokenExpiredAt(refreshToken);
+        RefreshTokenRedisEntity build = RefreshTokenRedisEntity.builder()
+            .id(userId.toString())
+            .ttl(tokenExpiredAt.getTime())
+            .refreshToken(refreshToken)
+            .build();
+        refreshTokenRedisEntityRepository.save(build);
+        return refreshToken;
     }
 
     // 토큰 리프레쉬 하기

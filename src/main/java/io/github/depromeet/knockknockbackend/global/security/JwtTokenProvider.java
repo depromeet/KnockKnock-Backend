@@ -109,4 +109,8 @@ public class JwtTokenProvider {
         throw InvalidTokenException.EXCEPTION;
     }
 
+    public Date getTokenExpiredAt(String token){
+        return getJws(token).getBody().getExpiration();
+    }
+
 }
