@@ -2,11 +2,15 @@ package io.github.depromeet.knockknockbackend.domain.credential.presentation;
 
 
 import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.request.OauthCodeRequest;
+import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.response.AfterOauthResponse;
 import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.response.OauthLoginLinkResponse;
 import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.response.UserProfileDto;
 import io.github.depromeet.knockknockbackend.domain.credential.service.CredentialService;
 import io.github.depromeet.knockknockbackend.domain.credential.service.OauthProvider;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/credentials")
 @RequiredArgsConstructor
+@Tag(name = "인증 관련 컨트롤러", description = "oauth, token refresh 기능을 담당합니다")
 public class CredentialController {
 
 
@@ -25,12 +30,15 @@ public class CredentialController {
     }
 
     @GetMapping("/oauth/kakao")
-    public UserProfileDto kakaoAuth(OauthCodeRequest oauthCodeRequest){
+    public ResponseEntity<AfterOauthResponse> kakaoAuth(OauthCodeRequest oauthCodeRequest){
         //TODO : 사용자가 로그인 취소시에 code 안넘어옴 별도 처리 필요.
-        //TODO : 리프레쉬토큰 , 어세스 토큰 발급
-        //TODO : 최초 회원가입 일때 유저 닉네임 업데이트 해야하는 조건
 
-        return credentialService.oauthCodeToUser(OauthProvider.KAKAO, oauthCodeRequest.getCode());
+        AfterOauthResponse afterOauthResponse = credentialService.oauthCodeToUser(OauthProvider.KAKAO, oauthCodeRequest.getCode());
+        Boolean isRegistered = afterOauthResponse.getIsRegistered();
+        if(isRegistered){
+            return ResponseEntity.ok(afterOauthResponse);
+        }
+        return new ResponseEntity(afterOauthResponse, HttpStatus.CREATED);
     }
 
     @GetMapping("/oauth/link/google")
@@ -39,12 +47,13 @@ public class CredentialController {
     }
 
     @GetMapping("/oauth/google")
-    public UserProfileDto googleAuth(OauthCodeRequest oauthCodeRequest){
-        //TODO : 사용자가 로그인 취소시에 code 안넘어옴 별도 처리 필요.
-        //TODO : 리프레쉬토큰 , 어세스 토큰 발급
-        //TODO : 최초 회원가입 일때 유저 닉네임 업데이트 해야하는 조건
-
-        return credentialService.oauthCodeToUser(OauthProvider.GOOGLE, oauthCodeRequest.getCode());
+    public ResponseEntity<AfterOauthResponse> googleAuth(OauthCodeRequest oauthCodeRequest){
+        AfterOauthResponse afterOauthResponse = credentialService.oauthCodeToUser(OauthProvider.KAKAO, oauthCodeRequest.getCode());
+        Boolean isRegistered = afterOauthResponse.getIsRegistered();
+        if(isRegistered){
+            return ResponseEntity.ok(afterOauthResponse);
+        }
+        return new ResponseEntity(afterOauthResponse, HttpStatus.CREATED);
     }
 
 

@@ -1,6 +1,7 @@
 package io.github.depromeet.knockknockbackend.domain.credential.service;
 
 import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.request.OauthCodeRequest;
+import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.response.AfterOauthResponse;
 import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.response.TokenResponse;
 import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.response.UserProfileDto;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
@@ -25,25 +26,36 @@ public class CredentialService {
         OauthStrategy oauthStrategy = oauthFactory.getOauthstrategy(oauthProvider);
         return  oauthStrategy.getOauthLink();
     }
-    public UserProfileDto oauthCodeToUser(OauthProvider oauthProvider ,String code){
+    public AfterOauthResponse oauthCodeToUser(OauthProvider oauthProvider ,String code){
         OauthStrategy oauthStrategy = oauthFactory.getOauthstrategy(oauthProvider);
-        String accessToken = oauthStrategy.getAccessToken(code);
+        String oauthAccessToken = oauthStrategy.getAccessToken(code);
        // 어세스토큰 처음부터 회원가입 테스트 할려면 여기서 얻어야함!
         //        System.out.println(accessToken);
-        OauthCommonUserInfoDto oauthUserInfo = oauthStrategy.getUserInfo(accessToken);
+        OauthCommonUserInfoDto oauthUserInfo = oauthStrategy.getUserInfo(oauthAccessToken);
 
         String oauthId = oauthUserInfo.getOauthId();
         String email = oauthUserInfo.getEmail();
 
         Optional<User> checkUser = userRepository.findByOauthIdAndOauthProvider(oauthId, oauthProvider.getValue());
-
-        if(checkUser.isEmpty()){
+        Boolean isRegistered = checkUser.isPresent();
+        Long userId ;
+        if(!isRegistered){
             //널값있을수 있음 email
             User user = User.builder().oauthProvider(oauthProvider.getValue()).oauthId(oauthId).email(email).build();
             userRepository.save(user);
-            return new UserProfileDto(user);
+            userId = user.getId();
+        }else {
+            userId = checkUser.get().getId();
         }
-        return new UserProfileDto(checkUser.get());
+
+        String refreshToken = jwtTokenProvider.generateRefreshToken(userId);
+        String accessToken = jwtTokenProvider.generateAccessToken(userId);
+
+        return AfterOauthResponse.builder()
+            .isRegistered(isRegistered)
+            .accessToken(accessToken)
+            .refreshToken(refreshToken)
+            .build();
     }
 
 
