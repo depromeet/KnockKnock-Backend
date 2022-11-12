@@ -9,6 +9,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.Size;
+
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 
@@ -21,6 +23,7 @@ public class User {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Size(max = 10)
     private String nickname;
 
     private String oauthProvider;
@@ -39,5 +42,8 @@ public class User {
         this.email = email;
     }
 
+    public void changeNickname(String nickname) {
+        this.nickname = nickname;
+    }
 
 }
