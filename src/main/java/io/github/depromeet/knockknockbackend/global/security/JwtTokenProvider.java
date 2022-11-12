@@ -72,16 +72,15 @@ public class JwtTokenProvider {
 
     public String generateAccessToken(Long id) {
         final Date issuedAt = new Date();
-        final Date accessTokenExpiresIn = new Date(issuedAt.getTime() + jwtProperties.getAccessExp());
+        final Date accessTokenExpiresIn = new Date(issuedAt.getTime() + jwtProperties.getAccessExp() * 1000);
 
         return buildToken(id, issuedAt, accessTokenExpiresIn,"access_token");
     }
 
 
-    //TODO : 리프레쉬 토큰 생성후에 레디스 저장하는 로직 필요 ( credential 서비스에..? )
     public String generateRefreshToken(Long id) {
         final Date issuedAt = new Date();
-        final Date refreshTokenExpiresIn = new Date(issuedAt.getTime() + jwtProperties.getRefreshExp());
+        final Date refreshTokenExpiresIn = new Date(issuedAt.getTime() + jwtProperties.getAccessExp() * 1000);
         return buildToken(id, issuedAt, refreshTokenExpiresIn,"refresh_token");
     }
 

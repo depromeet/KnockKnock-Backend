@@ -2,12 +2,12 @@ package io.github.depromeet.knockknockbackend.domain.credential.service;
 
 import io.github.depromeet.knockknockbackend.domain.credential.domain.RefreshTokenRedisEntity;
 import io.github.depromeet.knockknockbackend.domain.credential.domain.repository.RefreshTokenRedisEntityRepository;
-import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.request.OauthCodeRequest;
 import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.response.AfterOauthResponse;
-import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.response.TokenResponse;
-import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.response.UserProfileDto;
+import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.response.AccessTokenResponse;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.domain.user.domain.repository.UserRepository;
+import io.github.depromeet.knockknockbackend.global.exception.InvalidTokenException;
+import io.github.depromeet.knockknockbackend.global.exception.UserNotFoundException;
 import io.github.depromeet.knockknockbackend.global.security.JwtTokenProvider;
 import java.util.Date;
 import java.util.Optional;
@@ -80,8 +80,22 @@ public class CredentialService {
     }
 
     // 토큰 리프레쉬 하기
-    public TokenResponse refreshToken(){
-     return null;
+    public AccessTokenResponse tokenRefresh(String refreshToken){
+        Long userId = jwtTokenProvider.parseRefreshToken(refreshToken);
+
+        Optional<RefreshTokenRedisEntity> entityOptional = refreshTokenRedisEntityRepository.findByRefreshToken(
+            refreshToken);
+
+        RefreshTokenRedisEntity refreshTokenRedisEntity = entityOptional.orElseThrow(
+            () -> InvalidTokenException.EXCEPTION);
+
+        if(!userId.toString().equals(refreshTokenRedisEntity.getId())){
+            throw InvalidTokenException.EXCEPTION;
+        }
+
+        String accessToken = jwtTokenProvider.generateAccessToken(userId);
+
+        return new AccessTokenResponse(accessToken);
     }
 
 

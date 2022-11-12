@@ -2,12 +2,12 @@ package io.github.depromeet.knockknockbackend.domain.credential.presentation;
 
 
 import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.request.OauthCodeRequest;
+import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.request.TokenRefreshRequest;
+import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.response.AccessTokenResponse;
 import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.response.AfterOauthResponse;
 import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.response.OauthLoginLinkResponse;
-import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.response.UserProfileDto;
 import io.github.depromeet.knockknockbackend.domain.credential.service.CredentialService;
 import io.github.depromeet.knockknockbackend.domain.credential.service.OauthProvider;
-import io.swagger.v3.core.util.Json;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -19,6 +19,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -85,6 +87,15 @@ public class CredentialController {
             return ResponseEntity.ok(afterOauthResponse);
         }
         return new ResponseEntity(afterOauthResponse, HttpStatus.CREATED);
+    }
+
+
+    @Operation(summary = "토큰 리프레쉬", description = "토큰을 리프레쉬 합니다.")
+    @PostMapping("/refresh")
+    public ResponseEntity<AccessTokenResponse> refreshingToken(@RequestBody TokenRefreshRequest tokenRefreshRequest){
+        AccessTokenResponse accessTokenResponse = credentialService.tokenRefresh(
+            tokenRefreshRequest.getRefreshToken());
+        return ResponseEntity.ok(accessTokenResponse);
     }
 
 
