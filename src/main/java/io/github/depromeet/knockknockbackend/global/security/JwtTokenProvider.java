@@ -58,34 +58,31 @@ public class JwtTokenProvider {
         return Keys.hmacShaKeyFor(jwtProperties.getSecretKey().getBytes(StandardCharsets.UTF_8));
     }
 
-    public String generateAccessToken(Long id) {
+    private String buildToken(Long id, Date issuedAt, Date accessTokenExpiresIn,String claimValue) {
         final Key encodedKey = getSecretKey();
-        final Date now = new Date();
-        final Date accessTokenExpiresIn = new Date(now.getTime() + jwtProperties.getAccessExp());
         return Jwts.builder()
             .setIssuer("knockknock")
-            .setIssuedAt(now)
+            .setIssuedAt(issuedAt)
             .setSubject(id.toString())
-            .claim("type", "access_token")
+            .claim("type", claimValue)
             .setExpiration(accessTokenExpiresIn)
             .signWith(encodedKey)
             .compact();
     }
 
+    public String generateAccessToken(Long id) {
+        final Date issuedAt = new Date();
+        final Date accessTokenExpiresIn = new Date(issuedAt.getTime() + jwtProperties.getAccessExp());
+
+        return buildToken(id, issuedAt, accessTokenExpiresIn,"access_token");
+    }
+
 
     //TODO : 리프레쉬 토큰 생성후에 레디스 저장하는 로직 필요 ( credential 서비스에..? )
     public String generateRefreshToken(Long id) {
-        final Key encodedKey = getSecretKey();
-        final Date now = new Date();
-        final Date refreshTokenExpiresIn = new Date(now.getTime() + jwtProperties.getRefreshExp());
-        return Jwts.builder()
-            .setIssuer("knockknock")
-            .setIssuedAt(now)
-            .setSubject(id.toString())
-            .claim("type", "refresh_token")
-            .setExpiration(refreshTokenExpiresIn)
-            .signWith(encodedKey)
-            .compact();
+        final Date issuedAt = new Date();
+        final Date refreshTokenExpiresIn = new Date(issuedAt.getTime() + jwtProperties.getRefreshExp());
+        return buildToken(id, issuedAt, refreshTokenExpiresIn,"refresh_token");
     }
 
     public boolean isAccessToken(String token) {
@@ -97,16 +94,16 @@ public class JwtTokenProvider {
     }
 
     public Long parseAccessToken(String token) {
-        Claims claims = getJws(token).getBody();
-        if (claims.get("type").equals("access_token")) {
+        if (isAccessToken(token)) {
+            Claims claims = getJws(token).getBody();
             return Long.parseLong(claims.getSubject());
         }
         throw InvalidTokenException.EXCEPTION;
     }
 
     public Long parseRefreshToken(String token) {
-        Claims claims = getJws(token).getBody();
-        if (claims.get("type").equals("refresh_token")) {
+        if (isRefreshToken(token)) {
+            Claims claims = getJws(token).getBody();
             return Long.parseLong(claims.getSubject());
         }
         throw InvalidTokenException.EXCEPTION;
