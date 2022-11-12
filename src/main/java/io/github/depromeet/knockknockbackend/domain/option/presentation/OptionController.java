@@ -40,4 +40,16 @@ public class OptionController {
         optionService.changeReactionOption(false);
     }
 
+    @PostMapping("/night")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void nightOptionOn() {
+        optionService.changeNightOption(true);
+    }
+
+    @DeleteMapping("/night")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void nightOptionOff() {
+        optionService.changeNightOption(false);
+    }
+
 }

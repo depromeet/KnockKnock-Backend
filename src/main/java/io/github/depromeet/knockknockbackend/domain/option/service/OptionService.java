@@ -29,6 +29,14 @@ public class OptionService {
         optionRepository.save(option);
     }
 
+    public void changeNightOption(boolean value) {
+        Option option = queryOption();
+
+        option.setNightOption(value);
+
+        optionRepository.save(option);
+    }
+
     private Option queryOption() {
         return optionRepository.findById(SecurityUtils.getCurrentUserId())
                 .orElseThrow(() -> OptionNotFoundException.EXCEPTION);
