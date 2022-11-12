@@ -10,7 +10,6 @@ public class GoogleInformationResponse {
 
     private String email;
 
-    @JsonProperty("sub")
     private String id;
 
 }

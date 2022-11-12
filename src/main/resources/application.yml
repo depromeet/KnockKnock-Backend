@@ -11,7 +11,7 @@ spring:
   redis:
     host: ${REDIS_HOST:localhost}
     port: ${REDIS_PORT:6379}
-    password: ${REDIS_PASSWORD}
+    password: ${REDIS_PASSWORD:}
   jpa:
     show-sql: ${SHOW_SQL:true}
     properties:
@@ -44,7 +44,11 @@ fcm:
   value: ${fcm.value}
 
 
-
 springdoc:
   default-produces-media-type: application/json
   default-consumes-media-type: application/json
+
+logging:
+  level:
+    io.github.depromeet.knockknockbackend.global.utils.api.client.* : debug
+
