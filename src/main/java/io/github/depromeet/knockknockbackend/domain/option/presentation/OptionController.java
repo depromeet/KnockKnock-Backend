@@ -28,4 +28,16 @@ public class OptionController {
         optionService.changeNewOption(false);
     }
 
+    @PostMapping("/reaction")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void reactionOptionOn() {
+        optionService.changeReactionOption(true);
+    }
+
+    @DeleteMapping("/reaction")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void reactionOptionOff() {
+        optionService.changeReactionOption(false);
+    }
+
 }
