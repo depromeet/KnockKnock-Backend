@@ -1,6 +1,5 @@
 package io.github.depromeet.knockknockbackend.domain.user.domain;
 
-import javax.persistence.Column;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,17 +20,19 @@ public class User {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String role;
+    private String nickname;
 
-    private String nickName;
     private String oauthProvider;
+
     private String oauthId;
+
     private String email;
 
+    private String profilePath;
+
     @Builder
-    public User(Long id, String nickName, String oauthProvider, String oauthId , String email) {
-        this.id = id;
-        this.nickName = nickName;
+    public User(String nickname, String oauthProvider, String oauthId , String email) {
+        this.nickname = nickname;
         this.oauthProvider = oauthProvider;
         this.oauthId = oauthId;
         this.email = email;
