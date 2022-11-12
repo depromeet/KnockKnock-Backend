@@ -18,8 +18,7 @@ public class SecurityConfig {
     private static final String[] SwaggerPatterns = {
         "/swagger-resources/**",
         "/swagger-ui/**",
-        "/v2/api-docs",
-        "/webjars/**"
+        "/v3/api-docs/**",
     };
 
     @Bean
