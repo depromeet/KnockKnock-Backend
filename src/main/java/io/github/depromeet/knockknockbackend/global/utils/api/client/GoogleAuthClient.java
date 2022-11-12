@@ -18,7 +18,7 @@ public interface GoogleAuthClient {
     @PostMapping("/token?grant_type=authorization_code&client_id={CLIENT_ID}&redirect_uri={REDIRECT_URI}&code={CODE}&client_secret={CLIENT_SECRET}")
     OauthAccessTokenResponse googleAuth(@PathVariable("CLIENT_ID") String clientId,
         @PathVariable("REDIRECT_URI") String redirectUri,
-        @PathVariable("CODE") String code ,@PathVariable("CLIENT_SECRET") String client_secret , @RequestBody() EmptyDto emptyDto);
+        @PathVariable("CODE") String code ,@PathVariable("CLIENT_SECRET") String client_secret );
 
 
 }

@@ -40,8 +40,7 @@ public class GoogleOauthStrategy implements OauthStrategy{
                 oauthProperties.getGoogleClientId(),
                 oauthProperties.getGoogleRedirectUrl(),
                 decodedCode,
-                oauthProperties.getGoogleClientSecret(),
-                new EmptyDto()
+                oauthProperties.getGoogleClientSecret()
             ).getAccessToken();
     }
 

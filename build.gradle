@@ -42,7 +42,9 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
 
+
     implementation 'org.springdoc:springdoc-openapi-ui:1.6.12'
+    implementation 'io.github.openfeign:feign-httpclient:12.0'
 }
 
 tasks.named('test') {
