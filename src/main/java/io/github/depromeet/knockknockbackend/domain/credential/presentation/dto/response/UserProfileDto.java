@@ -13,7 +13,7 @@ public class UserProfileDto {
 
     public UserProfileDto(User user){
         userId = user.getId();
-        nickName = user.getNickName();
+        nickName = user.getNickname();
 
     }
 

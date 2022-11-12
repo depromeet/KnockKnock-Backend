@@ -4,9 +4,7 @@ import io.github.depromeet.knockknockbackend.domain.credential.service.OauthComm
 import io.github.depromeet.knockknockbackend.global.property.OauthProperties;
 import io.github.depromeet.knockknockbackend.global.utils.api.client.GoogleAuthClient;
 import io.github.depromeet.knockknockbackend.global.utils.api.client.GoogleInfoClient;
-import io.github.depromeet.knockknockbackend.global.utils.api.dto.request.EmptyDto;
 import io.github.depromeet.knockknockbackend.global.utils.api.dto.response.GoogleInformationResponse;
-import io.github.depromeet.knockknockbackend.global.utils.api.dto.response.KakaoInformationResponse.KakaoAccount;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import lombok.AllArgsConstructor;
