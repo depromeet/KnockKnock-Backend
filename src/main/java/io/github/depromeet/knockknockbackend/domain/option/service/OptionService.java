@@ -14,12 +14,24 @@ public class OptionService {
     private final OptionRepository optionRepository;
 
     public void changeNewOption(boolean value) {
-        Option option = optionRepository.findById(SecurityUtils.getCurrentUserId())
-                .orElseThrow(() -> OptionNotFoundException.EXCEPTION);
+        Option option = queryOption();
 
         option.setNewOption(value);
 
         optionRepository.save(option);
+    }
+
+    public void changeReactionOption(boolean value) {
+        Option option = queryOption();
+
+        option.setReactionOption(value);
+
+        optionRepository.save(option);
+    }
+
+    private Option queryOption() {
+        return optionRepository.findById(SecurityUtils.getCurrentUserId())
+                .orElseThrow(() -> OptionNotFoundException.EXCEPTION);
     }
 
 }
