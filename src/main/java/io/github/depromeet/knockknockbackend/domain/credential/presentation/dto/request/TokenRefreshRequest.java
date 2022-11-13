@@ -8,7 +8,7 @@ import lombok.Getter;
 
 @Getter
 public class TokenRefreshRequest {
-//    @NotEmpty()
+    @NotEmpty()
     private String refreshToken;
 
 }

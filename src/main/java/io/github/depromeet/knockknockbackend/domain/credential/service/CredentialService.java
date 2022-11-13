@@ -3,11 +3,10 @@ package io.github.depromeet.knockknockbackend.domain.credential.service;
 import io.github.depromeet.knockknockbackend.domain.credential.domain.RefreshTokenRedisEntity;
 import io.github.depromeet.knockknockbackend.domain.credential.domain.repository.RefreshTokenRedisEntityRepository;
 import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.response.AfterOauthResponse;
-import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.response.AccessTokenResponse;
+import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.response.AuthTokensResponse;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.domain.user.domain.repository.UserRepository;
 import io.github.depromeet.knockknockbackend.global.exception.InvalidTokenException;
-import io.github.depromeet.knockknockbackend.global.exception.UserNotFoundException;
 import io.github.depromeet.knockknockbackend.global.security.JwtTokenProvider;
 import java.util.Date;
 import java.util.Optional;
@@ -80,11 +79,11 @@ public class CredentialService {
     }
 
     // 토큰 리프레쉬 하기
-    public AccessTokenResponse tokenRefresh(String refreshToken){
-        Long userId = jwtTokenProvider.parseRefreshToken(refreshToken);
+    public AuthTokensResponse tokenRefresh(String requestRefreshToken){
+        Long userId = jwtTokenProvider.parseRefreshToken(requestRefreshToken);
 
         Optional<RefreshTokenRedisEntity> entityOptional = refreshTokenRedisEntityRepository.findByRefreshToken(
-            refreshToken);
+            requestRefreshToken);
 
         RefreshTokenRedisEntity refreshTokenRedisEntity = entityOptional.orElseThrow(
             () -> InvalidTokenException.EXCEPTION);
@@ -94,8 +93,10 @@ public class CredentialService {
         }
 
         String accessToken = jwtTokenProvider.generateAccessToken(userId);
+        String refreshToken = generateRefreshToken(userId);
 
-        return new AccessTokenResponse(accessToken);
+
+        return  AuthTokensResponse.builder().accessToken(accessToken).refreshToken(refreshToken).build();
     }
 
 

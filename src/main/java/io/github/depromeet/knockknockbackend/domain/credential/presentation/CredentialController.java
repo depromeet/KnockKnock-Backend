@@ -3,8 +3,8 @@ package io.github.depromeet.knockknockbackend.domain.credential.presentation;
 
 import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.request.OauthCodeRequest;
 import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.request.TokenRefreshRequest;
-import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.response.AccessTokenResponse;
 import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.response.AfterOauthResponse;
+import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.response.AuthTokensResponse;
 import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.response.OauthLoginLinkResponse;
 import io.github.depromeet.knockknockbackend.domain.credential.service.CredentialService;
 import io.github.depromeet.knockknockbackend.domain.credential.service.OauthProvider;
@@ -92,10 +92,10 @@ public class CredentialController {
 
     @Operation(summary = "토큰 리프레쉬", description = "토큰을 리프레쉬 합니다.")
     @PostMapping("/refresh")
-    public ResponseEntity<AccessTokenResponse> refreshingToken(@RequestBody TokenRefreshRequest tokenRefreshRequest){
-        AccessTokenResponse accessTokenResponse = credentialService.tokenRefresh(
+    public AuthTokensResponse refreshingToken(@RequestBody TokenRefreshRequest tokenRefreshRequest){
+        AuthTokensResponse authTokensResponse = credentialService.tokenRefresh(
             tokenRefreshRequest.getRefreshToken());
-        return ResponseEntity.ok(accessTokenResponse);
+        return authTokensResponse;
     }
 
 
