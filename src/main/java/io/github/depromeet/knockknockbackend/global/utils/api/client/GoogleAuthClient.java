@@ -2,7 +2,6 @@ package io.github.depromeet.knockknockbackend.global.utils.api.client;
 
 import feign.Body;
 import feign.Headers;
-import io.github.depromeet.knockknockbackend.global.utils.api.dto.request.EmptyDto;
 import io.github.depromeet.knockknockbackend.global.utils.api.dto.response.OauthAccessTokenResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PathVariable;
