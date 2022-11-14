@@ -1,6 +1,8 @@
 package io.github.depromeet.knockknockbackend.global.config;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.core.jackson.ModelResolver;
 import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.Components;
@@ -47,6 +49,11 @@ public class SwaggerConfig {
             new SecurityScheme()
                 .type(Type.HTTP).scheme("bearer").bearerFormat("JWT")
                 .in(In.HEADER).name("Authorization"));
+    }
+
+    @Bean
+    public ModelResolver modelResolver(ObjectMapper objectMapper) {
+        return new ModelResolver(objectMapper);
     }
 
     //    static {
