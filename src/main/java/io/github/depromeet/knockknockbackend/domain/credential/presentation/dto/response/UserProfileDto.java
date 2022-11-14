@@ -11,9 +11,12 @@ public class UserProfileDto {
     private Long userId;
     private String nickName;
 
+    private String profilePath;
+
     public UserProfileDto(User user){
         userId = user.getId();
         nickName = user.getNickname();
+        profilePath = user.getProfilePath();
 
     }
 

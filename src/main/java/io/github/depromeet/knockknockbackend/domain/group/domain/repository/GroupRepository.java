@@ -1,7 +1,7 @@
 package io.github.depromeet.knockknockbackend.domain.group.domain.repository;
 
-import io.github.depromeet.knockknockbackend.domain.group.domain.GroupCategory;
-import org.springframework.data.repository.CrudRepository;
+import io.github.depromeet.knockknockbackend.domain.group.domain.Group;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface GroupRepository extends CrudRepository<GroupCategory, Long> {
+public interface GroupRepository extends JpaRepository<Group, Long> {
 }

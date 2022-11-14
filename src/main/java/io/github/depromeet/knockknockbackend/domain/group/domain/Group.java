@@ -13,11 +13,15 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Table(name = "tbl_group")
 @Entity
+@NoArgsConstructor
 public class Group {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,5 +45,17 @@ public class Group {
     private GroupCategory groupCategory;
 
 
+    @Builder
+    public Group(String title, String description, String thumbnailPath, String backgroundImagePath,
+        Boolean publicAccess) {
+        this.title = title;
+        this.description = description;
+        this.thumbnailPath = thumbnailPath;
+        this.backgroundImagePath = backgroundImagePath;
+        this.publicAccess = publicAccess;
+    }
 
+    public void setMembers(List<Member> memberList){
+        members = memberList;
+    }
 }

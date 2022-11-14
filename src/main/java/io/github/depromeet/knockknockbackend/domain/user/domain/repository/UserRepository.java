@@ -11,4 +11,7 @@ public interface UserRepository extends CrudRepository<User, Long> {
     List<User> findByNicknameLike(String nickname);
 
     Optional<User> findByOauthIdAndOauthProvider(String oauthId , String oauthProvider);
+
+    List<User> findByIdIn(List<Long> ids);
+
 }
