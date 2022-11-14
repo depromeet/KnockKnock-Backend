@@ -2,10 +2,13 @@ package io.github.depromeet.knockknockbackend.domain.group.service;
 
 
 import io.github.depromeet.knockknockbackend.domain.group.domain.Group;
+import io.github.depromeet.knockknockbackend.domain.group.domain.Group.GroupBuilder;
+import io.github.depromeet.knockknockbackend.domain.group.domain.Category;
 import io.github.depromeet.knockknockbackend.domain.group.domain.Member;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.GroupCategoryRepository;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.GroupRepository;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.MemberRepository;
+import io.github.depromeet.knockknockbackend.domain.group.exception.CategoryNotFoundException;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateOpenGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.CreateOpenGroupResponse;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
@@ -30,8 +33,14 @@ public class GroupService {
 
     private User getUserFromSecurityContext(){
         Long currentUserId = SecurityUtils.getCurrentUserId();
-        User user = userRepository.findById(currentUserId).orElseThrow(() -> UserNotFoundException.EXCEPTION);
+        User user = userRepository.findById(currentUserId)
+            .orElseThrow(() -> UserNotFoundException.EXCEPTION);
         return user;
+    }
+
+    private Category queryGroupCategroyById(Long categoryId){
+        return groupCategoryRepository.findById(categoryId)
+            .orElseThrow(() -> CategoryNotFoundException.EXCEPTION);
     }
 
     public CreateOpenGroupResponse createOpenGroup(CreateOpenGroupRequest createOpenGroupRequest) {
@@ -50,13 +59,21 @@ public class GroupService {
             throw UserNotFoundException.EXCEPTION;
         }
 
-        Group group = Group.builder()
+        GroupBuilder groupBuilder = Group.builder()
             .publicAccess(createOpenGroupRequest.getPublicAccess())
             .thumbnailPath(createOpenGroupRequest.getThumbnailPath())
             .backgroundImagePath(createOpenGroupRequest.getBackgroundImagePath())
             .description(createOpenGroupRequest.getDescription())
-            .title(createOpenGroupRequest.getTitle())
-            .build();
+            .title(createOpenGroupRequest.getTitle());
+
+        if(createOpenGroupRequest.getCategoryId() != null){
+            Category category = queryGroupCategroyById(
+                createOpenGroupRequest.getCategoryId());
+            groupBuilder.category(category);
+
+        }
+
+        Group group = groupBuilder.build();
 
         groupRepository.save(group);
 

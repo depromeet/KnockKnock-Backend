@@ -19,12 +19,15 @@ public class CreateOpenGroupRequest {
 
     @NotNull
     private String description;
-
+    @NotNull
     private Boolean publicAccess;
+
 
     private String thumbnailPath;
 
     private String backgroundImagePath;
+
+    private Long categoryId;
 
     private List<Long> memberIds = new ArrayList<>();
 

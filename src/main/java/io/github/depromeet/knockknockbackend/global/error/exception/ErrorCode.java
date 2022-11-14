@@ -25,7 +25,8 @@ public enum ErrorCode {
     OTHER_SERVER_BAD_REQUEST(400, "FEIGN-400-1", "Other server bad request"),
     OTHER_SERVER_UNAUTHORIZED(401, "FEIGN-401-1", "Other server unauthorized"),
     OTHER_SERVER_FORBIDDEN(403, "FEIGN-403-1", "Other server forbidden"),
-    OTHER_SERVER_EXPIRED_TOKEN(419, "FEIGN-419-1", "Other server expired token");
+    OTHER_SERVER_EXPIRED_TOKEN(419, "FEIGN-419-1", "Other server expired token"),
+    CATEGORY_NOT_FOUND(404,"GROUP-400-1", "Category Not Found" );
 
     private int status;
     private String code;

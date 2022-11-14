@@ -2,11 +2,13 @@ package io.github.depromeet.knockknockbackend.domain.group.presentation.dto.resp
 
 import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.response.UserProfileDto;
 import io.github.depromeet.knockknockbackend.domain.group.domain.Group;
-import java.util.ArrayList;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import lombok.Getter;
 
+
+@Getter
 public class CreateOpenGroupResponse {
 
     private Long groupId ;
@@ -18,13 +20,13 @@ public class CreateOpenGroupResponse {
     private String thumbnailPath;
 
     private String backgroundImagePath;
-
+    @Schema(description = "공개 그룹 여부 ture 면 공개임")
     private Boolean publicAccess;
-
+    @Schema(description = "내가 호스트(방장)인지에 대한 정보")
     private Boolean iHost;
-
-    private GroupCategoryDto groupCategoryDto;
-
+    @Schema(description = "카테고리 디티오")
+    private CategoryDto categoryDto;
+    @Schema(description = "멤버들 목록")
     private List<UserProfileDto> members ;
 
 
@@ -41,8 +43,8 @@ public class CreateOpenGroupResponse {
             .map(member -> new UserProfileDto(member.getUser()))
             .collect(Collectors.toList());
 
-        if(group.getGroupCategory() != null)
-            groupCategoryDto = new GroupCategoryDto(group.getGroupCategory());
+        if(group.getCategory() != null)
+            categoryDto = new CategoryDto(group.getCategory());
     }
 
 }

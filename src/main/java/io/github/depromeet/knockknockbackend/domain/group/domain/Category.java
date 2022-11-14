@@ -14,7 +14,7 @@ import lombok.Getter;
 @Getter
 @Table(name = "tbl_group_category")
 @Entity
-public class GroupCategory {
+public class Category {
 
 
     @Id
@@ -25,7 +25,7 @@ public class GroupCategory {
 
     private String content;
 
-    @OneToMany(mappedBy = "groupCategory")
+    @OneToMany(mappedBy = "category")
     private List<Group> groups = new ArrayList<>();
 
 }

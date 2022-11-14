@@ -1,7 +1,13 @@
 package io.github.depromeet.knockknockbackend.domain.group.presentation;
 
+import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.response.AfterOauthResponse;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateOpenGroupRequest;
+import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.CreateOpenGroupResponse;
 import io.github.depromeet.knockknockbackend.domain.group.service.GroupService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import javax.validation.Valid;
@@ -23,9 +29,10 @@ public class GroupController {
 
 
 
+    @Operation(summary = "공개 그룹을 만듭니다")
     @PostMapping("")
-    public void createOpenGroup(@Valid @RequestBody CreateOpenGroupRequest createOpenGroupRequest){
-        this.groupService.createOpenGroup(createOpenGroupRequest);
+    public CreateOpenGroupResponse createOpenGroup(@Valid @RequestBody CreateOpenGroupRequest createOpenGroupRequest){
+        return this.groupService.createOpenGroup(createOpenGroupRequest);
     }
 
 

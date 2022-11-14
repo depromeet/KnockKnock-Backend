@@ -3,7 +3,6 @@ package io.github.depromeet.knockknockbackend.domain.group.domain;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -16,7 +15,6 @@ import javax.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Getter
 @Table(name = "tbl_group")
@@ -41,18 +39,23 @@ public class Group {
     private List<Member> members = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "group_category_id")
-    private GroupCategory groupCategory;
+    @JoinColumn(name = "category_id")
+    private Category category;
+
+    // 기타 카테고리 ...
+    private String otherCategoryContent;
 
 
     @Builder
     public Group(String title, String description, String thumbnailPath, String backgroundImagePath,
-        Boolean publicAccess) {
+        Boolean publicAccess , Category category) {
         this.title = title;
         this.description = description;
         this.thumbnailPath = thumbnailPath;
         this.backgroundImagePath = backgroundImagePath;
         this.publicAccess = publicAccess;
+        this.category = category;
+
     }
 
     public void setMembers(List<Member> memberList){
