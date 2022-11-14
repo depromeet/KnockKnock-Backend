@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.domain.user.domain;
 
+import io.github.depromeet.knockknockbackend.domain.user.domain.vo.UserInfoVO;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,7 +13,6 @@ import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.ColumnDefault;
 
 @Getter
 @Table(name = "tbl_user")
@@ -40,6 +40,10 @@ public class User {
         this.oauthProvider = oauthProvider;
         this.oauthId = oauthId;
         this.email = email;
+    }
+
+    public UserInfoVO getUserInfo() {
+        return new UserInfoVO(id, nickname, profilePath);
     }
 
     public void changeNickname(String nickname) {
