@@ -2,7 +2,7 @@ spring:
   jackson:
     property-naming-strategy: SNAKE_CASE
   datasource:
-    url: ${MYSQL_URL}
+    url: jdbc:mysql://${MYSQL_HOST}:${MYSQL_PORT}/${DB_NAME}?useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true&tinyInt1isBit=false
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       maxLifetime: 580000
@@ -41,7 +41,7 @@ oauth:
     redirect-url: ${GOOGLE_REDIRECT}
 
 fcm:
-  value: ${fcm.value}
+  value: ${FCM_VALUE:empty}
 
 
 springdoc:
