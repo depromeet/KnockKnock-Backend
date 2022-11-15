@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.domain.user.service;
 
+import io.github.depromeet.knockknockbackend.domain.user.UserUtils;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.domain.user.domain.repository.UserRepository;
 import io.github.depromeet.knockknockbackend.domain.user.presentation.dto.response.QueryUserByNicknameResponse;
@@ -14,7 +15,7 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
-public class UserService {
+public class UserService implements UserUtils {
 
     private final UserRepository userRepository;
 
@@ -32,12 +33,16 @@ public class UserService {
     }
 
     public void changeNickname(String nickname) {
-        User user = userRepository.findById(SecurityUtils.getCurrentUserId())
-                .orElseThrow(() -> UserNotFoundException.EXCEPTION);
+        User user = getUserById(SecurityUtils.getCurrentUserId());
 
         user.changeNickname(nickname);
 
         userRepository.save(user);
     }
 
+    @Override
+    public User getUserById(Long id) {
+        return userRepository.findById(SecurityUtils.getCurrentUserId())
+                .orElseThrow(() -> UserNotFoundException.EXCEPTION);
+    }
 }
