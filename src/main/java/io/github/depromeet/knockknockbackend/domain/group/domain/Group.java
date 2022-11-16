@@ -4,6 +4,8 @@ package io.github.depromeet.knockknockbackend.domain.group.domain;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -34,6 +36,9 @@ public class Group {
     private String backgroundImagePath;
 
     private Boolean publicAccess;
+
+    @Enumerated(EnumType.STRING)
+    private GroupType groupType;
 
     @OneToMany(mappedBy = "group")
     private List<Member> members = new ArrayList<>();

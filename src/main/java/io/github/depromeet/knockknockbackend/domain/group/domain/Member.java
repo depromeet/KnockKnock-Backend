@@ -1,6 +1,7 @@
 package io.github.depromeet.knockknockbackend.domain.group.domain;
 
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
+import io.github.depromeet.knockknockbackend.domain.user.domain.vo.UserInfoVO;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.persistence.Entity;
@@ -40,7 +41,9 @@ public class Member {
     private Boolean isHost;
     // user , host (방장) true false 나중에 어떻게될지 모르니 role로 냅뒀음!
 
-
+    public UserInfoVO getMemberUserInfo() {
+        return this.user.getUserInfo();
+    }
     @Builder
     public Member(Group group, User user, Boolean isHost) {
         this.group = group;
