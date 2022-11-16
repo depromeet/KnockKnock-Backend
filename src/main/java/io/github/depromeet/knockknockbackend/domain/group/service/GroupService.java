@@ -34,6 +34,8 @@ public class GroupService {
     private final MemberRepository memberRepository;
     private final GroupCategoryRepository groupCategoryRepository;
 
+    private final ThumbnailImageService thumbnailImageService;
+
     private User getUserFromSecurityContext(){
         Long currentUserId = SecurityUtils.getCurrentUserId();
         User user = userRepository.findById(currentUserId)
@@ -64,7 +66,9 @@ public class GroupService {
 
         GroupBuilder groupBuilder = Group.builder()
             .publicAccess(createOpenGroupRequest.getPublicAccess())
-            .thumbnailPath(createOpenGroupRequest.getThumbnailPath())
+            .thumbnailPath(
+                thumbnailImageService.getThumbnailUrl(createOpenGroupRequest.getThumbnailPath())
+            )
             .backgroundImagePath(createOpenGroupRequest.getBackgroundImagePath())
             .description(createOpenGroupRequest.getDescription())
             .title(createOpenGroupRequest.getTitle())
@@ -91,6 +95,8 @@ public class GroupService {
     }
 
     public CreateFriendGroupResponse createFriendGroup(CreateFriendGroupRequest createFriendGroupRequest) {
+        //TODO : 요청 받은 memeberId가 친구 목록에 속해있는지 검증.
+
 
     }
 }
