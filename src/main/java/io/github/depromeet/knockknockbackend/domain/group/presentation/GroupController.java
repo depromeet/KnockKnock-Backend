@@ -1,7 +1,9 @@
 package io.github.depromeet.knockknockbackend.domain.group.presentation;
 
 import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.response.AfterOauthResponse;
+import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateFriendGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateOpenGroupRequest;
+import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.CreateFriendGroupResponse;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.CreateOpenGroupResponse;
 import io.github.depromeet.knockknockbackend.domain.group.service.GroupService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,10 +32,15 @@ public class GroupController {
 
 
     @Operation(summary = "공개 그룹을 만듭니다")
-    @PostMapping("")
+    @PostMapping("/open")
     public CreateOpenGroupResponse createOpenGroup(@Valid @RequestBody CreateOpenGroupRequest createOpenGroupRequest){
         return this.groupService.createOpenGroup(createOpenGroupRequest);
     }
 
+    @Operation(summary = "친구 그룹을 만듭니다")
+    @PostMapping("/friend")
+    public CreateFriendGroupResponse createFriendGroup(@Valid @RequestBody CreateFriendGroupRequest createFriendGroupRequest){
+        return this.groupService.createFriendGroup(createFriendGroupRequest);
+    }
 
 }

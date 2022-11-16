@@ -10,7 +10,9 @@ import io.github.depromeet.knockknockbackend.domain.group.domain.repository.Grou
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.GroupRepository;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.MemberRepository;
 import io.github.depromeet.knockknockbackend.domain.group.exception.CategoryNotFoundException;
+import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateFriendGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateOpenGroupRequest;
+import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.CreateFriendGroupResponse;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.CreateOpenGroupResponse;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.domain.user.domain.repository.UserRepository;
@@ -86,5 +88,9 @@ public class GroupService {
         group.setMembers(memberList);
 
         return new CreateOpenGroupResponse(group,true);
+    }
+
+    public CreateFriendGroupResponse createFriendGroup(CreateFriendGroupRequest createFriendGroupRequest) {
+
     }
 }
