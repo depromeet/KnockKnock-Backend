@@ -12,8 +12,7 @@ import io.github.depromeet.knockknockbackend.domain.group.domain.repository.Memb
 import io.github.depromeet.knockknockbackend.domain.group.exception.CategoryNotFoundException;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateFriendGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateOpenGroupRequest;
-import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.CreateFriendGroupResponse;
-import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.CreateOpenGroupResponse;
+import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.CreateGroupResponse;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.domain.user.domain.repository.UserRepository;
 import io.github.depromeet.knockknockbackend.global.exception.UserNotFoundException;
@@ -50,7 +49,7 @@ public class GroupService {
             .orElseThrow(() -> CategoryNotFoundException.EXCEPTION);
     }
 
-    public CreateOpenGroupResponse createOpenGroup(CreateOpenGroupRequest createOpenGroupRequest) {
+    public CreateGroupResponse createOpenGroup(CreateOpenGroupRequest createOpenGroupRequest) {
         // 요청자 정보 시큐리티에서 가져옴
         User reqUser = getUserFromSecurityContext();
 
@@ -66,6 +65,48 @@ public class GroupService {
             throw UserNotFoundException.EXCEPTION;
         }
 
+        Group group = makeOpenGroup(createOpenGroupRequest);
+
+        groupRepository.save(group);
+
+        List<Member> memberList = Member.makeGroupsMemberList(reqUser, requestUserList, group);
+
+        memberRepository.saveAll(memberList);
+        // 그룹에 멤버들 저장
+        group.setMembers(memberList);
+
+        return new CreateGroupResponse(
+            group.getGroupBaseInfoVo() ,
+            Member.getUserInfoList(memberList)
+            ,true);
+    }
+
+
+
+    public CreateGroupResponse createFriendGroup(CreateFriendGroupRequest createFriendGroupRequest) {
+        User reqUser = getUserFromSecurityContext();
+
+        //TODO : 요청 받은 memeberId가 친구 목록에 속해있는지 검증.
+        List<Long> memberIds = createFriendGroupRequest.getMemberIds();
+        memberIds.removeIf(id -> reqUser.getId().equals(id));
+        //요청받은 id 목록들로 디비에서 조회
+        List<User> requestUserList =
+            userRepository.findByIdIn(memberIds);
+
+        Group group = makeFriendGroup();
+
+        List<Member> memberList = Member.makeGroupsMemberList(reqUser, requestUserList, group);
+
+        memberRepository.saveAll(memberList);
+
+
+        return new CreateGroupResponse(
+            group.getGroupBaseInfoVo() ,
+            Member.getUserInfoList(memberList)
+            ,true);
+    }
+
+    private Group makeOpenGroup(CreateOpenGroupRequest createOpenGroupRequest) {
         GroupBuilder groupBuilder = Group.builder()
             .publicAccess(createOpenGroupRequest.getPublicAccess())
             .thumbnailPath(
@@ -86,29 +127,11 @@ public class GroupService {
         }
 
         Group group = groupBuilder.build();
-
-        groupRepository.save(group);
-
-        List<Member> memberList = Member.makeGroupsMemberList(reqUser, requestUserList, group);
-
-        memberRepository.saveAll(memberList);
-        // 그룹에 멤버들 저장
-        group.setMembers(memberList);
-
-        return new CreateOpenGroupResponse(group,true);
+        return group;
     }
 
-    public CreateFriendGroupResponse createFriendGroup(CreateFriendGroupRequest createFriendGroupRequest) {
-        User reqUser = getUserFromSecurityContext();
-
-        //TODO : 요청 받은 memeberId가 친구 목록에 속해있는지 검증.
-        List<Long> memberIds = createFriendGroupRequest.getMemberIds();
-        memberIds.removeIf(id -> reqUser.getId().equals(id));
-        //요청받은 id 목록들로 디비에서 조회
-        List<User> requestUserList =
-            userRepository.findByIdIn(memberIds);
-
-        GroupBuilder groupBuilder = Group.builder()
+    private Group makeFriendGroup() {
+        Group group = Group.builder()
             .publicAccess(false)
             .thumbnailPath(
                 thumbnailImageService.getThumbnailUrl()
@@ -117,18 +140,9 @@ public class GroupService {
                 backgroundImageService.getBackgroundImageUrl()
             )
             .title(Group.generateGroupTitle())
-            .groupType(GroupType.FRIEND);
-
-        Group group = groupBuilder.build();
+            .groupType(GroupType.FRIEND).build();
 
         groupRepository.save(group);
-
-
-        List<Member> memberList = Member.makeGroupsMemberList(reqUser, requestUserList, group);
-
-        memberRepository.saveAll(memberList);
-
-
-        return null;
+        return group;
     }
 }

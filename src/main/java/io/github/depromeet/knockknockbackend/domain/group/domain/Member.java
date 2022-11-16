@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.domain.group.domain;
 
+import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.MemberInfoDto;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.domain.user.domain.vo.UserInfoVO;
 import java.util.List;
@@ -39,7 +40,7 @@ public class Member {
     private User user; //유저
 
     private Boolean isHost;
-    // user , host (방장) true false 나중에 어떻게될지 모르니 role로 냅뒀음!
+    // user , host (방장) true false Member나중에 어떻게될지 모르니 role로 냅뒀음!
 
     public UserInfoVO getMemberUserInfo() {
         return this.user.getUserInfo();
@@ -64,5 +65,10 @@ public class Member {
             .group(group).build();
         memberList.add(hostMember);
         return memberList;
+    }
+
+    public static List<UserInfoVO> getUserInfoList(List<Member> memberList){
+        return memberList.stream().map(member -> member.getUser().getUserInfo())
+            .collect(Collectors.toList());
     }
 }

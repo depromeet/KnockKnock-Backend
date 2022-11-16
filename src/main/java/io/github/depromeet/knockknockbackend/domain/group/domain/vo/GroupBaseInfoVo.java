@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @Builder
 public class GroupBaseInfoVo {
-
+    private final Long groupId;
     private final String title;
     private final String description;
     private final String thumbnailPath;

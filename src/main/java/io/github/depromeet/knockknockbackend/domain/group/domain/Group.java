@@ -78,6 +78,7 @@ public class Group {
             .backgroundImagePath(backgroundImagePath)
             .publicAccess(publicAccess)
             .category(category)
-            .groupType(groupType).build();
+            .groupType(groupType)
+            .groupId(id).build();
     }
 }
