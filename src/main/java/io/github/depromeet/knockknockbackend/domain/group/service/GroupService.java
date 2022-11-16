@@ -4,6 +4,7 @@ package io.github.depromeet.knockknockbackend.domain.group.service;
 import io.github.depromeet.knockknockbackend.domain.group.domain.Group;
 import io.github.depromeet.knockknockbackend.domain.group.domain.Group.GroupBuilder;
 import io.github.depromeet.knockknockbackend.domain.group.domain.Category;
+import io.github.depromeet.knockknockbackend.domain.group.domain.GroupType;
 import io.github.depromeet.knockknockbackend.domain.group.domain.Member;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.GroupCategoryRepository;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.GroupRepository;
@@ -64,7 +65,8 @@ public class GroupService {
             .thumbnailPath(createOpenGroupRequest.getThumbnailPath())
             .backgroundImagePath(createOpenGroupRequest.getBackgroundImagePath())
             .description(createOpenGroupRequest.getDescription())
-            .title(createOpenGroupRequest.getTitle());
+            .title(createOpenGroupRequest.getTitle())
+            .groupType(GroupType.OPEN);
 
         if(createOpenGroupRequest.getCategoryId() != null){
             Category category = queryGroupCategroyById(

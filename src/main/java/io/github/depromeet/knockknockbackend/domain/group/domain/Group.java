@@ -50,14 +50,14 @@ public class Group {
 
     @Builder
     public Group(String title, String description, String thumbnailPath, String backgroundImagePath,
-        Boolean publicAccess , Category category) {
+        Boolean publicAccess , Category category ,GroupType groupType) {
         this.title = title;
         this.description = description;
         this.thumbnailPath = thumbnailPath;
         this.backgroundImagePath = backgroundImagePath;
         this.publicAccess = publicAccess;
         this.category = category;
-
+        this.groupType = groupType;
     }
 
     public void setMembers(List<Member> memberList){

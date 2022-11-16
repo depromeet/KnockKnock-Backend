@@ -1,6 +1,7 @@
 package io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response;
 
 import io.github.depromeet.knockknockbackend.domain.group.domain.Group;
+import io.github.depromeet.knockknockbackend.domain.group.domain.GroupType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,6 +29,7 @@ public class CreateOpenGroupResponse {
     @Schema(description = "멤버들 목록")
     private List<MemberInfoDto> members ;
 
+    private GroupType groupType;
 
     public CreateOpenGroupResponse(Group group , Boolean iHost ){
         groupId = group.getId();
@@ -36,6 +38,7 @@ public class CreateOpenGroupResponse {
         backgroundImagePath = group.getBackgroundImagePath();
         publicAccess = group.getPublicAccess();
         thumbnailPath = group.getThumbnailPath();
+        groupType = group.getGroupType();
         this.iHost = iHost;
 
         members = group.getMembers().stream()
