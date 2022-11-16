@@ -1,6 +1,7 @@
 package io.github.depromeet.knockknockbackend.domain.group.domain;
 
 
+import io.github.depromeet.knockknockbackend.domain.group.domain.vo.GroupBaseInfoVo;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Entity;
@@ -62,5 +63,21 @@ public class Group {
 
     public void setMembers(List<Member> memberList){
         members = memberList;
+    }
+
+    public static String generateGroupTitle(){
+        // TODO : 방이름 자동 설정 로직 정책에 따르기
+        return "방이름";
+    }
+
+    public GroupBaseInfoVo getGroupBaseInfoVo(){
+        return GroupBaseInfoVo.builder()
+            .title(title)
+            .description(description)
+            .thumbnailPath(thumbnailPath)
+            .backgroundImagePath(backgroundImagePath)
+            .publicAccess(publicAccess)
+            .category(category)
+            .groupType(groupType).build();
     }
 }

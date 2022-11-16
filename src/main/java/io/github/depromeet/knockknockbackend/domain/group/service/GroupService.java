@@ -37,6 +37,7 @@ public class GroupService {
     private final ThumbnailImageService thumbnailImageService;
     private final BackgroundImageService backgroundImageService;
 
+    //TODO : 리팩토링 예정 유저 유틸 써야함!
     private User getUserFromSecurityContext(){
         Long currentUserId = SecurityUtils.getCurrentUserId();
         User user = userRepository.findById(currentUserId)
@@ -98,8 +99,36 @@ public class GroupService {
     }
 
     public CreateFriendGroupResponse createFriendGroup(CreateFriendGroupRequest createFriendGroupRequest) {
+        User reqUser = getUserFromSecurityContext();
+
         //TODO : 요청 받은 memeberId가 친구 목록에 속해있는지 검증.
+        List<Long> memberIds = createFriendGroupRequest.getMemberIds();
+        memberIds.removeIf(id -> reqUser.getId().equals(id));
+        //요청받은 id 목록들로 디비에서 조회
+        List<User> requestUserList =
+            userRepository.findByIdIn(memberIds);
+
+        GroupBuilder groupBuilder = Group.builder()
+            .publicAccess(false)
+            .thumbnailPath(
+                thumbnailImageService.getThumbnailUrl()
+            )
+            .backgroundImagePath(
+                backgroundImageService.getBackgroundImageUrl()
+            )
+            .title(Group.generateGroupTitle())
+            .groupType(GroupType.FRIEND);
+
+        Group group = groupBuilder.build();
+
+        groupRepository.save(group);
 
 
+        List<Member> memberList = Member.makeGroupsMemberList(reqUser, requestUserList, group);
+
+        memberRepository.saveAll(memberList);
+
+
+        return null;
     }
 }
