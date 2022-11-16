@@ -1,6 +1,5 @@
 package io.github.depromeet.knockknockbackend.domain.group.domain;
 
-import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.MemberInfoDto;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.domain.user.domain.vo.UserInfoVO;
 import java.util.List;
@@ -25,7 +24,7 @@ import lombok.Setter;
 @Table(name = "tbl_member")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class Member {
+public class GroupUser {
 
 
     @Id
@@ -46,20 +45,20 @@ public class Member {
         return this.user.getUserInfo();
     }
     @Builder
-    public Member(Group group, User user, Boolean isHost) {
+    public GroupUser(Group group, User user, Boolean isHost) {
         this.group = group;
         this.user = user;
         this.isHost = isHost;
     }
 
-    public static List<Member> makeGroupsMemberList(User host , List<User>  requestUserList , Group group){
-        List<Member> memberList = requestUserList.stream()
-            .map(user -> Member.builder()
+    public static List<GroupUser> makeGroupUserList(User host , List<User>  requestUserList , Group group){
+        List<GroupUser> memberList = requestUserList.stream()
+            .map(user -> GroupUser.builder()
                 .isHost(false)
                 .user(user)
                 .group(group).build())
             .collect(Collectors.toList());
-        Member hostMember = Member.builder()
+        GroupUser hostMember = GroupUser.builder()
             .isHost(true)
             .user(host)
             .group(group).build();
@@ -67,7 +66,7 @@ public class Member {
         return memberList;
     }
 
-    public static List<UserInfoVO> getUserInfoList(List<Member> memberList){
+    public static List<UserInfoVO> getUserInfoList(List<GroupUser> memberList){
         return memberList.stream().map(member -> member.getUser().getUserInfo())
             .collect(Collectors.toList());
     }

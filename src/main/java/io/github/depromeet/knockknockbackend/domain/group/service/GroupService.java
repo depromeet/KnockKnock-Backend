@@ -5,7 +5,7 @@ import io.github.depromeet.knockknockbackend.domain.group.domain.Group;
 import io.github.depromeet.knockknockbackend.domain.group.domain.Group.GroupBuilder;
 import io.github.depromeet.knockknockbackend.domain.group.domain.Category;
 import io.github.depromeet.knockknockbackend.domain.group.domain.GroupType;
-import io.github.depromeet.knockknockbackend.domain.group.domain.Member;
+import io.github.depromeet.knockknockbackend.domain.group.domain.GroupUser;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.GroupCategoryRepository;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.GroupRepository;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.MemberRepository;
@@ -49,38 +49,38 @@ public class GroupService {
             .orElseThrow(() -> CategoryNotFoundException.EXCEPTION);
     }
 
+    private static void checkReqMemberNotExist(List<User> findUserList, List<Long> requestUserIdList
+    ) {
+        List<Long> findUserIdList = findUserList.stream().map(user -> user.getId())
+            .collect(Collectors.toList());
+        //요청한 유저중에 없는 유저가 있으면 안됩니다.
+        if(!requestUserIdList.equals(findUserIdList)){
+            throw UserNotFoundException.EXCEPTION;
+        }
+    }
+
     public CreateGroupResponse createOpenGroup(CreateOpenGroupRequest createOpenGroupRequest) {
         // 요청자 정보 시큐리티에서 가져옴
         User reqUser = getUserFromSecurityContext();
-
+        // 혹시 본인 아이디 멤버로 넣었으면 지워버리기.
         createOpenGroupRequest.getMemberIds().removeIf(id -> reqUser.getId().equals(id));
         //요청받은 id 목록들로 디비에서 조회
-        List<User> requestUserList =
+        List<User> findUserList =
             userRepository.findByIdIn(createOpenGroupRequest.getMemberIds());
-
-        List<Long> requestUserIdList = requestUserList.stream().map(user -> user.getId())
-            .collect(Collectors.toList());
-        //요청한 유저중에 없는 유저가 있으면 안됩니다.
-        if(!createOpenGroupRequest.getMemberIds().equals(requestUserIdList)){
-            throw UserNotFoundException.EXCEPTION;
-        }
-
+        // 요청받은 유저 아이디 목록이 디비에 존재하는 지 확인
+        checkReqMemberNotExist(findUserList, createOpenGroupRequest.getMemberIds());
+        // 오픈 그룹 만들기
         Group group = makeOpenGroup(createOpenGroupRequest);
-
         groupRepository.save(group);
-
-        List<Member> memberList = Member.makeGroupsMemberList(reqUser, requestUserList, group);
-
-        memberRepository.saveAll(memberList);
-        // 그룹에 멤버들 저장
-        group.setMembers(memberList);
+        // 그룹 유저 리스트 추가
+        List<GroupUser> groupUserList = GroupUser.makeGroupUserList(reqUser, findUserList, group);
+        memberRepository.saveAll(groupUserList);
 
         return new CreateGroupResponse(
             group.getGroupBaseInfoVo() ,
-            Member.getUserInfoList(memberList)
+            GroupUser.getUserInfoList(groupUserList)
             ,true);
     }
-
 
 
     public CreateGroupResponse createFriendGroup(CreateFriendGroupRequest createFriendGroupRequest) {
@@ -92,17 +92,17 @@ public class GroupService {
         //요청받은 id 목록들로 디비에서 조회
         List<User> requestUserList =
             userRepository.findByIdIn(memberIds);
-
+        // 그룹 만들기
         Group group = makeFriendGroup();
-
-        List<Member> memberList = Member.makeGroupsMemberList(reqUser, requestUserList, group);
-
-        memberRepository.saveAll(memberList);
+        groupRepository.save(group);
+        // 그룹 유저 리스트만들기
+        List<GroupUser> groupUserList = GroupUser.makeGroupUserList(reqUser, requestUserList, group);
+        memberRepository.saveAll(groupUserList);
 
 
         return new CreateGroupResponse(
             group.getGroupBaseInfoVo() ,
-            Member.getUserInfoList(memberList)
+            GroupUser.getUserInfoList(groupUserList)
             ,true);
     }
 

@@ -42,7 +42,7 @@ public class Group {
     private GroupType groupType;
 
     @OneToMany(mappedBy = "group")
-    private List<Member> members = new ArrayList<>();
+    private List<GroupUser> members = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
@@ -61,7 +61,7 @@ public class Group {
         this.groupType = groupType;
     }
 
-    public void setMembers(List<Member> memberList){
+    public void setMembers(List<GroupUser> memberList){
         members = memberList;
     }
 
