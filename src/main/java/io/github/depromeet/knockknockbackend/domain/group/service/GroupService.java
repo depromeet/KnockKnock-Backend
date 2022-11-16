@@ -35,6 +35,7 @@ public class GroupService {
     private final GroupCategoryRepository groupCategoryRepository;
 
     private final ThumbnailImageService thumbnailImageService;
+    private final BackgroundImageService backgroundImageService;
 
     private User getUserFromSecurityContext(){
         Long currentUserId = SecurityUtils.getCurrentUserId();
@@ -69,7 +70,9 @@ public class GroupService {
             .thumbnailPath(
                 thumbnailImageService.getThumbnailUrl(createOpenGroupRequest.getThumbnailPath())
             )
-            .backgroundImagePath(createOpenGroupRequest.getBackgroundImagePath())
+            .backgroundImagePath(
+                backgroundImageService.getBackgroundImageUrl(createOpenGroupRequest.getBackgroundImagePath())
+            )
             .description(createOpenGroupRequest.getDescription())
             .title(createOpenGroupRequest.getTitle())
             .groupType(GroupType.OPEN);
