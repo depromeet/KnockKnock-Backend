@@ -44,7 +44,7 @@ public class CreateGroupResponse {
         this.iHost = iHost;
 
         members = userInfoList.stream()
-            .map(userInfoVO -> new MemberInfoDto(userInfoVO))
+            .map(MemberInfoDto::new)
             .collect(Collectors.toList());
 
         if(groupBaseInfoVo.getCategory() != null)

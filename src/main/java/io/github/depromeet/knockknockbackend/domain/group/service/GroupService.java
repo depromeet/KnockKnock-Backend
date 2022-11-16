@@ -78,7 +78,7 @@ public class GroupService {
 
         return new CreateGroupResponse(
             group.getGroupBaseInfoVo() ,
-            GroupUser.getUserInfoList(groupUserList)
+            GroupUser.getUserInfoVoList(groupUserList)
             ,true);
     }
 
@@ -102,7 +102,7 @@ public class GroupService {
 
         return new CreateGroupResponse(
             group.getGroupBaseInfoVo() ,
-            GroupUser.getUserInfoList(groupUserList)
+            GroupUser.getUserInfoVoList(groupUserList)
             ,true);
     }
 
@@ -119,6 +119,7 @@ public class GroupService {
             .title(createOpenGroupRequest.getTitle())
             .groupType(GroupType.OPEN);
 
+        // 카테고리 자체가 null 값일 수 있음..
         if(createOpenGroupRequest.getCategoryId() != null){
             Category category = queryGroupCategroyById(
                 createOpenGroupRequest.getCategoryId());

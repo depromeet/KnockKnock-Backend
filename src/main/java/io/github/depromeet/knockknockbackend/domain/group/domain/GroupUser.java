@@ -21,7 +21,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@Table(name = "tbl_member")
+@Table(name = "tbl_group_user")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class GroupUser {
@@ -39,7 +39,6 @@ public class GroupUser {
     private User user; //유저
 
     private Boolean isHost;
-    // user , host (방장) true false Member나중에 어떻게될지 모르니 role로 냅뒀음!
 
     public UserInfoVO getMemberUserInfo() {
         return this.user.getUserInfo();
@@ -66,8 +65,8 @@ public class GroupUser {
         return memberList;
     }
 
-    public static List<UserInfoVO> getUserInfoList(List<GroupUser> memberList){
-        return memberList.stream().map(member -> member.getUser().getUserInfo())
+    public static List<UserInfoVO> getUserInfoVoList(List<GroupUser> groupUserList){
+        return groupUserList.stream().map(member -> member.getMemberUserInfo())
             .collect(Collectors.toList());
     }
 }
