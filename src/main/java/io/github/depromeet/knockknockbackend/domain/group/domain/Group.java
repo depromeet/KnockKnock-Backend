@@ -42,9 +42,6 @@ public class Group {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    // 기타 카테고리 ...
-    private String otherCategoryContent;
-
 
     @Builder
     public Group(String title, String description, String thumbnailPath, String backgroundImagePath,
