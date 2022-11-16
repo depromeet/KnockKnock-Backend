@@ -19,7 +19,7 @@ spring:
         format_sql: ${FORMAT_SQL:true}
     open-in-view: false
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
 
 auth:
   jwt:
