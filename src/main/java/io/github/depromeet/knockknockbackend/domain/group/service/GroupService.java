@@ -50,12 +50,10 @@ public class GroupService {
             .orElseThrow(() -> CategoryNotFoundException.EXCEPTION);
     }
 
-    private static void checkReqMemberNotExist(List<User> findUserList, List<Long> requestUserIdList
+    private void validReqMemberNotExist(List<User> findUserList, List<Long> requestUserIdList
     ) {
-        List<Long> findUserIdList = findUserList.stream().map(user -> user.getId())
-            .collect(Collectors.toList());
         //요청한 유저중에 없는 유저가 있으면 안됩니다.
-        if(!requestUserIdList.equals(findUserIdList)){
+        if(requestUserIdList.size() != findUserList.size()){
             throw UserNotFoundException.EXCEPTION;
         }
     }
@@ -69,7 +67,7 @@ public class GroupService {
         List<User> findUserList = userUtils.findByIdIn(createOpenGroupRequest.getMemberIds());
 
         // 요청받은 유저 아이디 목록이 디비에 존재하는 지 확인
-        checkReqMemberNotExist(findUserList, createOpenGroupRequest.getMemberIds());
+        validReqMemberNotExist(findUserList, createOpenGroupRequest.getMemberIds());
         // 오픈 그룹 만들기
         Group group = makeOpenGroup(createOpenGroupRequest);
         groupRepository.save(group);
