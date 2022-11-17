@@ -42,6 +42,9 @@ public class User {
         this.email = email;
     }
 
+    public User(Long userId) {
+		this.id = userId;
+	}
     public UserInfoVO getUserInfo() {
         return new UserInfoVO(id, nickname, profilePath);
     }
@@ -50,4 +53,7 @@ public class User {
         this.nickname = nickname;
     }
 
+    public static User of(Long userId) {
+        return new User(userId);
+    }
 }

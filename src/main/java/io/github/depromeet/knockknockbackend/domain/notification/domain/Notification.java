@@ -1,0 +1,51 @@
+package io.github.depromeet.knockknockbackend.domain.notification.domain;
+
+import io.github.depromeet.knockknockbackend.domain.user.domain.User;
+import java.time.LocalDateTime;
+import javax.persistence.Convert;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "tbl_notification")
+@Entity
+public class Notification {
+
+    public static final Integer DEFAULT_PAGE = 0;
+    public static final Integer DEFAULT_PAGE_SIZE = 5;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private LocalDateTime sendAt;
+
+    private String content;
+
+    private String imageUrl;
+
+    @Convert(converter = AlarmTypeConverter.class)
+    private AlarmType alarmType;
+
+    //+그룹아이디
+
+    @JoinColumn(name = "send_user_id")
+    @OneToOne(fetch = FetchType.LAZY)
+    private User sendUser;
+
+    @JoinColumn(name = "receive_user_id")
+    @OneToOne(fetch = FetchType.LAZY)
+    private User receiveUser;
+
+
+}
