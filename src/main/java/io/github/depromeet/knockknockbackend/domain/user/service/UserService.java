@@ -45,4 +45,9 @@ public class UserService implements UserUtils {
         return userRepository.findById(SecurityUtils.getCurrentUserId())
                 .orElseThrow(() -> UserNotFoundException.EXCEPTION);
     }
+
+    @Override
+    public List<User> findByIdIn(List<Long> ids) {
+        return userRepository.findByIdIn(ids);
+    }
 }

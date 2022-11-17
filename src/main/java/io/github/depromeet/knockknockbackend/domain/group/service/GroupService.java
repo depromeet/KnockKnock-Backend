@@ -39,6 +39,7 @@ public class GroupService {
 
     private final UserUtils userUtils;
 
+    //TODO : 리팩토링 예정 유저 유틸 써야함!
     private User getUserFromSecurityContext(){
         Long currentUserId = SecurityUtils.getCurrentUserId();
         User user = userUtils.getUserById(currentUserId);
@@ -66,8 +67,8 @@ public class GroupService {
         // 혹시 본인 아이디 멤버로 넣었으면 지워버리기.
         createOpenGroupRequest.getMemberIds().removeIf(id -> reqUser.getId().equals(id));
         //요청받은 id 목록들로 디비에서 조회
-        List<User> findUserList =
-            userRepository.findByIdIn(createOpenGroupRequest.getMemberIds());
+        List<User> findUserList = userUtils.findByIdIn(createOpenGroupRequest.getMemberIds());
+
         // 요청받은 유저 아이디 목록이 디비에 존재하는 지 확인
         checkReqMemberNotExist(findUserList, createOpenGroupRequest.getMemberIds());
         // 오픈 그룹 만들기
@@ -91,8 +92,7 @@ public class GroupService {
         List<Long> memberIds = createFriendGroupRequest.getMemberIds();
         memberIds.removeIf(id -> reqUser.getId().equals(id));
         //요청받은 id 목록들로 디비에서 조회
-        List<User> requestUserList =
-            userRepository.findByIdIn(memberIds);
+        List<User> requestUserList = userUtils.findByIdIn(memberIds);
         // 그룹 만들기
         Group group = makeFriendGroup();
         groupRepository.save(group);
