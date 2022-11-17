@@ -39,14 +39,13 @@ public class GroupService {
 
     private final UserUtils userUtils;
 
-    //TODO : 리팩토링 예정 유저 유틸 써야함!
     private User getUserFromSecurityContext(){
         Long currentUserId = SecurityUtils.getCurrentUserId();
         User user = userUtils.getUserById(currentUserId);
         return user;
     }
 
-    private Category queryGroupCategroyById(Long categoryId){
+    private Category queryGroupCategoryById(Long categoryId){
         return groupCategoryRepository.findById(categoryId)
             .orElseThrow(() -> CategoryNotFoundException.EXCEPTION);
     }
@@ -123,7 +122,7 @@ public class GroupService {
 
         // 카테고리 자체가 null 값일 수 있음..
         if(createOpenGroupRequest.getCategoryId() != null){
-            Category category = queryGroupCategroyById(
+            Category category = queryGroupCategoryById(
                 createOpenGroupRequest.getCategoryId());
             groupBuilder.category(category);
 
@@ -145,7 +144,6 @@ public class GroupService {
             .title(Group.generateGroupTitle())
             .groupType(GroupType.FRIEND).build();
 
-        groupRepository.save(group);
         return group;
     }
 }

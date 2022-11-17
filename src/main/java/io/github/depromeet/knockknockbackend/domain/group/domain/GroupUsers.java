@@ -24,7 +24,7 @@ public class GroupUsers {
     }
 
     public static GroupUsers createGroupUsers(User host , List<User>  requestUserList , Group group){
-        List<GroupUser> groupUserList = requestUserList.stream()
+        List<GroupUser> requestGroupUserList = requestUserList.stream()
             .map(user -> GroupUser.builder()
                 .isHost(false)
                 .user(user)
@@ -34,8 +34,8 @@ public class GroupUsers {
             .isHost(true)
             .user(host)
             .group(group).build();
-        groupUserList.add(hostMember);
-        return new GroupUsers(groupUserList);
+        requestGroupUserList.add(hostMember);
+        return new GroupUsers(requestGroupUserList);
     }
 
     public List<UserInfoVO> getUserInfoVoList(){
