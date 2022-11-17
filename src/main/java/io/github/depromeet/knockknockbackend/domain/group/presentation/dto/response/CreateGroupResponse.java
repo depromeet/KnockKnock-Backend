@@ -47,8 +47,7 @@ public class CreateGroupResponse {
             .map(MemberInfoDto::new)
             .collect(Collectors.toList());
 
-        if(groupBaseInfoVo.getCategory() != null)
-            category = new CategoryDto(groupBaseInfoVo.getCategory());
+        category = new CategoryDto(groupBaseInfoVo.getCategory());
     }
 
 }

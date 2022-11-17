@@ -120,13 +120,9 @@ public class GroupService {
             .title(createOpenGroupRequest.getTitle())
             .groupType(GroupType.OPEN);
 
-        // 카테고리 자체가 null 값일 수 있음..
-        if(createOpenGroupRequest.getCategoryId() != null){
-            Category category = queryGroupCategoryById(
-                createOpenGroupRequest.getCategoryId());
-            groupBuilder.category(category);
-
-        }
+        Category category = queryGroupCategoryById(
+            createOpenGroupRequest.getCategoryId());
+        groupBuilder.category(category);
 
         Group group = groupBuilder.build();
         return group;
