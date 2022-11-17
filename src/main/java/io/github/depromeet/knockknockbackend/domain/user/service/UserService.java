@@ -50,4 +50,5 @@ public class UserService implements UserUtils {
     public List<User> findByIdIn(List<Long> ids) {
         return userRepository.findByIdIn(ids);
     }
+
 }

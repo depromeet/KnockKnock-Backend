@@ -20,6 +20,8 @@ public enum ErrorCode {
     OAUTH_TOKEN_INVALID(401, "CREDENTIAL-401-1", "Oauth Token Invalid"),
     ALREADY_SIGNUP_USER(400, "CREDENTIAL-400-1", "user is already signup"),
 
+    ALREADY_SEND_REQUEST(400, "RELATION-400-1", "Already Send Request."),
+
     OPTION_NOT_FOUND(404, "OPTION-404-1", "Option Not Found."),
 
     OTHER_SERVER_BAD_REQUEST(400, "FEIGN-400-1", "Other server bad request"),

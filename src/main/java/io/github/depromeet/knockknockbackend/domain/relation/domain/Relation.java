@@ -2,6 +2,7 @@ package io.github.depromeet.knockknockbackend.domain.relation.domain;
 
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.domain.user.domain.vo.UserInfoVO;
+import lombok.Builder;
 import lombok.Getter;
 
 import javax.persistence.Entity;
@@ -37,5 +38,14 @@ public class Relation {
         return this.receiveUser.getUserInfo();
     }
 
+    public void updateFriend(boolean value) {
+        this.isFriend = value;
+    }
+
+    @Builder
+    public Relation(User sendUser, User receiveUser) {
+        this.sendUser = sendUser;
+        this.receiveUser = receiveUser;
+    }
 
 }
