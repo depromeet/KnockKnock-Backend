@@ -2,13 +2,14 @@ package io.github.depromeet.knockknockbackend.domain.group.presentation.dto.requ
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.validation.constraints.NotNull;
 import lombok.Getter;
 
 
 @Getter
 public class CreateFriendGroupRequest {
 
-    // 친구목록만 받아옴 빈리스트도 가능
-    private List<Long> memberIds = new ArrayList<>();
+    @NotNull
+    private List<Long> memberIds ;
 
 }

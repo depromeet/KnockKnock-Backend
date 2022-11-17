@@ -129,6 +129,9 @@ public class GroupService {
     }
 
     private Group makeFriendGroup() {
+        //defaultCategory
+        Category category = queryGroupCategoryById(1L);
+
         Group group = Group.builder()
             .publicAccess(false)
             .thumbnailPath(
@@ -137,6 +140,7 @@ public class GroupService {
             .backgroundImagePath(
                 backgroundImageService.getBackgroundImageUrl()
             )
+            .category(category)
             .title(Group.generateGroupTitle())
             .groupType(GroupType.FRIEND).build();
 
