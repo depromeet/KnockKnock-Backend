@@ -32,6 +32,7 @@ public class CreateOpenGroupRequest {
     @Schema(defaultValue = "1" , description = "건너뛰기일 경우 1로 설정")
     private Long categoryId;
 
-    private List<Long> memberIds = new ArrayList<>();
+    @NotNull
+    private List<Long> memberIds ;
 
 }
