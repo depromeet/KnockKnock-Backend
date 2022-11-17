@@ -15,18 +15,12 @@ public class ThumbnailImageService {
 
     private final ThumbnailRepository thumbnailRepository;
 
-    public String getThumbnailUrl() {
+    public String getRandomThumbnailUrl() {
         Optional<Thumbnail> randomThumbnail = thumbnailRepository.findRandomThumbnail();
         // 디비에 썸네일 값이 안채워져있을 때임... 테스트 환경외엔 발생할수 없음!
         Thumbnail thumbnail = randomThumbnail.orElseThrow(()-> ThumbNailImageNotFoundException.EXCEPTION);
         return thumbnail.getThumbnailImageUrl();
     }
 
-    public String getThumbnailUrl(@Nullable  String thumbNailImageUrl) {
-        if(thumbNailImageUrl == null){
-            return getThumbnailUrl();
-        }
-        return thumbNailImageUrl;
-    }
 
 }

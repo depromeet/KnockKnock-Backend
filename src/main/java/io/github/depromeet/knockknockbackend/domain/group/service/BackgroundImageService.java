@@ -15,18 +15,13 @@ public class BackgroundImageService {
 
     private final BackGroundImageRepository backGroundImageRepository;
 
-    public String getBackgroundImageUrl() {
+    public String getRandomBackgroundImageUrl() {
         Optional<BackgroundImage> randomBackgorond = backGroundImageRepository.findRandomBackgroundImage();
         // 디비에 썸네일 값이 안채워져있을 때임... 테스트 환경외엔 발생할수 없음!
         BackgroundImage backgroundImage = randomBackgorond.orElseThrow(()-> BackgroundImageNotFoundException.EXCEPTION);
         return backgroundImage.getBackgroundImageUrl();
     }
 
-    public String getBackgroundImageUrl(@Nullable String backgroundImageUrl) {
-        if(backgroundImageUrl == null){
-            return getBackgroundImageUrl();
-        }
-        return backgroundImageUrl;
-    }
+
 
 }

@@ -109,10 +109,14 @@ public class GroupService {
         GroupBuilder groupBuilder = Group.builder()
             .publicAccess(createOpenGroupRequest.getPublicAccess())
             .thumbnailPath(
-                thumbnailImageService.getThumbnailUrl(createOpenGroupRequest.getThumbnailPath())
+                createOpenGroupRequest.getThumbnailPath() == null ?
+                    thumbnailImageService.getRandomThumbnailUrl() :
+                    createOpenGroupRequest.getThumbnailPath()
             )
             .backgroundImagePath(
-                backgroundImageService.getBackgroundImageUrl(createOpenGroupRequest.getBackgroundImagePath())
+                createOpenGroupRequest.getBackgroundImagePath() == null ?
+                    backgroundImageService.getRandomBackgroundImageUrl() :
+                    createOpenGroupRequest.getBackgroundImagePath()
             )
             .description(createOpenGroupRequest.getDescription())
             .title(createOpenGroupRequest.getTitle())
@@ -133,10 +137,10 @@ public class GroupService {
         Group group = Group.builder()
             .publicAccess(false)
             .thumbnailPath(
-                thumbnailImageService.getThumbnailUrl()
+                thumbnailImageService.getRandomThumbnailUrl()
             )
             .backgroundImagePath(
-                backgroundImageService.getBackgroundImageUrl()
+                backgroundImageService.getRandomBackgroundImageUrl()
             )
             .category(category)
             .title(Group.generateGroupTitle())
