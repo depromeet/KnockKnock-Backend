@@ -14,6 +14,7 @@ import io.github.depromeet.knockknockbackend.domain.group.exception.CategoryNotF
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateFriendGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateOpenGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.CreateGroupResponse;
+import io.github.depromeet.knockknockbackend.domain.user.UserUtils;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.domain.user.domain.repository.UserRepository;
 import io.github.depromeet.knockknockbackend.global.exception.UserNotFoundException;
@@ -30,18 +31,17 @@ import org.springframework.transaction.annotation.Transactional;
 public class GroupService {
 
     private final GroupRepository groupRepository;
-    private final UserRepository userRepository;
     private final MemberRepository memberRepository;
     private final GroupCategoryRepository groupCategoryRepository;
 
     private final ThumbnailImageService thumbnailImageService;
     private final BackgroundImageService backgroundImageService;
 
-    //TODO : 리팩토링 예정 유저 유틸 써야함!
+    private final UserUtils userUtils;
+
     private User getUserFromSecurityContext(){
         Long currentUserId = SecurityUtils.getCurrentUserId();
-        User user = userRepository.findById(currentUserId)
-            .orElseThrow(() -> UserNotFoundException.EXCEPTION);
+        User user = userUtils.getUserById(currentUserId);
         return user;
     }
 
