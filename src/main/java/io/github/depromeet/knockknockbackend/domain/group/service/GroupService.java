@@ -6,6 +6,7 @@ import io.github.depromeet.knockknockbackend.domain.group.domain.Group.GroupBuil
 import io.github.depromeet.knockknockbackend.domain.group.domain.Category;
 import io.github.depromeet.knockknockbackend.domain.group.domain.GroupType;
 import io.github.depromeet.knockknockbackend.domain.group.domain.GroupUser;
+import io.github.depromeet.knockknockbackend.domain.group.domain.GroupUsers;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.GroupCategoryRepository;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.GroupRepository;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.MemberRepository;
@@ -73,12 +74,12 @@ public class GroupService {
         Group group = makeOpenGroup(createOpenGroupRequest);
         groupRepository.save(group);
         // 그룹 유저 리스트 추가
-        List<GroupUser> groupUserList = GroupUser.makeGroupUserList(reqUser, findUserList, group);
-        memberRepository.saveAll(groupUserList);
+        GroupUsers groupUsers = GroupUsers.createGroupUsers(reqUser, findUserList, group);
+        memberRepository.saveAll(groupUsers.getGroupUserList());
 
         return new CreateGroupResponse(
             group.getGroupBaseInfoVo() ,
-            GroupUser.getUserInfoVoList(groupUserList)
+            groupUsers.getUserInfoVoList()
             ,true);
     }
 
@@ -96,13 +97,14 @@ public class GroupService {
         Group group = makeFriendGroup();
         groupRepository.save(group);
         // 그룹 유저 리스트만들기
-        List<GroupUser> groupUserList = GroupUser.makeGroupUserList(reqUser, requestUserList, group);
-        memberRepository.saveAll(groupUserList);
+        GroupUsers groupUsers = GroupUsers.createGroupUsers(reqUser, requestUserList, group);
+
+        memberRepository.saveAll(groupUsers.getGroupUserList());
 
 
         return new CreateGroupResponse(
             group.getGroupBaseInfoVo() ,
-            GroupUser.getUserInfoVoList(groupUserList)
+            groupUsers.getUserInfoVoList()
             ,true);
     }
 

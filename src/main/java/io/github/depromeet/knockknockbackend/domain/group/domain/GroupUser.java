@@ -50,23 +50,5 @@ public class GroupUser {
         this.isHost = isHost;
     }
 
-    public static List<GroupUser> makeGroupUserList(User host , List<User>  requestUserList , Group group){
-        List<GroupUser> memberList = requestUserList.stream()
-            .map(user -> GroupUser.builder()
-                .isHost(false)
-                .user(user)
-                .group(group).build())
-            .collect(Collectors.toList());
-        GroupUser hostMember = GroupUser.builder()
-            .isHost(true)
-            .user(host)
-            .group(group).build();
-        memberList.add(hostMember);
-        return memberList;
-    }
 
-    public static List<UserInfoVO> getUserInfoVoList(List<GroupUser> groupUserList){
-        return groupUserList.stream().map(member -> member.getMemberUserInfo())
-            .collect(Collectors.toList());
-    }
 }

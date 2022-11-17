@@ -4,6 +4,7 @@ package io.github.depromeet.knockknockbackend.domain.group.domain;
 import io.github.depromeet.knockknockbackend.domain.group.domain.vo.GroupBaseInfoVo;
 import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -41,8 +42,9 @@ public class Group {
     @Enumerated(EnumType.STRING)
     private GroupType groupType;
 
-    @OneToMany(mappedBy = "group")
-    private List<GroupUser> members = new ArrayList<>();
+
+    @Embedded
+    private GroupUsers groupUsers = new GroupUsers();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
@@ -59,10 +61,6 @@ public class Group {
         this.publicAccess = publicAccess;
         this.category = category;
         this.groupType = groupType;
-    }
-
-    public void setMembers(List<GroupUser> memberList){
-        members = memberList;
     }
 
     public static String generateGroupTitle(){
