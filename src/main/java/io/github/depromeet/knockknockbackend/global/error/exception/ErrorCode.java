@@ -28,8 +28,10 @@ public enum ErrorCode {
     OTHER_SERVER_UNAUTHORIZED(401, "FEIGN-401-1", "Other server unauthorized"),
     OTHER_SERVER_FORBIDDEN(403, "FEIGN-403-1", "Other server forbidden"),
     OTHER_SERVER_EXPIRED_TOKEN(419, "FEIGN-419-1", "Other server expired token"),
-    CATEGORY_NOT_FOUND(404,"GROUP-400-1", "Category Not Found" );
+    CATEGORY_NOT_FOUND(404,"GROUP-404-1", "Category Not Found" ),
+    BACKGROUND_NOT_FOUND(404,"GROUP-404-2", "BACKGROUND Not Found"),
 
+    THUMBNAIL_NOT_FOUND(404,"GROUP-404-3", "THUMBNAIL Not Found");
     private int status;
     private String code;
     private String reason;

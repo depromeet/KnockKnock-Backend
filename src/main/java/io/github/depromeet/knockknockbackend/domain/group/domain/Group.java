@@ -1,8 +1,10 @@
 package io.github.depromeet.knockknockbackend.domain.group.domain;
 
 
+import io.github.depromeet.knockknockbackend.domain.group.domain.vo.GroupBaseInfoVo;
 import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -40,8 +42,9 @@ public class Group {
     @Enumerated(EnumType.STRING)
     private GroupType groupType;
 
-    @OneToMany(mappedBy = "group")
-    private List<Member> members = new ArrayList<>();
+
+    @Embedded
+    private GroupUsers groupUsers = new GroupUsers();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
@@ -60,7 +63,20 @@ public class Group {
         this.groupType = groupType;
     }
 
-    public void setMembers(List<Member> memberList){
-        members = memberList;
+    public static String generateGroupTitle(){
+        // TODO : 방이름 자동 설정 로직 정책에 따르기
+        return "방이름";
+    }
+
+    public GroupBaseInfoVo getGroupBaseInfoVo(){
+        return GroupBaseInfoVo.builder()
+            .title(title)
+            .description(description)
+            .thumbnailPath(thumbnailPath)
+            .backgroundImagePath(backgroundImagePath)
+            .publicAccess(publicAccess)
+            .category(category)
+            .groupType(groupType)
+            .groupId(id).build();
     }
 }

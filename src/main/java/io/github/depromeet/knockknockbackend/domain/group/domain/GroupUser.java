@@ -21,10 +21,10 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@Table(name = "tbl_member")
+@Table(name = "tbl_group_user")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class Member {
+public class GroupUser {
 
 
     @Id
@@ -39,30 +39,16 @@ public class Member {
     private User user; //유저
 
     private Boolean isHost;
-    // user , host (방장) true false 나중에 어떻게될지 모르니 role로 냅뒀음!
 
     public UserInfoVO getMemberUserInfo() {
         return this.user.getUserInfo();
     }
     @Builder
-    public Member(Group group, User user, Boolean isHost) {
+    public GroupUser(Group group, User user, Boolean isHost) {
         this.group = group;
         this.user = user;
         this.isHost = isHost;
     }
 
-    public static List<Member> makeGroupsMemberList(User host , List<User>  requestUserList , Group group){
-        List<Member> memberList = requestUserList.stream()
-            .map(user -> Member.builder()
-                .isHost(false)
-                .user(user)
-                .group(group).build())
-            .collect(Collectors.toList());
-        Member hostMember = Member.builder()
-            .isHost(true)
-            .user(host)
-            .group(group).build();
-        memberList.add(hostMember);
-        return memberList;
-    }
+
 }
