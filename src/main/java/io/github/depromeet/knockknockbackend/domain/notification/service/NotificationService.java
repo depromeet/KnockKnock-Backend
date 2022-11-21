@@ -18,13 +18,14 @@ import org.springframework.transaction.annotation.Transactional;
 public class NotificationService {
 
     private final NotificationRepository notificationRepository;
+    private final NotificationMapper notificationMapper;
 
     @Transactional
     public QueryAlarmHistoryResponse queryAlarmHistoryByUserId(Pageable pageable) {
         Page<Notification> alarmHistory = notificationRepository.findAllByReceiveUserId(SecurityUtils.getCurrentUserId(), pageable);
 
         List<QueryAlarmHistoryResponseElement> result = alarmHistory.stream()
-            .map(notification -> QueryAlarmHistoryResponseElement.from(notification))
+            .map(notification -> notificationMapper.toDtoForQueryAlarmHistory(notification))
             .collect(Collectors.toList());
 
         return new QueryAlarmHistoryResponse(result);
