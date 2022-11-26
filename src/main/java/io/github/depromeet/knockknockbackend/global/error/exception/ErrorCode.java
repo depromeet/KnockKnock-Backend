@@ -31,7 +31,13 @@ public enum ErrorCode {
     CATEGORY_NOT_FOUND(404,"GROUP-404-1", "Category Not Found" ),
     BACKGROUND_NOT_FOUND(404,"GROUP-404-2", "BACKGROUND Not Found"),
 
-    THUMBNAIL_NOT_FOUND(404,"GROUP-404-3", "THUMBNAIL Not Found");
+    THUMBNAIL_NOT_FOUND(404,"GROUP-404-3", "THUMBNAIL Not Found"),
+    GROUP_NOT_FOUND(404,"GROUP-404-1", "Group Not Found" ),
+
+    GROUP_NOT_HOST(400 , "GROUP-400-1","User Not Host" );
+
+
+
     private int status;
     private String code;
     private String reason;

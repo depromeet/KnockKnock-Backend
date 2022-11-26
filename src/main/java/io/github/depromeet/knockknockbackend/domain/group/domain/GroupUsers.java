@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.domain.group.domain;
 
+import io.github.depromeet.knockknockbackend.domain.group.exception.NotHostException;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.domain.user.domain.vo.UserInfoVO;
 import java.util.ArrayList;
@@ -41,5 +42,12 @@ public class GroupUsers {
     public List<UserInfoVO> getUserInfoVoList(){
         return groupUserList.stream().map(GroupUser::getMemberUserInfo)
             .collect(Collectors.toList());
+    }
+
+    public void validReqUserIsHost(User reqUser) {
+        groupUserList.stream()
+            .filter(groupUser -> groupUser.getUser().equals(reqUser) && groupUser.getIsHost())
+            .findFirst()
+            .orElseThrow(() -> NotHostException.EXCEPTION);
     }
 }

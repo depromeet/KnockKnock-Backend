@@ -5,12 +5,12 @@ import io.github.depromeet.knockknockbackend.domain.group.domain.Group;
 import io.github.depromeet.knockknockbackend.domain.group.domain.Group.GroupBuilder;
 import io.github.depromeet.knockknockbackend.domain.group.domain.Category;
 import io.github.depromeet.knockknockbackend.domain.group.domain.GroupType;
-import io.github.depromeet.knockknockbackend.domain.group.domain.GroupUser;
 import io.github.depromeet.knockknockbackend.domain.group.domain.GroupUsers;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.GroupCategoryRepository;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.GroupRepository;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.MemberRepository;
 import io.github.depromeet.knockknockbackend.domain.group.exception.CategoryNotFoundException;
+import io.github.depromeet.knockknockbackend.domain.group.exception.GroupNotFoundException;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateFriendGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateOpenGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.UpdateGroupRequest;
@@ -18,11 +18,9 @@ import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.respo
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupResponse;
 import io.github.depromeet.knockknockbackend.domain.user.UserUtils;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
-import io.github.depromeet.knockknockbackend.domain.user.domain.repository.UserRepository;
 import io.github.depromeet.knockknockbackend.global.exception.UserNotFoundException;
 import io.github.depromeet.knockknockbackend.global.utils.security.SecurityUtils;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,6 +48,11 @@ public class GroupService {
     private Category queryGroupCategoryById(Long categoryId){
         return groupCategoryRepository.findById(categoryId)
             .orElseThrow(() -> CategoryNotFoundException.EXCEPTION);
+    }
+
+    private Group queryGroup(Long groupId) {
+        return groupRepository.findById(groupId)
+            .orElseThrow(() -> GroupNotFoundException.EXCEPTION);
     }
 
     private void validReqMemberNotExist(List<User> findUserList, List<Long> requestUserIdList
@@ -151,8 +154,25 @@ public class GroupService {
         return group;
     }
 
-    public GroupResponse updateGroup(Long groupId, UpdateGroupRequest updateGroupRequest) {
+    public GroupResponse updateGroup(Long groupId , UpdateGroupRequest updateGroupRequest) {
+        Group group = queryGroup(groupId);
+        User reqUser = getUserFromSecurityContext();
+
+        // 그룹 유저 일급 컬랙션
+        GroupUsers groupUsers = group.getGroupUsers();
+        // reqUser 가 호스트인지 확인하는 메서드
+        groupUsers.validReqUserIsHost(reqUser);
+        Category category = queryGroupCategoryById(updateGroupRequest.getCategoryId());
+        group.updateGroup(updateGroupRequest, category);
+
+        return new GroupResponse(
+            group.getGroupBaseInfoVo(),
+            groupUsers.getUserInfoVoList()
+            , true);
     }
+
+
+
 
     public void deleteGroup(Long groupId) {
     }
