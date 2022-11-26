@@ -6,6 +6,7 @@ import io.github.depromeet.knockknockbackend.domain.user.domain.vo.UserInfoVO;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
 import lombok.AccessLevel;
@@ -17,7 +18,7 @@ import lombok.NoArgsConstructor;
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class GroupUsers {
-    @OneToMany(mappedBy = "group")
+    @OneToMany(mappedBy = "group", cascade = CascadeType.ALL)
     private List<GroupUser> groupUserList = new ArrayList<>();
 
     public GroupUsers(List<GroupUser> groupUserList) {

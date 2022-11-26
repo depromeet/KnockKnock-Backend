@@ -5,6 +5,7 @@ import io.github.depromeet.knockknockbackend.domain.group.domain.Group;
 import io.github.depromeet.knockknockbackend.domain.group.domain.Group.GroupBuilder;
 import io.github.depromeet.knockknockbackend.domain.group.domain.Category;
 import io.github.depromeet.knockknockbackend.domain.group.domain.GroupType;
+import io.github.depromeet.knockknockbackend.domain.group.domain.GroupUser;
 import io.github.depromeet.knockknockbackend.domain.group.domain.GroupUsers;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.GroupCategoryRepository;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.GroupRepository;
@@ -171,9 +172,16 @@ public class GroupService {
             , true);
     }
 
-
-
-
     public void deleteGroup(Long groupId) {
+        Group group = queryGroup(groupId);
+        User reqUser = getUserFromSecurityContext();
+        GroupUsers groupUsers = group.getGroupUsers();
+
+        groupUsers.validReqUserIsHost(reqUser);
+
+        // 캐스케이드 타입 all로 줬습니다.!
+        // 그룹지우면 그룹유저 미들 테이블 삭제됩니다.
+        groupRepository.delete(group);
+
     }
 }
