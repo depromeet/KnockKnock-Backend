@@ -1,4 +1,4 @@
-package io.github.depromeet.knockknockbackend.domain.user;
+package io.github.depromeet.knockknockbackend.global.utils.user;
 
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import java.util.List;
