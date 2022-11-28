@@ -19,4 +19,8 @@ public interface RelationRepository extends CrudRepository<Relation, Long> {
     @Query(value = "select r from Relation r where r.isFriend = false and (r.sendUser.id = :sendUserId and r.receiveUser.id = :currentUserId)")
     Optional<Relation> isPendingRequest(Long currentUserId, Long sendUserId); // TODO 추후 QueryDSL로 이관.
 
+    @Query(value = "select COALESCE(r.isFriend, false) from Relation r where r.isFriend = false and ((r.sendUser.id = :userId and r.receiveUser.id = :currentUserId)" +
+            "or (r.sendUser.id = :currentUserId and r.receiveUser.id = :userId))")
+    boolean isFriend(Long currentUserId, Long userId); // TODO 추후 QueryDSL로 이관.
+
 }
