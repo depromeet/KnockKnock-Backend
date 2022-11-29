@@ -6,7 +6,7 @@ import io.github.depromeet.knockknockbackend.domain.group.domain.Group.GroupBuil
 import io.github.depromeet.knockknockbackend.domain.group.domain.Category;
 import io.github.depromeet.knockknockbackend.domain.group.domain.GroupType;
 import io.github.depromeet.knockknockbackend.domain.group.domain.GroupUsers;
-import io.github.depromeet.knockknockbackend.domain.group.domain.repository.GroupCategoryRepository;
+import io.github.depromeet.knockknockbackend.domain.group.domain.repository.CategoryRepository;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.GroupRepository;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.MemberRepository;
 import io.github.depromeet.knockknockbackend.domain.group.exception.CategoryNotFoundException;
@@ -33,7 +33,7 @@ public class GroupService {
 
     private final GroupRepository groupRepository;
     private final MemberRepository memberRepository;
-    private final GroupCategoryRepository groupCategoryRepository;
+    private final CategoryRepository categoryRepository;
 
     private final ThumbnailImageService thumbnailImageService;
     private final BackgroundImageService backgroundImageService;
@@ -47,7 +47,7 @@ public class GroupService {
     }
 
     private Category queryGroupCategoryById(Long categoryId){
-        return groupCategoryRepository.findById(categoryId)
+        return categoryRepository.findById(categoryId)
             .orElseThrow(() -> CategoryNotFoundException.EXCEPTION);
     }
 
