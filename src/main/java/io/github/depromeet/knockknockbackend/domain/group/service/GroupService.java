@@ -5,6 +5,7 @@ import io.github.depromeet.knockknockbackend.domain.group.domain.Group;
 import io.github.depromeet.knockknockbackend.domain.group.domain.Group.GroupBuilder;
 import io.github.depromeet.knockknockbackend.domain.group.domain.Category;
 import io.github.depromeet.knockknockbackend.domain.group.domain.GroupType;
+import io.github.depromeet.knockknockbackend.domain.group.domain.GroupUser;
 import io.github.depromeet.knockknockbackend.domain.group.domain.GroupUsers;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.GroupCategoryRepository;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.GroupRepository;
@@ -267,7 +268,10 @@ public class GroupService {
     }
 
     public GroupBriefInfoListResponse findAllJoinedGroups() {
-        List<Group> groupList = groupRepository.findAll();
+        User reqUser = getUserFromSecurityContext();
+        GroupUsers groupUsers = GroupUsers.from(groupUserRepository.findAllByUser(reqUser));
+
+        List<Group> groupList = groupUsers.getGroupList();
 
         List<GroupBriefInfoDto> groupBriefInfoDtos = groupList.stream().map(group ->
             new GroupBriefInfoDto(group.getGroupBaseInfoVo(), group.getGroupUsers().getMemberCount())).collect(Collectors.toList());

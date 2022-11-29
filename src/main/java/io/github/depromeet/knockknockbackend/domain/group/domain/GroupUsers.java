@@ -25,6 +25,10 @@ public class GroupUsers {
         this.groupUserList = groupUserList;
     }
 
+    public static GroupUsers from(List<GroupUser> groupUserList) {
+        return new GroupUsers(groupUserList);
+    }
+
     public static GroupUsers createGroupUsers(User host , List<User>  requestUserList , Group group){
         List<GroupUser> requestGroupUserList = requestUserList.stream()
             .map(user -> GroupUser.builder()
@@ -61,5 +65,10 @@ public class GroupUsers {
 
     public int getMemberCount(){
         return groupUserList.size();
+    }
+
+    public List<Group> getGroupList(){
+        return groupUserList.stream().map(GroupUser::getGroup).collect(
+            Collectors.toList());
     }
 }
