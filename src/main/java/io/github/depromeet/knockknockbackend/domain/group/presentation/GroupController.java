@@ -3,6 +3,7 @@ package io.github.depromeet.knockknockbackend.domain.group.presentation;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateFriendGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateOpenGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.UpdateGroupRequest;
+import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.CategoryDto;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.CreateGroupResponse;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupResponse;
 import io.github.depromeet.knockknockbackend.domain.group.service.GroupService;
@@ -12,6 +13,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -56,5 +58,16 @@ public class GroupController {
         groupService.deleteGroup(groupId);
     }
 
+
+    @GetMapping("/categories")
+    public CategoryListResponse getCateory(){
+        return categoryService.findAllCategory();
+    }
+
+    //TODO : 관리자권한 필요
+    @PostMapping("/categories")
+    public CategoryDto createCategory(@RequestBody @Valid CreateCategoryRequest createCategoryRequest){
+        return categoryService.saveCategory(createCategoryRequest);
+    }
 
 }
