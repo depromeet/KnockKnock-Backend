@@ -2,6 +2,7 @@ package io.github.depromeet.knockknockbackend.domain.group.domain;
 
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.domain.user.domain.vo.UserInfoVO;
+import io.github.depromeet.knockknockbackend.global.database.BaseTimeEntity;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.persistence.Entity;
@@ -24,7 +25,7 @@ import lombok.Setter;
 @Table(name = "tbl_group_user")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class GroupUser {
+public class GroupUser extends BaseTimeEntity {
 
 
     @Id

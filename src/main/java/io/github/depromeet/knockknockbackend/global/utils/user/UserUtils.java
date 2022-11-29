@@ -8,4 +8,6 @@ public interface UserUtils {
 
     List<User> findByIdIn(List<Long> ids);
 
+    User getUserFromSecurityContext();
+
 }

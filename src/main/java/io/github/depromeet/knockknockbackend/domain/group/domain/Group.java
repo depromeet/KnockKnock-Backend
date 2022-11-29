@@ -4,6 +4,7 @@ package io.github.depromeet.knockknockbackend.domain.group.domain;
 import io.github.depromeet.knockknockbackend.domain.group.domain.vo.GroupBaseInfoVo;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.UpdateGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.service.dto.UpdateGroupDto;
+import io.github.depromeet.knockknockbackend.global.database.BaseTimeEntity;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Embedded;
@@ -27,7 +28,7 @@ import org.springframework.lang.Nullable;
 @Table(name = "tbl_group")
 @Entity
 @NoArgsConstructor
-public class Group {
+public class Group extends BaseTimeEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -90,5 +91,9 @@ public class Group {
         this.backgroundImagePath = updateGroupDto.getBackgroundImagePath();
         this.publicAccess = updateGroupDto.getPublicAccess();
         this.category = category;
+    }
+
+    public int getMemberCount(){
+        return this.groupUsers.getMemberCount();
     }
 }

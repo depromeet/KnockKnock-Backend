@@ -34,6 +34,8 @@ public class Category {
     @OneToMany(mappedBy = "category")
     private List<Group> groups = new ArrayList<>();
 
+    public static final Long defaultEmptyCategoryId = 1L;
+
 
     @Builder
     public Category(Long id, String emoji, String content) {

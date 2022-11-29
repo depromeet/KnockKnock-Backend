@@ -16,12 +16,11 @@ import org.springframework.stereotype.Service;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
-    private static final Long defaultEmptyCategoryId = 1L;
 
     public CategoryListResponse findAllCategory(){
         List<Category> categoryList = categoryRepository.findAll();
         List<CategoryDto> categoryDtoList = categoryList.stream()
-            .filter(category -> !category.getId().equals(defaultEmptyCategoryId))
+            .filter(category -> !category.getId().equals(Category.defaultEmptyCategoryId))
             .map(CategoryDto::new)
             .collect(Collectors.toList());
         return new CategoryListResponse(categoryDtoList);

@@ -25,6 +25,10 @@ public class GroupUsers {
         this.groupUserList = groupUserList;
     }
 
+    public static GroupUsers from(List<GroupUser> groupUserList) {
+        return new GroupUsers(groupUserList);
+    }
+
     public static GroupUsers createGroupUsers(User host , List<User>  requestUserList , Group group){
         List<GroupUser> requestGroupUserList = requestUserList.stream()
             .map(user -> GroupUser.builder()
@@ -50,5 +54,21 @@ public class GroupUsers {
             .filter(groupUser -> groupUser.getUser().equals(reqUser) && groupUser.getIsHost())
             .findFirst()
             .orElseThrow(() -> NotHostException.EXCEPTION);
+    }
+
+    public Boolean checkReqUserGroupHost(User reqUser) {
+        return groupUserList.stream()
+            .anyMatch(groupUser ->
+                groupUser.getIsHost() && groupUser.getUser().getId().equals(reqUser.getId()));
+
+    }
+
+    protected int getMemberCount(){
+        return groupUserList.size();
+    }
+
+    public List<Group> getGroupList(){
+        return groupUserList.stream().map(GroupUser::getGroup).collect(
+            Collectors.toList());
     }
 }
