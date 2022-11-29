@@ -63,7 +63,7 @@ public class GroupUsers {
 
     }
 
-    public int getMemberCount(){
+    protected int getMemberCount(){
         return groupUserList.size();
     }
 

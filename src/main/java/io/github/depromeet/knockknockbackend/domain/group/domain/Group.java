@@ -92,4 +92,8 @@ public class Group extends BaseTimeEntity {
         this.publicAccess = updateGroupDto.getPublicAccess();
         this.category = category;
     }
+
+    public int getMemberCount(){
+        return this.groupUsers.getMemberCount();
+    }
 }

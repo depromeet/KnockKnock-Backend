@@ -316,7 +316,7 @@ public class GroupService {
     private GroupBriefInfoListResponse getGroupBriefInfoListResponse(List<Group> groupList) {
         List<GroupBriefInfoDto> groupBriefInfoDtos = groupList.stream().map(group ->
             new GroupBriefInfoDto(group.getGroupBaseInfoVo(),
-                group.getGroupUsers().getMemberCount())).collect(Collectors.toList());
+                group.getMemberCount())).collect(Collectors.toList());
 
         return new GroupBriefInfoListResponse(groupBriefInfoDtos);
     }
