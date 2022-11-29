@@ -44,17 +44,6 @@ public class GroupService {
 
     private final UserUtils userUtils;
 
-
-    /**
-     * 요청한 유저의 entity를 securityContext 에서 가져옵니다.
-     * @return
-     */
-    private User getUserFromSecurityContext(){
-        Long currentUserId = SecurityUtils.getCurrentUserId();
-        User user = userUtils.getUserById(currentUserId);
-        return user;
-    }
-
     /**
      * 카테고리 정보를 가져옵니다.
      * @param categoryId 카테고리 아이디
@@ -97,7 +86,7 @@ public class GroupService {
      */
     public CreateGroupResponse createOpenGroup(CreateOpenGroupRequest createOpenGroupRequest) {
         // 요청자 정보 시큐리티에서 가져옴
-        User reqUser = getUserFromSecurityContext();
+        User reqUser = userUtils.getUserFromSecurityContext();
         // 혹시 본인 아이디 멤버로 넣었으면 지워버리기.
         createOpenGroupRequest.getMemberIds().removeIf(id -> reqUser.getId().equals(id));
         //요청받은 id 목록들로 디비에서 조회
@@ -123,7 +112,7 @@ public class GroupService {
      * @return CreateGroupResponse
      */
     public CreateGroupResponse createFriendGroup(CreateFriendGroupRequest createFriendGroupRequest) {
-        User reqUser = getUserFromSecurityContext();
+        User reqUser = userUtils.getUserFromSecurityContext();
 
         //TODO : 요청 받은 memeberId가 친구 목록에 속해있는지 검증.
         List<Long> memberIds = createFriendGroupRequest.getMemberIds();
@@ -209,7 +198,7 @@ public class GroupService {
      */
     public GroupResponse updateGroup(Long groupId , UpdateGroupRequest updateGroupRequest) {
         Group group = queryGroup(groupId);
-        User reqUser = getUserFromSecurityContext();
+        User reqUser = userUtils.getUserFromSecurityContext();
 
         // 그룹 유저 일급 컬랙션
         GroupUsers groupUsers = group.getGroupUsers();
@@ -231,7 +220,7 @@ public class GroupService {
      */
     public void deleteGroup(Long groupId) {
         Group group = queryGroup(groupId);
-        User reqUser = getUserFromSecurityContext();
+        User reqUser = userUtils.getUserFromSecurityContext();
         GroupUsers groupUsers = group.getGroupUsers();
 
         groupUsers.validReqUserIsHost(reqUser);
@@ -248,7 +237,7 @@ public class GroupService {
      */
     public GroupResponse getGroupDetailById(Long groupId) {
         Group group = queryGroup(groupId);
-        User reqUser = getUserFromSecurityContext();
+        User reqUser = userUtils.getUserFromSecurityContext();
         GroupUsers groupUsers = group.getGroupUsers();
 
         Boolean iHost = groupUsers.checkReqUserGroupHost(reqUser);
@@ -275,7 +264,7 @@ public class GroupService {
      * @return GroupBriefInfoListResponse
      */
     public GroupBriefInfoListResponse findAllJoinedGroups() {
-        User reqUser = getUserFromSecurityContext();
+        User reqUser = userUtils.getUserFromSecurityContext();
         GroupUsers groupUsers = GroupUsers.from(groupUserRepository.findAllByUser(reqUser));
 
         List<Group> groupList = groupUsers.getGroupList();
@@ -294,7 +283,7 @@ public class GroupService {
             return findAllJoinedGroups();
         }
 
-        User reqUser = getUserFromSecurityContext();
+        User reqUser = userUtils.getUserFromSecurityContext();
         GroupType groupType = GroupType.valueOf(groupInTypeRequest.getValue());
 
         GroupUsers groupUsers = GroupUsers.from(

@@ -27,4 +27,10 @@ public class UserUtilsImpl implements UserUtils {
         return userRepository.findByIdIn(ids);
     }
 
+
+    public User getUserFromSecurityContext(){
+        Long currentUserId = SecurityUtils.getCurrentUserId();
+        User user = getUserById(currentUserId);
+        return user;
+    }
 }
