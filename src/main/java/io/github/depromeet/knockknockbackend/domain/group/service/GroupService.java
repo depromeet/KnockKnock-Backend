@@ -251,7 +251,7 @@ public class GroupService {
         User reqUser = getUserFromSecurityContext();
         GroupUsers groupUsers = group.getGroupUsers();
 
-        Boolean iHost = groupUsers.isReqUserHost(reqUser);
+        Boolean iHost = groupUsers.checkReqUserGroupHost(reqUser);
 
         return new GroupResponse(
             group.getGroupBaseInfoVo(),

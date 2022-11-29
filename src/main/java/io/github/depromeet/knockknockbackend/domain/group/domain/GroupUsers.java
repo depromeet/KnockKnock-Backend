@@ -56,7 +56,7 @@ public class GroupUsers {
             .orElseThrow(() -> NotHostException.EXCEPTION);
     }
 
-    public Boolean isReqUserHost(User reqUser) {
+    public Boolean checkReqUserGroupHost(User reqUser) {
         return groupUserList.stream()
             .anyMatch(groupUser ->
                 groupUser.getIsHost() && groupUser.getUser().getId().equals(reqUser.getId()));
