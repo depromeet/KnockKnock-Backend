@@ -73,13 +73,13 @@ public class GroupController {
     @Parameter(name = "type", description = "type", schema = @Schema(implementation = GroupInTypeRequest.class)
         , in = ParameterIn.QUERY)
     @Operation(summary = "참여중인 그룹 목록 전체 홀로외침 친구들 방 필터링")
-    @GetMapping("/in")
+    @GetMapping("/joined")
     public GroupBriefInfoListResponse getParticipatingGroups(
         @RequestParam("type") GroupInTypeRequest groupInTypeRequest){
         if(groupInTypeRequest == GroupInTypeRequest.ALL){
-            return groupService.findAllGroups();
+            return groupService.findAllJoinedGroups();
         }
-        return groupService.findInGroupByType(groupInTypeRequest);
+        return groupService.findJoinedGroupByType(groupInTypeRequest);
     }
 
 

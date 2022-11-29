@@ -5,11 +5,10 @@ import io.github.depromeet.knockknockbackend.domain.group.domain.Group;
 import io.github.depromeet.knockknockbackend.domain.group.domain.Group.GroupBuilder;
 import io.github.depromeet.knockknockbackend.domain.group.domain.Category;
 import io.github.depromeet.knockknockbackend.domain.group.domain.GroupType;
-import io.github.depromeet.knockknockbackend.domain.group.domain.GroupUser;
 import io.github.depromeet.knockknockbackend.domain.group.domain.GroupUsers;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.GroupCategoryRepository;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.GroupRepository;
-import io.github.depromeet.knockknockbackend.domain.group.domain.repository.MemberRepository;
+import io.github.depromeet.knockknockbackend.domain.group.domain.repository.GroupUserRepository;
 import io.github.depromeet.knockknockbackend.domain.group.exception.CategoryNotFoundException;
 import io.github.depromeet.knockknockbackend.domain.group.exception.GroupNotFoundException;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateFriendGroupRequest;
@@ -24,7 +23,6 @@ import io.github.depromeet.knockknockbackend.domain.user.UserUtils;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.global.exception.UserNotFoundException;
 import io.github.depromeet.knockknockbackend.global.utils.security.SecurityUtils;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class GroupService {
 
     private final GroupRepository groupRepository;
-    private final MemberRepository memberRepository;
+    private final GroupUserRepository groupUserRepository;
     private final GroupCategoryRepository groupCategoryRepository;
 
     private final ThumbnailImageService thumbnailImageService;
@@ -111,7 +109,7 @@ public class GroupService {
         groupRepository.save(group);
         // 그룹 유저 리스트 추가
         GroupUsers groupUsers = GroupUsers.createGroupUsers(reqUser, findUserList, group);
-        memberRepository.saveAll(groupUsers.getGroupUserList());
+        groupUserRepository.saveAll(groupUsers.getGroupUserList());
 
         return new CreateGroupResponse(
             group.getGroupBaseInfoVo() ,
@@ -137,7 +135,7 @@ public class GroupService {
         // 그룹 유저 리스트만들기
         GroupUsers groupUsers = GroupUsers.createGroupUsers(reqUser, requestUserList, group);
 
-        memberRepository.saveAll(groupUsers.getGroupUserList());
+        groupUserRepository.saveAll(groupUsers.getGroupUserList());
 
 
         return new CreateGroupResponse(
@@ -257,6 +255,8 @@ public class GroupService {
             , iHost);
     }
 
+
+
     public GroupBriefInfoListResponse findAllGroups() {
         List<Group> groupList = groupRepository.findAll();
 
@@ -266,8 +266,30 @@ public class GroupService {
         return new GroupBriefInfoListResponse(groupBriefInfoDtos);
     }
 
-    public GroupBriefInfoListResponse findInGroupByType(GroupInTypeRequest groupInTypeRequest) {
+    public GroupBriefInfoListResponse findAllJoinedGroups() {
+        List<Group> groupList = groupRepository.findAll();
 
+        List<GroupBriefInfoDto> groupBriefInfoDtos = groupList.stream().map(group ->
+            new GroupBriefInfoDto(group.getGroupBaseInfoVo(), group.getGroupUsers().getMemberCount())).collect(Collectors.toList());
+
+        return new GroupBriefInfoListResponse(groupBriefInfoDtos);
+    }
+
+    public GroupBriefInfoListResponse findJoinedGroupByType(GroupInTypeRequest groupInTypeRequest) {
+        List<Group> groupList;
+        if(groupInTypeRequest == GroupInTypeRequest.ALL){
+            groupList = groupRepository.findAll();
+        }else{
+            GroupType groupType = GroupType.valueOf(groupInTypeRequest.getValue());
+            groupList = groupRepository.findAllByGroupType(groupType);
+        }
+
+        List<GroupBriefInfoDto> groupBriefInfoDtos = groupList.stream().map(group -> {
+            GroupUsers groupUsers = group.getGroupUsers();
+            return new GroupBriefInfoDto(group.getGroupBaseInfoVo(), groupUsers.getMemberCount());
+        }).collect(Collectors.toList());
+
+        return new GroupBriefInfoListResponse(groupBriefInfoDtos);
     }
 
     public GroupBriefInfoListResponse findGroupByCategory(Long categoryId) {
