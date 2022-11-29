@@ -2,6 +2,8 @@ package io.github.depromeet.knockknockbackend.domain.group.domain;
 
 
 import io.github.depromeet.knockknockbackend.domain.group.domain.vo.GroupBaseInfoVo;
+import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.UpdateGroupRequest;
+import io.github.depromeet.knockknockbackend.domain.group.service.dto.UpdateGroupDto;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Embedded;
@@ -19,6 +21,7 @@ import javax.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.lang.Nullable;
 
 @Getter
 @Table(name = "tbl_group")
@@ -78,5 +81,14 @@ public class Group {
             .category(category)
             .groupType(groupType)
             .groupId(id).build();
+    }
+
+    public void updateGroup(UpdateGroupDto updateGroupDto,Category category) {
+        this.title = updateGroupDto.getTitle();
+        this.description = updateGroupDto.getDescription();
+        this.thumbnailPath = updateGroupDto.getThumbnailPath();
+        this.backgroundImagePath = updateGroupDto.getBackgroundImagePath();
+        this.publicAccess = updateGroupDto.getPublicAccess();
+        this.category = category;
     }
 }

@@ -11,16 +11,17 @@ import io.github.depromeet.knockknockbackend.domain.group.domain.repository.Grou
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.GroupRepository;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.MemberRepository;
 import io.github.depromeet.knockknockbackend.domain.group.exception.CategoryNotFoundException;
+import io.github.depromeet.knockknockbackend.domain.group.exception.GroupNotFoundException;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateFriendGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateOpenGroupRequest;
+import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.UpdateGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.CreateGroupResponse;
+import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupResponse;
 import io.github.depromeet.knockknockbackend.domain.user.UserUtils;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
-import io.github.depromeet.knockknockbackend.domain.user.domain.repository.UserRepository;
 import io.github.depromeet.knockknockbackend.global.exception.UserNotFoundException;
 import io.github.depromeet.knockknockbackend.global.utils.security.SecurityUtils;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,6 +49,11 @@ public class GroupService {
     private Category queryGroupCategoryById(Long categoryId){
         return groupCategoryRepository.findById(categoryId)
             .orElseThrow(() -> CategoryNotFoundException.EXCEPTION);
+    }
+
+    private Group queryGroup(Long groupId) {
+        return groupRepository.findById(groupId)
+            .orElseThrow(() -> GroupNotFoundException.EXCEPTION);
     }
 
     private void validReqMemberNotExist(List<User> findUserList, List<Long> requestUserIdList
@@ -147,5 +153,35 @@ public class GroupService {
             .groupType(GroupType.FRIEND).build();
 
         return group;
+    }
+
+    public GroupResponse updateGroup(Long groupId , UpdateGroupRequest updateGroupRequest) {
+        Group group = queryGroup(groupId);
+        User reqUser = getUserFromSecurityContext();
+
+        // 그룹 유저 일급 컬랙션
+        GroupUsers groupUsers = group.getGroupUsers();
+        // reqUser 가 호스트인지 확인하는 메서드
+        groupUsers.validReqUserIsHost(reqUser);
+        Category category = queryGroupCategoryById(updateGroupRequest.getCategoryId());
+        group.updateGroup(updateGroupRequest.toUpdateGroupDto(), category);
+
+        return new GroupResponse(
+            group.getGroupBaseInfoVo(),
+            groupUsers.getUserInfoVoList()
+            , true);
+    }
+
+    public void deleteGroup(Long groupId) {
+        Group group = queryGroup(groupId);
+        User reqUser = getUserFromSecurityContext();
+        GroupUsers groupUsers = group.getGroupUsers();
+
+        groupUsers.validReqUserIsHost(reqUser);
+
+        // 캐스케이드 타입 all로 줬습니다.!
+        // 그룹지우면 그룹유저 미들 테이블 삭제됩니다.
+        groupRepository.delete(group);
+
     }
 }
