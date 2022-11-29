@@ -10,5 +10,5 @@ import lombok.Getter;
 public class CategoryListResponse {
 
 
-    List<CategoryDto> categorys;
+    List<CategoryDto> categories;
 }
