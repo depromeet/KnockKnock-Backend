@@ -1,6 +1,5 @@
 package io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response;
 
-import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,5 +10,5 @@ import lombok.Getter;
 public class CategoryListResponse {
 
 
-    List<CategoryDto> categoryList;
+    List<CategoryDto> categorys;
 }

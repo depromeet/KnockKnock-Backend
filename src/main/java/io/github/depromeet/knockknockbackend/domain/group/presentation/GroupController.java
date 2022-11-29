@@ -1,11 +1,14 @@
 package io.github.depromeet.knockknockbackend.domain.group.presentation;
 
+import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateCategoryRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateFriendGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateOpenGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.UpdateGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.CategoryDto;
+import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.CategoryListResponse;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.CreateGroupResponse;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupResponse;
+import io.github.depromeet.knockknockbackend.domain.group.service.CategoryService;
 import io.github.depromeet.knockknockbackend.domain.group.service.GroupService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -31,7 +34,7 @@ public class GroupController {
 
     private final GroupService groupService;
 
-
+    private final CategoryService categoryService;
 
     @Operation(summary = "공개 그룹을 만듭니다")
     @PostMapping("/open")
@@ -60,7 +63,7 @@ public class GroupController {
 
 
     @GetMapping("/categories")
-    public CategoryListResponse getCateory(){
+    public CategoryListResponse getCategory(){
         return categoryService.findAllCategory();
     }
 
