@@ -86,12 +86,12 @@ public class GroupController {
     @Parameter(name = "category", description = "category", schema = @Schema(implementation = Long.class)
         , in = ParameterIn.QUERY)
     @Operation(summary = "방 찾기")
-    @GetMapping("")
-    public GroupBriefInfoListResponse getGroups(@RequestParam(value = "category" ,required = false ) Long categoryId){
+    @GetMapping("/open")
+    public GroupBriefInfoListResponse getAllOpenGroups(@RequestParam(value = "category" ,required = false  ) Long categoryId){
         if(categoryId.equals(1L)){
-            return groupService.findAllGroups();
+            return groupService.findAllOpenGroups();
         }
-        return groupService.findGroupByCategory(categoryId);
+        return groupService.findOpenGroupByCategory(categoryId);
     }
 
 }

@@ -242,7 +242,10 @@ public class GroupService {
 
     }
 
-
+    /**
+     * id를 통해서 그룹의 디테일한 정보를 가져옵니다.
+     * @return GroupResponse
+     */
     public GroupResponse getGroupDetailById(Long groupId) {
         Group group = queryGroup(groupId);
         User reqUser = getUserFromSecurityContext();
@@ -257,16 +260,24 @@ public class GroupService {
     }
 
 
-
-    public GroupBriefInfoListResponse findAllGroups() {
-        List<Group> groupList = groupRepository.findAll();
+    /**
+     * 모든 그룹의 정보를 가져옵니다.
+     * @return GroupBriefInfoListResponse
+     */
+    public GroupBriefInfoListResponse findAllOpenGroups() {
+        List<Group> groupList = groupRepository.findAllByGroupType(GroupType.OPEN);
 
         List<GroupBriefInfoDto> groupBriefInfoDtos = groupList.stream().map(group ->
-            new GroupBriefInfoDto(group.getGroupBaseInfoVo(), group.getGroupUsers().getMemberCount())).collect(Collectors.toList());
+            new GroupBriefInfoDto(group.getGroupBaseInfoVo(),
+                group.getGroupUsers().getMemberCount())).collect(Collectors.toList());
 
         return new GroupBriefInfoListResponse(groupBriefInfoDtos);
     }
 
+    /**
+     * 내가 들어가 있는 그룹목록을 가져옵니다.
+     * @return GroupBriefInfoListResponse
+     */
     public GroupBriefInfoListResponse findAllJoinedGroups() {
         User reqUser = getUserFromSecurityContext();
         GroupUsers groupUsers = GroupUsers.from(groupUserRepository.findAllByUser(reqUser));
@@ -280,6 +291,11 @@ public class GroupService {
         return new GroupBriefInfoListResponse(groupBriefInfoDtos);
     }
 
+    /**
+     * 내가 들어가 있는 그룹 목록중에서 GroupType에 따라 필터링합니다.
+     * @param groupInTypeRequest
+     * @return GroupBriefInfoListResponse
+     */
     public GroupBriefInfoListResponse findJoinedGroupByType(GroupInTypeRequest groupInTypeRequest) {
 
         if(groupInTypeRequest == GroupInTypeRequest.ALL){
@@ -300,10 +316,14 @@ public class GroupService {
         return new GroupBriefInfoListResponse(groupBriefInfoDtos);
     }
 
-    public GroupBriefInfoListResponse findGroupByCategory(Long categoryId) {
+    /**
+     * 탐색탭에서 카테고리별 오픈 그룹 검색
+     * @return GroupBriefInfoListResponse
+     */
+    public GroupBriefInfoListResponse findOpenGroupByCategory(Long categoryId) {
         Category category = queryGroupCategoryById(categoryId);
 
-        List<Group> groupList = groupRepository.findAllByCategory(category);
+        List<Group> groupList = groupRepository.findAllByGroupTypeAndCategory(GroupType.OPEN,category);
 
         List<GroupBriefInfoDto> groupBriefInfoDtos = groupList.stream().map(group ->
             new GroupBriefInfoDto(group.getGroupBaseInfoVo(),
