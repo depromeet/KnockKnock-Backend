@@ -58,4 +58,8 @@ public class GroupUsers {
                 groupUser.getIsHost() && groupUser.getUser().getId().equals(reqUser.getId()));
 
     }
+
+    public int getMemberCount(){
+        return groupUserList.size();
+    }
 }

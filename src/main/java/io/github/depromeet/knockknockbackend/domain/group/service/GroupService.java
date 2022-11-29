@@ -17,13 +17,16 @@ import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.reque
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.GroupInTypeRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.UpdateGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.CreateGroupResponse;
+import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupBriefInfoDto;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupBriefInfoListResponse;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupResponse;
 import io.github.depromeet.knockknockbackend.domain.user.UserUtils;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.global.exception.UserNotFoundException;
 import io.github.depromeet.knockknockbackend.global.utils.security.SecurityUtils;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -242,13 +245,29 @@ public class GroupService {
 
 
     public GroupResponse getGroupDetailById(Long groupId) {
+        Group group = queryGroup(groupId);
+        User reqUser = getUserFromSecurityContext();
+        GroupUsers groupUsers = group.getGroupUsers();
 
+        Boolean iHost = groupUsers.isReqUserHost(reqUser);
+
+        return new GroupResponse(
+            group.getGroupBaseInfoVo(),
+            groupUsers.getUserInfoVoList()
+            , iHost);
     }
 
     public GroupBriefInfoListResponse findAllGroups() {
+        List<Group> groupList = groupRepository.findAll();
+
+        List<GroupBriefInfoDto> groupBriefInfoDtos = groupList.stream().map(group ->
+            new GroupBriefInfoDto(group.getGroupBaseInfoVo(), group.getGroupUsers().getMemberCount())).collect(Collectors.toList());
+
+        return new GroupBriefInfoListResponse(groupBriefInfoDtos);
     }
 
     public GroupBriefInfoListResponse findInGroupByType(GroupInTypeRequest groupInTypeRequest) {
+
     }
 
     public GroupBriefInfoListResponse findGroupByCategory(Long categoryId) {
