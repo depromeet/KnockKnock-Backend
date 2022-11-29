@@ -92,9 +92,7 @@ public class GroupController {
     @Operation(summary = "방 찾기")
     @GetMapping("/open")
     public GroupBriefInfoListResponse getAllOpenGroups(@RequestParam(value = "category" ,required = false  ) Long categoryId) {
-        if (categoryId.equals(1L)) {
-            return groupService.findAllOpenGroups();
-        }
+
         return groupService.findOpenGroupByCategory(categoryId);
     }
 

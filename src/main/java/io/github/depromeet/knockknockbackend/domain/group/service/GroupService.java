@@ -309,6 +309,9 @@ public class GroupService {
      * @return GroupBriefInfoListResponse
      */
     public GroupBriefInfoListResponse findOpenGroupByCategory(Long categoryId) {
+        if (categoryId.equals(Category.defaultEmptyCategoryId)) {
+            return findAllOpenGroups();
+        }
         Category category = queryGroupCategoryById(categoryId);
 
         List<Group> groupList = groupRepository.findAllByGroupTypeAndCategory(GroupType.OPEN,category);
