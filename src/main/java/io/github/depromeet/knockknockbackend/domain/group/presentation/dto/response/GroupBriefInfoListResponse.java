@@ -8,7 +8,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public class GroupBriefInfoListResponse {
 
-    private List<GroupBriefInfoDto> groupBriefInfoList;
+    private List<GroupBriefInfoDto> groupInfos;
 
 
 }

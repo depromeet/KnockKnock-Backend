@@ -12,6 +12,6 @@ public interface GroupUserRepository extends JpaRepository<GroupUser, Long> {
 
     List<GroupUser> findAllByUser(User user);
 
-    @Query("select GU from GroupUser as GU join fetch GU.group where GU.user = :reqUSer and GU.group.groupType = :groupType")
+    @Query("select GU from GroupUser as GU join fetch GU.group where GU.user = :reqUser and GU.group.groupType = :groupType")
     List<GroupUser> findJoinedGroupUserByGroupType(@Param("reqUser") User reqUser,@Param("groupType") GroupType groupType);
 }
