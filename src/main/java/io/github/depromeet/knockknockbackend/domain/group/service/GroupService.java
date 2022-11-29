@@ -14,8 +14,10 @@ import io.github.depromeet.knockknockbackend.domain.group.exception.CategoryNotF
 import io.github.depromeet.knockknockbackend.domain.group.exception.GroupNotFoundException;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateFriendGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateOpenGroupRequest;
+import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.GroupInTypeRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.UpdateGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.CreateGroupResponse;
+import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupBriefInfoListResponse;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupResponse;
 import io.github.depromeet.knockknockbackend.domain.user.UserUtils;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
@@ -186,5 +188,14 @@ public class GroupService {
     }
 
     public GroupResponse getGroupById(Long groupId) {
+    }
+
+    public GroupBriefInfoListResponse findAllGroups() {
+    }
+
+    public GroupBriefInfoListResponse findInGroupByType(GroupInTypeRequest groupInTypeRequest) {
+    }
+
+    public GroupBriefInfoListResponse exploreGroupByCategory(Long categoryId) {
     }
 }
