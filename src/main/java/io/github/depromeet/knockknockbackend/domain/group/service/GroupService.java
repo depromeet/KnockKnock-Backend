@@ -184,4 +184,7 @@ public class GroupService {
         groupRepository.delete(group);
 
     }
+
+    public GroupResponse getGroupById(Long groupId) {
+    }
 }
