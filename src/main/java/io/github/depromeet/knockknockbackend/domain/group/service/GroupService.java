@@ -301,5 +301,14 @@ public class GroupService {
     }
 
     public GroupBriefInfoListResponse findGroupByCategory(Long categoryId) {
+        Category category = queryGroupCategoryById(categoryId);
+
+        List<Group> groupList = groupRepository.findAllByCategory(category);
+
+        List<GroupBriefInfoDto> groupBriefInfoDtos = groupList.stream().map(group ->
+            new GroupBriefInfoDto(group.getGroupBaseInfoVo(),
+                group.getGroupUsers().getMemberCount())).collect(Collectors.toList());
+
+        return new GroupBriefInfoListResponse(groupBriefInfoDtos);
     }
 }
