@@ -1,12 +1,16 @@
 package io.github.depromeet.knockknockbackend.domain.group.presentation;
 
+import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateCategoryRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateFriendGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateOpenGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.GroupInTypeRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.UpdateGroupRequest;
+import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.CategoryDto;
+import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.CategoryListResponse;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.CreateGroupResponse;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupBriefInfoListResponse;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupResponse;
+import io.github.depromeet.knockknockbackend.domain.group.service.CategoryService;
 import io.github.depromeet.knockknockbackend.domain.group.service.GroupService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -36,7 +40,7 @@ public class GroupController {
 
     private final GroupService groupService;
 
-
+    private final CategoryService categoryService;
 
     @Operation(summary = "공개 그룹을 만듭니다")
     @PostMapping("/open")
@@ -87,11 +91,22 @@ public class GroupController {
         , in = ParameterIn.QUERY)
     @Operation(summary = "방 찾기")
     @GetMapping("/open")
-    public GroupBriefInfoListResponse getAllOpenGroups(@RequestParam(value = "category" ,required = false  ) Long categoryId){
-        if(categoryId.equals(1L)){
+    public GroupBriefInfoListResponse getAllOpenGroups(@RequestParam(value = "category" ,required = false  ) Long categoryId) {
+        if (categoryId.equals(1L)) {
             return groupService.findAllOpenGroups();
         }
         return groupService.findOpenGroupByCategory(categoryId);
+    }
+
+    @GetMapping("/categories")
+    public CategoryListResponse getCategory(){
+        return categoryService.findAllCategory();
+    }
+
+    //TODO : 관리자권한 필요
+    @PostMapping("/categories")
+    public CategoryDto createCategory(@RequestBody @Valid CreateCategoryRequest createCategoryRequest){
+        return categoryService.saveCategory(createCategoryRequest);
     }
 
 }

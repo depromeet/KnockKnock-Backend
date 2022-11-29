@@ -5,9 +5,8 @@ import io.github.depromeet.knockknockbackend.domain.group.domain.Group;
 import io.github.depromeet.knockknockbackend.domain.group.domain.Group.GroupBuilder;
 import io.github.depromeet.knockknockbackend.domain.group.domain.Category;
 import io.github.depromeet.knockknockbackend.domain.group.domain.GroupType;
-import io.github.depromeet.knockknockbackend.domain.group.domain.GroupUser;
 import io.github.depromeet.knockknockbackend.domain.group.domain.GroupUsers;
-import io.github.depromeet.knockknockbackend.domain.group.domain.repository.GroupCategoryRepository;
+import io.github.depromeet.knockknockbackend.domain.group.domain.repository.CategoryRepository;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.GroupRepository;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.GroupUserRepository;
 import io.github.depromeet.knockknockbackend.domain.group.exception.CategoryNotFoundException;
@@ -19,8 +18,8 @@ import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.reque
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.CreateGroupResponse;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupBriefInfoDto;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupBriefInfoListResponse;
+import io.github.depromeet.knockknockbackend.global.utils.user.UserUtils;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupResponse;
-import io.github.depromeet.knockknockbackend.domain.user.UserUtils;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.global.exception.UserNotFoundException;
 import io.github.depromeet.knockknockbackend.global.utils.security.SecurityUtils;
@@ -37,7 +36,8 @@ public class GroupService {
 
     private final GroupRepository groupRepository;
     private final GroupUserRepository groupUserRepository;
-    private final GroupCategoryRepository groupCategoryRepository;
+    private final CategoryRepository categoryRepository;
+
 
     private final ThumbnailImageService thumbnailImageService;
     private final BackgroundImageService backgroundImageService;
@@ -61,7 +61,7 @@ public class GroupService {
      * @throws CategoryNotFoundException
      */
     private Category queryGroupCategoryById(Long categoryId){
-        return groupCategoryRepository.findById(categoryId)
+        return categoryRepository.findById(categoryId)
             .orElseThrow(() -> CategoryNotFoundException.EXCEPTION);
     }
 

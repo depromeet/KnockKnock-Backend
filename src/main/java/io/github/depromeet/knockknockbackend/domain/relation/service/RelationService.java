@@ -6,8 +6,9 @@ import io.github.depromeet.knockknockbackend.domain.relation.exception.AlreadySe
 import io.github.depromeet.knockknockbackend.domain.relation.presentation.dto.request.SendFriendRequest;
 import io.github.depromeet.knockknockbackend.domain.relation.presentation.dto.response.QueryFriendListResponse;
 import io.github.depromeet.knockknockbackend.domain.relation.presentation.dto.response.QueryFriendListResponseElement;
-import io.github.depromeet.knockknockbackend.domain.user.UserUtils;
+import io.github.depromeet.knockknockbackend.domain.user.UserRelationService;
 import io.github.depromeet.knockknockbackend.global.utils.security.SecurityUtils;
+import io.github.depromeet.knockknockbackend.global.utils.user.UserUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -17,7 +18,7 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
-public class RelationService {
+public class RelationService implements UserRelationService {
 
     private final RelationRepository relationRepository;
     private final UserUtils userUtils;
@@ -61,6 +62,10 @@ public class RelationService {
 
         return HttpStatus.CREATED;
 
+    }
+
+    public boolean getIsFriend(Long userId) {
+        return relationRepository.isFriend(SecurityUtils.getCurrentUserId(), userId);
     }
 
 }
