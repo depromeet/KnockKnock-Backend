@@ -5,6 +5,7 @@ import io.github.depromeet.knockknockbackend.domain.group.domain.Group;
 import io.github.depromeet.knockknockbackend.domain.group.domain.Group.GroupBuilder;
 import io.github.depromeet.knockknockbackend.domain.group.domain.Category;
 import io.github.depromeet.knockknockbackend.domain.group.domain.GroupType;
+import io.github.depromeet.knockknockbackend.domain.group.domain.GroupUser;
 import io.github.depromeet.knockknockbackend.domain.group.domain.GroupUsers;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.CategoryRepository;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.GroupRepository;
@@ -204,7 +205,7 @@ public class GroupService {
         // 그룹 유저 일급 컬랙션
         GroupUsers groupUsers = group.getGroupUsers();
         // reqUser 가 호스트인지 확인하는 메서드
-        groupUsers.validReqUserIsHost(reqUser);
+        groupUsers.validReqUserIsGroupHost(reqUser);
         Category category = queryGroupCategoryById(updateGroupRequest.getCategoryId());
         group.updateGroup(updateGroupRequest.toUpdateGroupDto(), category);
 
@@ -224,7 +225,7 @@ public class GroupService {
         User reqUser = userUtils.getUserFromSecurityContext();
         GroupUsers groupUsers = group.getGroupUsers();
 
-        groupUsers.validReqUserIsHost(reqUser);
+        groupUsers.validReqUserIsGroupHost(reqUser);
 
         // 캐스케이드 타입 all로 줬습니다.!
         // 그룹지우면 그룹유저 미들 테이블 삭제됩니다.
@@ -326,6 +327,24 @@ public class GroupService {
     }
 
     public GroupResponse addMembersToGroup(Long groupId, AddFriendToGroupRequest addFriendToGroupRequest) {
+        User reqUser = userUtils.getUserFromSecurityContext();
+        Group group = queryGroup(groupId);
+
+        List<Long> requestMemberIds = addFriendToGroupRequest.getMemberIds();
+        GroupUsers groupUsers = group.getGroupUsers();
+        List<Long> groupUserIds = groupUsers.getUserIds();
+
+        requestMemberIds.removeIf(groupUserIds::contains);
+
+        groupUsers.validReqUserIsGroupHost(reqUser);
+
+        List<User> findUserList = userUtils.findByIdIn(requestMemberIds);
+        // 요청받은 유저 아이디 목록이 디비에 존재하는 지 확인
+        validReqMemberNotExist(findUserList, addFriendToGroupRequest.getMemberIds());
+
+        groupUsers.addMembers(findUserList ,group);
+
+        return new GroupResponse(group.getGroupBaseInfoVo(),groupUsers.getUserInfoVoList(),true);
     }
 
     public GroupResponse deleteMemberFromGroup(Long groupId, Long userId) {
