@@ -274,24 +274,28 @@ public class GroupService {
         List<Group> groupList = groupUsers.getGroupList();
 
         List<GroupBriefInfoDto> groupBriefInfoDtos = groupList.stream().map(group ->
-            new GroupBriefInfoDto(group.getGroupBaseInfoVo(), group.getGroupUsers().getMemberCount())).collect(Collectors.toList());
+            new GroupBriefInfoDto(group.getGroupBaseInfoVo(),
+                group.getGroupUsers().getMemberCount())).collect(Collectors.toList());
 
         return new GroupBriefInfoListResponse(groupBriefInfoDtos);
     }
 
     public GroupBriefInfoListResponse findJoinedGroupByType(GroupInTypeRequest groupInTypeRequest) {
-        List<Group> groupList;
+
         if(groupInTypeRequest == GroupInTypeRequest.ALL){
-            groupList = groupRepository.findAll();
-        }else{
-            GroupType groupType = GroupType.valueOf(groupInTypeRequest.getValue());
-            groupList = groupRepository.findAllByGroupType(groupType);
+            return findAllJoinedGroups();
         }
 
-        List<GroupBriefInfoDto> groupBriefInfoDtos = groupList.stream().map(group -> {
-            GroupUsers groupUsers = group.getGroupUsers();
-            return new GroupBriefInfoDto(group.getGroupBaseInfoVo(), groupUsers.getMemberCount());
-        }).collect(Collectors.toList());
+        User reqUser = getUserFromSecurityContext();
+        GroupType groupType = GroupType.valueOf(groupInTypeRequest.getValue());
+
+        GroupUsers groupUsers = GroupUsers.from(
+            groupUserRepository.findJoinedGroupUserByGroupType(reqUser, groupType));
+        List<Group> groupList = groupUsers.getGroupList();
+
+        List<GroupBriefInfoDto> groupBriefInfoDtos = groupList.stream().map(group ->
+            new GroupBriefInfoDto(group.getGroupBaseInfoVo(),
+                group.getGroupUsers().getMemberCount())).collect(Collectors.toList());
 
         return new GroupBriefInfoListResponse(groupBriefInfoDtos);
     }
