@@ -16,11 +16,12 @@ import org.springframework.stereotype.Service;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private static final Long defaultEmptyCategoryId = 1L;
 
     public CategoryListResponse findAllCategory(){
         List<Category> categoryList = categoryRepository.findAll();
         List<CategoryDto> categoryDtoList = categoryList.stream()
-            .filter(category -> !category.getId().equals(1L))
+            .filter(category -> !category.getId().equals(defaultEmptyCategoryId))
             .map(CategoryDto::new)
             .collect(Collectors.toList());
         return new CategoryListResponse(categoryDtoList);
@@ -28,8 +29,10 @@ public class CategoryService {
 
     public CategoryDto saveCategory(CreateCategoryRequest createCategoryRequest){
 
-        Category category = Category.builder().emoji(createCategoryRequest.getEmoji())
-            .content(createCategoryRequest.getContent()).build();
+        Category category = Category.builder()
+            .emoji(createCategoryRequest.getEmoji())
+            .content(createCategoryRequest.getContent())
+            .build();
 
         categoryRepository.save(category);
 
