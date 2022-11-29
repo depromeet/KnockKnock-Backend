@@ -244,8 +244,8 @@ public class GroupService {
 
         return new GroupResponse(
             group.getGroupBaseInfoVo(),
-            groupUsers.getUserInfoVoList()
-            , iHost);
+            groupUsers.getUserInfoVoList(),
+            iHost);
     }
 
 
@@ -314,9 +314,12 @@ public class GroupService {
      * @return GroupBriefInfoListResponse
      */
     private GroupBriefInfoListResponse getGroupBriefInfoListResponse(List<Group> groupList) {
-        List<GroupBriefInfoDto> groupBriefInfoDtos = groupList.stream().map(group ->
-            new GroupBriefInfoDto(group.getGroupBaseInfoVo(),
-                group.getMemberCount())).collect(Collectors.toList());
+        List<GroupBriefInfoDto> groupBriefInfoDtos = groupList.stream()
+            .map(group ->
+                new GroupBriefInfoDto(
+                    group.getGroupBaseInfoVo(),
+                    group.getMemberCount()))
+            .collect(Collectors.toList());
 
         return new GroupBriefInfoListResponse(groupBriefInfoDtos);
     }

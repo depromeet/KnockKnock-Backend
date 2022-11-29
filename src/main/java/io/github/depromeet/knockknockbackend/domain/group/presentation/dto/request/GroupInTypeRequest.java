@@ -16,18 +16,4 @@ public enum GroupInTypeRequest {
 
     private String value;
 
-//    @JsonCreator
-//    public static GroupInTypeRequest from(String value) {
-//        for (GroupInTypeRequest status : GroupInTypeRequest.values()) {
-//            if (status.getValue().equals(value)) {
-//                return status;
-//            }
-//        }
-//        return null;
-//    }
-//
-//    @JsonValue
-//    public String getValue() {
-//        return value;
-//    }
 }
