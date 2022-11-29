@@ -85,4 +85,8 @@ public class GroupUsers {
             .collect(Collectors.toList());
         groupUserList.addAll(newGroupUsers);
     }
+
+    public void removeUserByUserId(Long userId){
+        groupUserList.removeIf(groupUser -> groupUser.getUserId().equals(userId));
+    }
 }

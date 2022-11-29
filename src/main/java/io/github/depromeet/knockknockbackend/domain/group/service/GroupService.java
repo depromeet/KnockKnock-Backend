@@ -12,6 +12,7 @@ import io.github.depromeet.knockknockbackend.domain.group.domain.repository.Grou
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.GroupUserRepository;
 import io.github.depromeet.knockknockbackend.domain.group.exception.CategoryNotFoundException;
 import io.github.depromeet.knockknockbackend.domain.group.exception.GroupNotFoundException;
+import io.github.depromeet.knockknockbackend.domain.group.exception.HostCanNotLeaveGroupException;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.AddFriendToGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateFriendGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateOpenGroupRequest;
@@ -348,5 +349,22 @@ public class GroupService {
     }
 
     public GroupResponse deleteMemberFromGroup(Long groupId, Long userId) {
+        User reqUser = userUtils.getUserFromSecurityContext();
+        Group group = queryGroup(groupId);
+        GroupUsers groupUsers = group.getGroupUsers();
+
+        // 일반 유저가 본인 스스로 방에서 나갈때
+        if(reqUser.getId().equals(userId)){
+            if(groupUsers.checkReqUserGroupHost(reqUser))
+                throw HostCanNotLeaveGroupException.EXCEPTION;
+            groupUsers.removeUserByUserId(userId);
+            return new GroupResponse(group.getGroupBaseInfoVo(),groupUsers.getUserInfoVoList(),false);
+        }
+
+        // 방장의 권한으로 내쫓을때
+        groupUsers.validReqUserIsGroupHost(reqUser);
+        groupUsers.removeUserByUserId(userId);
+        return new GroupResponse(group.getGroupBaseInfoVo(),groupUsers.getUserInfoVoList(),true);
+
     }
 }
