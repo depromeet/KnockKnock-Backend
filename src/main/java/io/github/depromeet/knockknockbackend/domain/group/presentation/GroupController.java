@@ -66,7 +66,7 @@ public class GroupController {
 
     @GetMapping("/{id}")
     public GroupResponse getGroupDetail(@PathVariable("id") Long groupId){
-        return groupService.getGroupById(groupId);
+        return groupService.getGroupDetailById(groupId);
     }
 
 
@@ -76,7 +76,7 @@ public class GroupController {
     @GetMapping("/in")
     public GroupBriefInfoListResponse getParticipatingGroups(
         @RequestParam("type") GroupInTypeRequest groupInTypeRequest){
-        if(groupInTypeRequest == groupInTypeRequest.ALL){
+        if(groupInTypeRequest == GroupInTypeRequest.ALL){
             return groupService.findAllGroups();
         }
         return groupService.findInGroupByType(groupInTypeRequest);
@@ -88,10 +88,10 @@ public class GroupController {
     @Operation(summary = "방 찾기")
     @GetMapping("")
     public GroupBriefInfoListResponse getGroups(@RequestParam(value = "category" ,required = false ) Long categoryId){
-        if(categoryId == null){
+        if(categoryId.equals(1L)){
             return groupService.findAllGroups();
         }
-        return groupService.exploreGroupByCategory(categoryId);
+        return groupService.findGroupByCategory(categoryId);
     }
 
 }

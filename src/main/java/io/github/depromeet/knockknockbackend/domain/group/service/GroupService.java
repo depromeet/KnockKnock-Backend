@@ -42,22 +42,44 @@ public class GroupService {
 
     private final UserUtils userUtils;
 
+
+    /**
+     * 요청한 유저의 entity를 securityContext 에서 가져옵니다.
+     * @return
+     */
     private User getUserFromSecurityContext(){
         Long currentUserId = SecurityUtils.getCurrentUserId();
         User user = userUtils.getUserById(currentUserId);
         return user;
     }
 
+    /**
+     * 카테고리 정보를 가져옵니다.
+     * @param categoryId 카테고리 아이디
+     * @throws CategoryNotFoundException
+     */
     private Category queryGroupCategoryById(Long categoryId){
         return groupCategoryRepository.findById(categoryId)
             .orElseThrow(() -> CategoryNotFoundException.EXCEPTION);
     }
 
+    /**
+     * 그룹 정보를 가져옵니다.
+     * @param groupId 그룹 아이디
+     * @return
+     */
     private Group queryGroup(Long groupId) {
         return groupRepository.findById(groupId)
             .orElseThrow(() -> GroupNotFoundException.EXCEPTION);
     }
 
+
+    /**
+     * 방에 집어넣을 유저가 존재하는 유저인지 판단합니다.
+     * @param findUserList
+     * @param requestUserIdList
+     * @throws UserNotFoundException
+     */
     private void validReqMemberNotExist(List<User> findUserList, List<Long> requestUserIdList
     ) {
         //요청한 유저중에 없는 유저가 있으면 안됩니다.
@@ -66,6 +88,11 @@ public class GroupService {
         }
     }
 
+
+    /**
+     * 오픈 그룹(홀로 외침방 )을 생성합니다.
+     * @return CreateGroupResponse
+     */
     public CreateGroupResponse createOpenGroup(CreateOpenGroupRequest createOpenGroupRequest) {
         // 요청자 정보 시큐리티에서 가져옴
         User reqUser = getUserFromSecurityContext();
@@ -89,7 +116,10 @@ public class GroupService {
             ,true);
     }
 
-
+    /**
+     * 친구그룹을 만듭니다
+     * @return CreateGroupResponse
+     */
     public CreateGroupResponse createFriendGroup(CreateFriendGroupRequest createFriendGroupRequest) {
         User reqUser = getUserFromSecurityContext();
 
@@ -113,6 +143,12 @@ public class GroupService {
             ,true);
     }
 
+    /**
+     * 오픈 그룹 생성 로직 뺀 함수입니다..
+     * 썸네일, 백그라운드 서비스를 파사드로 빼고
+     * 그룹 도메인으로 옮길 예정입니다.
+     * @return Group
+     */
     private Group makeOpenGroup(CreateOpenGroupRequest createOpenGroupRequest) {
         GroupBuilder groupBuilder = Group.builder()
             .publicAccess(createOpenGroupRequest.getPublicAccess())
@@ -138,6 +174,13 @@ public class GroupService {
         return group;
     }
 
+
+    /**
+     * 친구 그룹 생성 로직 뺀 함수입니다..
+     * 썸네일, 백그라운드 서비스를 파사드로 빼고
+     * 그룹 도메인으로 옮길 예정입니다.
+     * @return Group
+     */
     private Group makeFriendGroup() {
         //defaultCategory
         Category category = queryGroupCategoryById(1L);
@@ -157,6 +200,11 @@ public class GroupService {
         return group;
     }
 
+
+    /**
+     * 그룹을 업데이트 합니다
+     * @return GroupResponse
+     */
     public GroupResponse updateGroup(Long groupId , UpdateGroupRequest updateGroupRequest) {
         Group group = queryGroup(groupId);
         User reqUser = getUserFromSecurityContext();
@@ -174,6 +222,11 @@ public class GroupService {
             , true);
     }
 
+
+    /**
+     * 그룹을 삭제합니다
+     * @param groupId
+     */
     public void deleteGroup(Long groupId) {
         Group group = queryGroup(groupId);
         User reqUser = getUserFromSecurityContext();
@@ -187,7 +240,9 @@ public class GroupService {
 
     }
 
-    public GroupResponse getGroupById(Long groupId) {
+
+    public GroupResponse getGroupDetailById(Long groupId) {
+
     }
 
     public GroupBriefInfoListResponse findAllGroups() {
@@ -196,6 +251,6 @@ public class GroupService {
     public GroupBriefInfoListResponse findInGroupByType(GroupInTypeRequest groupInTypeRequest) {
     }
 
-    public GroupBriefInfoListResponse exploreGroupByCategory(Long categoryId) {
+    public GroupBriefInfoListResponse findGroupByCategory(Long categoryId) {
     }
 }
