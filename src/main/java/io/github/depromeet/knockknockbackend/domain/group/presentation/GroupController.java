@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.domain.group.presentation;
 
+import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.AddFriendToGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateCategoryRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateFriendGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateOpenGroupRequest;
@@ -105,6 +106,20 @@ public class GroupController {
     @PostMapping("/categories")
     public CategoryDto createCategory(@RequestBody @Valid CreateCategoryRequest createCategoryRequest){
         return categoryService.saveCategory(createCategoryRequest);
+    }
+
+    @Operation(summary = "방장 권한 멤버 추가")
+    @PostMapping("/{id}/members")
+    public GroupResponse addMembers(
+        @PathVariable(value = "id") Long groupId,
+        @Valid @RequestBody AddFriendToGroupRequest addFriendToGroupRequest){
+        return groupService.addMembersToGroup(groupId , addFriendToGroupRequest);
+    }
+
+    @Operation(summary = "멤버 제거 ( 방장일 경우 본인빼고 모든인원 , 멤버일경우 나만)")
+    @DeleteMapping("/{id}/members/{user_id}")
+    public GroupResponse deleteMemberFromGroup(@PathVariable(value = "id") Long groupId, @PathVariable(value = "user_id") Long userId){
+        return this.groupService.deleteMemberFromGroup(groupId , userId);
     }
 
 }
