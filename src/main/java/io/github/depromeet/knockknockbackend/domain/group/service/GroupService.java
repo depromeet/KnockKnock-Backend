@@ -267,11 +267,7 @@ public class GroupService {
     public GroupBriefInfoListResponse findAllOpenGroups() {
         List<Group> groupList = groupRepository.findAllByGroupType(GroupType.OPEN);
 
-        List<GroupBriefInfoDto> groupBriefInfoDtos = groupList.stream().map(group ->
-            new GroupBriefInfoDto(group.getGroupBaseInfoVo(),
-                group.getGroupUsers().getMemberCount())).collect(Collectors.toList());
-
-        return new GroupBriefInfoListResponse(groupBriefInfoDtos);
+        return getGroupBriefInfoListResponse(groupList);
     }
 
     /**
@@ -284,11 +280,7 @@ public class GroupService {
 
         List<Group> groupList = groupUsers.getGroupList();
 
-        List<GroupBriefInfoDto> groupBriefInfoDtos = groupList.stream().map(group ->
-            new GroupBriefInfoDto(group.getGroupBaseInfoVo(),
-                group.getGroupUsers().getMemberCount())).collect(Collectors.toList());
-
-        return new GroupBriefInfoListResponse(groupBriefInfoDtos);
+        return getGroupBriefInfoListResponse(groupList);
     }
 
     /**
@@ -309,11 +301,7 @@ public class GroupService {
             groupUserRepository.findJoinedGroupUserByGroupType(reqUser, groupType));
         List<Group> groupList = groupUsers.getGroupList();
 
-        List<GroupBriefInfoDto> groupBriefInfoDtos = groupList.stream().map(group ->
-            new GroupBriefInfoDto(group.getGroupBaseInfoVo(),
-                group.getGroupUsers().getMemberCount())).collect(Collectors.toList());
-
-        return new GroupBriefInfoListResponse(groupBriefInfoDtos);
+        return getGroupBriefInfoListResponse(groupList);
     }
 
     /**
@@ -325,6 +313,15 @@ public class GroupService {
 
         List<Group> groupList = groupRepository.findAllByGroupTypeAndCategory(GroupType.OPEN,category);
 
+        return getGroupBriefInfoListResponse(groupList);
+    }
+
+
+    /**
+     * 중복된 그룹리스트에 대한 정보를 반환하는 코드를 추출했습니다.
+     * @return GroupBriefInfoListResponse
+     */
+    private GroupBriefInfoListResponse getGroupBriefInfoListResponse(List<Group> groupList) {
         List<GroupBriefInfoDto> groupBriefInfoDtos = groupList.stream().map(group ->
             new GroupBriefInfoDto(group.getGroupBaseInfoVo(),
                 group.getGroupUsers().getMemberCount())).collect(Collectors.toList());
