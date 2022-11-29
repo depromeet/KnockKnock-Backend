@@ -164,7 +164,7 @@ public class GroupService {
         // reqUser 가 호스트인지 확인하는 메서드
         groupUsers.validReqUserIsHost(reqUser);
         Category category = queryGroupCategoryById(updateGroupRequest.getCategoryId());
-        group.updateGroup(updateGroupRequest, category);
+        group.updateGroup(updateGroupRequest.toUpdateGroupDto(), category);
 
         return new GroupResponse(
             group.getGroupBaseInfoVo(),
