@@ -107,4 +107,34 @@ public class GroupController {
         return categoryService.saveCategory(createCategoryRequest);
     }
 
+
+    @Operation(summary = "그룹에 가입요청을 합니다.")
+    @PostMapping("/{id}/admissions")
+    public AdmissionInfoDto admissionToGroup(@PathVariable(value = "id") Long groupId){
+        return admissionFacade.requestAdmission(groupId);
+    }
+
+    @Operation(summary = "그룹 가입 요청을 살펴봅니다.")
+    @GetMapping("/{id}/admissions")
+    public AdmissionInfoListResponse getAdmissionRequest(@PathVariable(value = "id") Long groupId){
+        return admissionFacade.getAdmissions(groupId);
+    }
+
+    @Operation(summary = "그룹 가입요청을 허락합니다.")
+    @PostMapping("/{id}/admissions/{admission_id}/allow")
+    public AdmissionInfoDto acceptAdmissionRequest(
+        @PathVariable(value = "id") Long groupId,
+        @PathVariable(value = "admission_id") Long admissionId){
+        return admissionFacade.acceptAdmission(groupId,admissionId);
+    }
+
+    @Operation(summary = "그룹 가입요청을 거절합니다.")
+    @PostMapping("/{id}/admissions/{admission_id}/refuse")
+    public AdmissionInfoDto refuseAdmissionRequest(
+        @PathVariable(value = "id") Long groupId,
+        @PathVariable(value = "admission_id") Long admissionId
+    ){
+        return admissionFacade.refuseAdmission(groupId,admissionId);
+    }
+
 }
