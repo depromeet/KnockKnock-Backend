@@ -36,7 +36,8 @@ public enum ErrorCode {
 
     GROUP_NOT_HOST(400 , "GROUP-400-1","User Not Host" ),
 
-    ALREADY_GROUP_ENTER(400 , "GROUP-400-3","Already enter group");
+    ALREADY_GROUP_ENTER(400 , "GROUP-400-3","Already enter group"),
+    ADMISSION_NOT_FOUND(404,"GROUP-404-4", "ADMISSION Not Found");
 
 
 
