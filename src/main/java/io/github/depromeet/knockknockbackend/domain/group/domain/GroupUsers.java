@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.domain.group.domain;
 
+import io.github.depromeet.knockknockbackend.domain.group.exception.AlreadyGroupEnterException;
 import io.github.depromeet.knockknockbackend.domain.group.exception.NotHostException;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.domain.user.domain.vo.UserInfoVO;
@@ -71,4 +72,16 @@ public class GroupUsers {
         return groupUserList.stream().map(GroupUser::getGroup).collect(
             Collectors.toList());
     }
+
+    public void validUserIsAlreadyEnterGroup(User reqUser){
+        if(checkUserIsAlreadyEnterGroup(reqUser))
+            throw AlreadyGroupEnterException.EXCEPTION;
+    }
+
+    public boolean checkUserIsAlreadyEnterGroup(User reqUser) {
+        return groupUserList.stream()
+            .anyMatch(groupUser ->
+                groupUser.getUser().getId().equals(reqUser.getId()));
+    }
+
 }

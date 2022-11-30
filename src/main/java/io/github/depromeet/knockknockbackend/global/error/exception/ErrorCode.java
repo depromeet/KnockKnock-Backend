@@ -34,7 +34,9 @@ public enum ErrorCode {
     THUMBNAIL_NOT_FOUND(404,"GROUP-404-3", "THUMBNAIL Not Found"),
     GROUP_NOT_FOUND(404,"GROUP-404-1", "Group Not Found" ),
 
-    GROUP_NOT_HOST(400 , "GROUP-400-1","User Not Host" );
+    GROUP_NOT_HOST(400 , "GROUP-400-1","User Not Host" ),
+
+    ALREADY_GROUP_ENTER(400 , "GROUP-400-3","Already enter group");
 
 
 

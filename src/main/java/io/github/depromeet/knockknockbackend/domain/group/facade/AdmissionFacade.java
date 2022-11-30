@@ -4,6 +4,7 @@ package io.github.depromeet.knockknockbackend.domain.group.facade;
 import io.github.depromeet.knockknockbackend.domain.group.domain.Group;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.AdmissionInfoDto;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.AdmissionInfoListResponse;
+import io.github.depromeet.knockknockbackend.domain.group.service.AdmissionService;
 import io.github.depromeet.knockknockbackend.domain.group.service.GroupService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
