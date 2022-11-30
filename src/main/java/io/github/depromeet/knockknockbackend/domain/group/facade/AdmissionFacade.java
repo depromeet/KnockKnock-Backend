@@ -31,6 +31,9 @@ public class AdmissionFacade {
 
     public AdmissionInfoDto acceptAdmission(Long groupId, Long admissionId) {
         Group group = groupService.queryGroup(groupId);
+
+        //TODO: 멤버 추가 해줘야함 58번 이슈 머지 되고나서 가능
+
         return admissionService.acceptAdmission(group,admissionId);
     }
 

@@ -25,7 +25,8 @@ public class AdmissionService {
     // TODO : 친구 초대했을 때도 Admission send를 해야함!!!
 
     private Admission queryAdmission(Long admissionId) {
-        return admissionRepository.findById(admissionId).orElseThrow(()-> AdmissionNotFoundException.EXCEPTION);
+        return admissionRepository.findById(admissionId)
+            .orElseThrow(()-> AdmissionNotFoundException.EXCEPTION);
     }
 
     private AdmissionInfoDto getAdmissionInfoDto(Admission admission) {
@@ -39,9 +40,12 @@ public class AdmissionService {
 
     private void validReqUserIsGroupHost(Group group, User reqUser) {
         GroupUsers groupUsers = group.getGroupUsers();
-        groupUsers.checkReqUserGroupHost(reqUser);
+        groupUsers.validReqUserIsHost(reqUser);
     }
 
+    /**
+     * 그룹 입장요청을 합니다.
+     */
     public AdmissionInfoDto requestAdmission(Group group) {
         User reqUser = userUtils.getUserFromSecurityContext();
         GroupUsers groupUsers = group.getGroupUsers();
@@ -55,7 +59,9 @@ public class AdmissionService {
     }
 
 
-
+    /**
+     * 방장이 요청상태가 PENDING 인 그룹 가입 요청을 가져옵니다.
+     */
     public AdmissionInfoListResponse getAdmissions(Group group) {
 
         User reqUser = userUtils.getUserFromSecurityContext();
@@ -72,7 +78,9 @@ public class AdmissionService {
     }
 
 
-
+    /**
+     * 방장이 그룹 가입 요청을 승인합니다.
+     */
     public AdmissionInfoDto acceptAdmission(Group group , Long admissionId) {
         User reqUser = userUtils.getUserFromSecurityContext();
         validReqUserIsGroupHost(group, reqUser);
@@ -82,7 +90,9 @@ public class AdmissionService {
 
         return getAdmissionInfoDto(admission);
     }
-
+    /**
+     * 방장이 그룹 가입 요청을 거절합니다.
+     */
     public AdmissionInfoDto refuseAdmission(Group group , Long admissionId) {
         User reqUser = userUtils.getUserFromSecurityContext();
         validReqUserIsGroupHost(group, reqUser);
