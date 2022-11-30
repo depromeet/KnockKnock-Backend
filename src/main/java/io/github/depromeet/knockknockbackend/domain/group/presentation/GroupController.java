@@ -107,12 +107,11 @@ public class GroupController {
         return categoryService.saveCategory(createCategoryRequest);
     }
 
-    @Parameter(name = "searchString", description = "searchString", schema = @Schema(implementation = String.class)
-        , in = ParameterIn.QUERY)
+
     @Operation(summary = "방 검색하기")
     @GetMapping("/search/{searchString}")
-    public GroupBriefInfoListResponse searchGroups(@PathVariable(value = "searchString") String searchString){
-        return groupService.searchGroups(searchString);
+    public GroupBriefInfoListResponse searchOpenGroups(@PathVariable(value = "searchString") String searchString){
+        return groupService.searchOpenGroups(searchString);
     }
 
 }
