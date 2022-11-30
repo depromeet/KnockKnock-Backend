@@ -37,6 +37,11 @@ public class AdmissionService {
             .build();
     }
 
+    private void validReqUserIsGroupHost(Group group, User reqUser) {
+        GroupUsers groupUsers = group.getGroupUsers();
+        groupUsers.checkReqUserGroupHost(reqUser);
+    }
+
     public AdmissionInfoDto requestAdmission(Group group) {
         User reqUser = userUtils.getUserFromSecurityContext();
         GroupUsers groupUsers = group.getGroupUsers();
@@ -54,9 +59,7 @@ public class AdmissionService {
     public AdmissionInfoListResponse getAdmissions(Group group) {
 
         User reqUser = userUtils.getUserFromSecurityContext();
-        GroupUsers groupUsers = group.getGroupUsers();
-        groupUsers.checkReqUserGroupHost(reqUser);
-
+        validReqUserIsGroupHost(group, reqUser);
 
         List<Admission> Admissions = admissionRepository.findByGroupAndAdmissionState(group ,
             AdmissionState.PENDING);
@@ -68,13 +71,12 @@ public class AdmissionService {
         return new AdmissionInfoListResponse(admissionInfoDtos);
     }
 
+
+
     public AdmissionInfoDto acceptAdmission(Group group , Long admissionId) {
         User reqUser = userUtils.getUserFromSecurityContext();
-        // 이거 어차피 뺄거
-        GroupUsers groupUsers = group.getGroupUsers();
-        groupUsers.checkReqUserGroupHost(reqUser);
+        validReqUserIsGroupHost(group, reqUser);
 
-        //TODO : AdmissionNotFoundException
         Admission admission = queryAdmission(admissionId);
         admission.acceptAdmission();
 
@@ -83,11 +85,8 @@ public class AdmissionService {
 
     public AdmissionInfoDto refuseAdmission(Group group , Long admissionId) {
         User reqUser = userUtils.getUserFromSecurityContext();
-        // 이거 어차피 뺄거
-        GroupUsers groupUsers = group.getGroupUsers();
-        groupUsers.checkReqUserGroupHost(reqUser);
+        validReqUserIsGroupHost(group, reqUser);
 
-        //TODO : AdmissionNotFoundException
         Admission admission = queryAdmission(admissionId);
         admission.refuseAdmission();
 
