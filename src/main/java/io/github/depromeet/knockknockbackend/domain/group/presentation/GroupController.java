@@ -1,10 +1,13 @@
 package io.github.depromeet.knockknockbackend.domain.group.presentation;
 
+import io.github.depromeet.knockknockbackend.domain.group.facade.AdmissionFacade;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateCategoryRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateFriendGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateOpenGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.GroupInTypeRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.UpdateGroupRequest;
+import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.AdmissionInfoDto;
+import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.AdmissionInfoListResponse;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.CategoryDto;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.CategoryListResponse;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.CreateGroupResponse;
@@ -41,6 +44,8 @@ public class GroupController {
     private final GroupService groupService;
 
     private final CategoryService categoryService;
+
+    private final AdmissionFacade admissionFacade;
 
     @Operation(summary = "공개 그룹을 만듭니다")
     @PostMapping("/open")
