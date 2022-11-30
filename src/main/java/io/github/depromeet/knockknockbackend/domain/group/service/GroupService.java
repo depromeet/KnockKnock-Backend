@@ -329,13 +329,6 @@ public class GroupService {
 
         List<Group> groupList = groupRepository.findByGroupTypeAndTitleContaining(GroupType.OPEN,searchString);
 
-        List<GroupBriefInfoDto> groupBriefInfoDtos = groupList.stream()
-            .map(group ->
-                new GroupBriefInfoDto(
-                    group.getGroupBaseInfoVo(),
-                    group.getMemberCount()))
-            .collect(Collectors.toList());
-
-        return new GroupBriefInfoListResponse(groupBriefInfoDtos);
+        return getGroupBriefInfoListResponse(groupList);
     }
 }
