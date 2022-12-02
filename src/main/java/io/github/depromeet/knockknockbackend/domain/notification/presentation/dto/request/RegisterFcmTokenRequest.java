@@ -6,6 +6,6 @@ import lombok.Getter;
 public class RegisterFcmTokenRequest {
 
     private String deviceId;
-    private String deviceToken;
+    private String token;
 
 }

@@ -1,6 +1,7 @@
 package io.github.depromeet.knockknockbackend.domain.notification.domain;
 
 import io.github.depromeet.knockknockbackend.global.database.BaseTimeEntity;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -28,6 +29,7 @@ public class DeviceToken extends BaseTimeEntity {
 
     private String deviceId;
 
+    @Column(unique = true)
     private String token;
 
 

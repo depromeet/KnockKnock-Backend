@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,7 +34,8 @@ public class NotificationController {
 
     @PostMapping("/token")
     public ResponseEntity<Void> registerFcmToken(@RequestBody RegisterFcmTokenRequest request) {
-        return new ResponseEntity<>(notificationService.registerFcmToken(request));
+        notificationService.registerFcmToken(request);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
 }

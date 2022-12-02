@@ -11,10 +11,10 @@ import io.github.depromeet.knockknockbackend.global.utils.security.SecurityUtils
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import javax.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +24,7 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final DeviceTokenRepository deviceTokenRepository;
+    private final EntityManager entityManager;
 
     private final NotificationMapper notificationMapper;
 
@@ -40,23 +41,27 @@ public class NotificationService {
     }
 
     @Transactional
-    public HttpStatus registerFcmToken(RegisterFcmTokenRequest request) {
+    public void registerFcmToken(RegisterFcmTokenRequest request) {
         Long currentUserId = SecurityUtils.getCurrentUserId();
+
         Optional<DeviceToken> deviceTokenOptional = deviceTokenRepository.findByDeviceId(
             request.getDeviceId());
 
-        deviceTokenOptional.filter(deviceToken -> !deviceToken.getUserId().equals(currentUserId))
-            .ifPresent(deviceToken -> {
-                deviceTokenRepository.deleteById(deviceToken.getId());
-                deviceTokenRepository.save(
-                    DeviceToken.of(currentUserId, request.getDeviceId(), request.getDeviceToken()));
-            });
-
-        deviceTokenOptional.filter(deviceToken -> deviceToken.getUserId().equals(currentUserId)
-                && !deviceToken.getToken().equals(request.getDeviceToken()))
-            .ifPresent(deviceToken -> deviceTokenRepository.save(
-                deviceToken.changeToken(request.getDeviceToken())));
-
-        return HttpStatus.CREATED;
+        deviceTokenOptional.ifPresentOrElse(
+            deviceToken -> {
+                if (deviceToken.getUserId().equals(currentUserId)) {
+                    deviceTokenRepository.save(
+                        deviceToken.changeToken(request.getToken()));
+                } else {
+                    deviceTokenRepository.deleteById(deviceToken.getId());
+                    entityManager.flush();
+                    deviceTokenRepository.save(
+                        DeviceToken.of(currentUserId, request.getDeviceId(), request.getToken()));
+                }
+            },
+            () -> deviceTokenRepository.save(
+                DeviceToken.of(currentUserId, request.getDeviceId(), request.getToken()))
+        );
     }
+
 }
