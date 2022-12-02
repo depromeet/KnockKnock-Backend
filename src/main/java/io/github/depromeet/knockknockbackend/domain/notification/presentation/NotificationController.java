@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.domain.notification.presentation;
 
+import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.request.RegisterFcmTokenRequest;
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.response.QueryAlarmHistoryResponse;
 import io.github.depromeet.knockknockbackend.domain.notification.service.NotificationService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -8,7 +9,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,4 +30,10 @@ public class NotificationController {
         @PageableDefault(size = 5, sort = "sendAt", direction = Direction.DESC) Pageable pageable) {
         return notificationService.queryAlarmHistoryByUserId(pageable);
     }
+
+    @PostMapping("/token")
+    public ResponseEntity<Void> registerFcmToken(@RequestBody RegisterFcmTokenRequest request) {
+        return new ResponseEntity<>(notificationService.registerFcmToken(request));
+    }
+
 }
