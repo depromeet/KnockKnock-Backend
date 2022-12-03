@@ -30,25 +30,12 @@ public class CustomRelationRepositoryImpl implements CustomRelationRepository {
     }
 
     @Override
-    public Optional<Relation> isAlreadyRequested(Long currentUserId, Long sendUserId) {
+    public Optional<Relation> findRelationBySendUserIdAndReceiveUserId(Long sendUserId, Long receiveUserId) {
         return Optional.of(
                 queryFactory.selectFrom(relation)
                         .where(
                                 relation.isFriend.eq(false).and(
-                                        friendPredicated(currentUserId, sendUserId)
-                                )
-                        )
-                        .fetchFirst()
-        );
-    }
-
-    @Override
-    public Optional<Relation> isPendingRequest(Long currentUserId, Long sendUserId) {
-        return Optional.of(
-                queryFactory.selectFrom(relation)
-                        .where(
-                                relation.isFriend.eq(false).and(
-                                        friendPredicated(sendUserId, currentUserId)
+                                        friendPredicated(sendUserId, receiveUserId)
                                 )
                         )
                         .fetchFirst()
