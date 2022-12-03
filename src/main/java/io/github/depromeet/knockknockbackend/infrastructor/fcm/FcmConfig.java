@@ -20,10 +20,11 @@ public class FcmConfig {
     @PostConstruct
     private void initialize() {
         try {
-            if(FirebaseApp.getApps().isEmpty()) {
+            if (FirebaseApp.getApps().isEmpty()) {
                 FirebaseOptions options = FirebaseOptions.builder()
-                        .setCredentials(GoogleCredentials.fromStream(new ByteArrayInputStream(fcmValue.getBytes(StandardCharsets.UTF_8))))
-                        .build();
+                    .setCredentials(GoogleCredentials.getApplicationDefault())
+//                        .setCredentials(GoogleCredentials.fromStream(new ByteArrayInputStream(fcmValue.getBytes(StandardCharsets.UTF_8))))
+                    .build();
                 FirebaseApp.initializeApp(options);
             }
         } catch (IOException e) {

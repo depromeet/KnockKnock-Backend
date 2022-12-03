@@ -12,6 +12,8 @@ import io.github.depromeet.knockknockbackend.domain.group.domain.repository.Grou
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.GroupUserRepository;
 import io.github.depromeet.knockknockbackend.domain.group.exception.CategoryNotFoundException;
 import io.github.depromeet.knockknockbackend.domain.group.exception.GroupNotFoundException;
+import io.github.depromeet.knockknockbackend.domain.group.exception.HostCanNotLeaveGroupException;
+import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.AddFriendToGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateFriendGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateOpenGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.GroupInTypeRequest;
@@ -204,7 +206,7 @@ public class GroupService {
         // 그룹 유저 일급 컬랙션
         GroupUsers groupUsers = group.getGroupUsers();
         // reqUser 가 호스트인지 확인하는 메서드
-        groupUsers.validReqUserIsHost(reqUser);
+        groupUsers.validReqUserIsGroupHost(reqUser);
         Category category = queryGroupCategoryById(updateGroupRequest.getCategoryId());
         group.updateGroup(updateGroupRequest.toUpdateGroupDto(), category);
 
@@ -224,7 +226,7 @@ public class GroupService {
         User reqUser = userUtils.getUserFromSecurityContext();
         GroupUsers groupUsers = group.getGroupUsers();
 
-        groupUsers.validReqUserIsHost(reqUser);
+        groupUsers.validReqUserIsGroupHost(reqUser);
 
         // 캐스케이드 타입 all로 줬습니다.!
         // 그룹지우면 그룹유저 미들 테이블 삭제됩니다.
@@ -325,10 +327,53 @@ public class GroupService {
         return new GroupBriefInfoListResponse(groupBriefInfoDtos);
     }
 
+
     public GroupBriefInfoListResponse searchOpenGroups(String searchString) {
 
-        List<Group> groupList = groupRepository.findByGroupTypeAndTitleContaining(GroupType.OPEN,searchString);
+        List<Group> groupList = groupRepository.findByGroupTypeAndTitleContaining(GroupType.OPEN,
+            searchString);
 
         return getGroupBriefInfoListResponse(groupList);
+    }
+
+    public GroupResponse addMembersToGroup(Long groupId, AddFriendToGroupRequest addFriendToGroupRequest) {
+        User reqUser = userUtils.getUserFromSecurityContext();
+        Group group = queryGroup(groupId);
+
+        List<Long> requestMemberIds = addFriendToGroupRequest.getMemberIds();
+        GroupUsers groupUsers = group.getGroupUsers();
+        List<Long> groupUserIds = groupUsers.getUserIds();
+
+        requestMemberIds.removeIf(groupUserIds::contains);
+
+        groupUsers.validReqUserIsGroupHost(reqUser);
+
+        List<User> findUserList = userUtils.findByIdIn(requestMemberIds);
+        // 요청받은 유저 아이디 목록이 디비에 존재하는 지 확인
+        validReqMemberNotExist(findUserList, addFriendToGroupRequest.getMemberIds());
+
+        groupUsers.addMembers(findUserList ,group);
+
+        return new GroupResponse(group.getGroupBaseInfoVo(),groupUsers.getUserInfoVoList(),true);
+    }
+
+    public GroupResponse deleteMemberFromGroup(Long groupId, Long userId) {
+        User reqUser = userUtils.getUserFromSecurityContext();
+        Group group = queryGroup(groupId);
+        GroupUsers groupUsers = group.getGroupUsers();
+
+        // 일반 유저가 본인 스스로 방에서 나갈때
+        if(reqUser.getId().equals(userId)){
+            if(groupUsers.checkReqUserGroupHost(reqUser))
+                throw HostCanNotLeaveGroupException.EXCEPTION;
+            groupUsers.removeUserByUserId(userId);
+            return new GroupResponse(group.getGroupBaseInfoVo(),groupUsers.getUserInfoVoList(),false);
+        }
+
+        // 방장의 권한으로 내쫓을때
+        groupUsers.validReqUserIsGroupHost(reqUser);
+        groupUsers.removeUserByUserId(userId);
+        return new GroupResponse(group.getGroupBaseInfoVo(),groupUsers.getUserInfoVoList(),true);
+
     }
 }

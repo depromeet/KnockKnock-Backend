@@ -44,6 +44,10 @@ public class GroupUser extends BaseTimeEntity {
     public UserInfoVO getMemberUserInfo() {
         return this.user.getUserInfo();
     }
+
+    public Long getUserId(){
+        return user.getId();
+    }
     @Builder
     public GroupUser(Group group, User user, Boolean isHost) {
         this.group = group;

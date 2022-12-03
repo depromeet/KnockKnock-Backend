@@ -41,7 +41,6 @@ public class User {
         this.oauthId = oauthId;
         this.email = email;
     }
-
     public UserInfoVO getUserInfo() {
         return new UserInfoVO(id, nickname, profilePath);
     }
