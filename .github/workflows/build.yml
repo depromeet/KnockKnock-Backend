@@ -31,7 +31,7 @@ jobs:
         uses: gradle/gradle-build-action@v2
         with:
           arguments: |
-            build
+            build -x test
             --no-daemon
             
       - name: Login to ECR
