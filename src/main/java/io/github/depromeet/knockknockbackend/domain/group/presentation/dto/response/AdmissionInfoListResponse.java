@@ -7,9 +7,6 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-
-
-
 public class AdmissionInfoListResponse {
     List<AdmissionInfoDto> admissions;
 

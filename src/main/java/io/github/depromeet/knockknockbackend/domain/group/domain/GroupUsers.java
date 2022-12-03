@@ -50,7 +50,7 @@ public class GroupUsers {
             .collect(Collectors.toList());
     }
 
-    public void validReqUserIsHost(User reqUser) {
+    public void validReqUserIsGroupHost(User reqUser) {
         groupUserList.stream()
             .filter(groupUser -> groupUser.getUser().equals(reqUser) && groupUser.getIsHost())
             .findFirst()
@@ -73,6 +73,7 @@ public class GroupUsers {
             Collectors.toList());
     }
 
+
     public void validUserIsAlreadyEnterGroup(User reqUser){
         if(checkUserIsAlreadyEnterGroup(reqUser))
             throw AlreadyGroupEnterException.EXCEPTION;
@@ -82,6 +83,25 @@ public class GroupUsers {
         return groupUserList.stream()
             .anyMatch(groupUser ->
                 groupUser.getUser().getId().equals(reqUser.getId()));
+    }
+
+
+    public List<Long> getUserIds() {
+        return groupUserList.stream()
+            .map(groupUser -> groupUser.getUser().getId())
+            .collect(Collectors.toList());
+    }
+
+    public void addMembers(List<User> newMembers , Group group){
+
+        List<GroupUser> newGroupUsers = newMembers.stream()
+            .map(user -> new GroupUser(group, user, false))
+            .collect(Collectors.toList());
+        groupUserList.addAll(newGroupUsers);
+    }
+
+    public void removeUserByUserId(Long userId){
+        groupUserList.removeIf(groupUser -> groupUser.getUserId().equals(userId));
     }
 
 }

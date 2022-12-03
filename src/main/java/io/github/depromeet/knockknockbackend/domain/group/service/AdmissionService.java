@@ -40,7 +40,7 @@ public class AdmissionService {
 
     private void validReqUserIsGroupHost(Group group, User reqUser) {
         GroupUsers groupUsers = group.getGroupUsers();
-        groupUsers.validReqUserIsHost(reqUser);
+        groupUsers.validReqUserIsGroupHost(reqUser);
     }
 
     /**
