@@ -62,7 +62,7 @@ public class GroupService {
      * @param groupId 그룹 아이디
      * @return
      */
-    private Group queryGroup(Long groupId) {
+    public Group queryGroup(Long groupId) {
         return groupRepository.findById(groupId)
             .orElseThrow(() -> GroupNotFoundException.EXCEPTION);
     }

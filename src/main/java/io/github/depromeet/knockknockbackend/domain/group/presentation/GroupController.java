@@ -1,11 +1,14 @@
 package io.github.depromeet.knockknockbackend.domain.group.presentation;
 
+import io.github.depromeet.knockknockbackend.domain.group.facade.AdmissionFacade;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.AddFriendToGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateCategoryRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateFriendGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateOpenGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.GroupInTypeRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.UpdateGroupRequest;
+import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.AdmissionInfoDto;
+import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.AdmissionInfoListResponse;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.CategoryDto;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.CategoryListResponse;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.CreateGroupResponse;
@@ -42,6 +45,8 @@ public class GroupController {
     private final GroupService groupService;
 
     private final CategoryService categoryService;
+
+    private final AdmissionFacade admissionFacade;
 
     @Operation(summary = "공개 그룹을 만듭니다")
     @PostMapping("/open")
@@ -109,6 +114,35 @@ public class GroupController {
     }
 
 
+
+    @Operation(summary = "그룹에 가입요청을 합니다.")
+    @PostMapping("/{id}/admissions")
+    public AdmissionInfoDto admissionToGroup(@PathVariable(value = "id") Long groupId){
+        return admissionFacade.requestAdmission(groupId);
+    }
+
+    @Operation(summary = "그룹 가입 요청을 살펴봅니다.")
+    @GetMapping("/{id}/admissions")
+    public AdmissionInfoListResponse getAdmissionRequest(@PathVariable(value = "id") Long groupId){
+        return admissionFacade.getAdmissions(groupId);
+    }
+
+    @Operation(summary = "그룹 가입요청을 허락합니다.")
+    @PostMapping("/{id}/admissions/{admission_id}/allow")
+    public AdmissionInfoDto acceptAdmissionRequest(
+        @PathVariable(value = "id") Long groupId,
+        @PathVariable(value = "admission_id") Long admissionId){
+        return admissionFacade.acceptAdmission(groupId,admissionId);
+    }
+
+    @Operation(summary = "그룹 가입요청을 거절합니다.")
+    @PostMapping("/{id}/admissions/{admission_id}/refuse")
+    public AdmissionInfoDto refuseAdmissionRequest(
+        @PathVariable(value = "id") Long groupId,
+        @PathVariable(value = "admission_id") Long admissionId
+    ) {
+        return admissionFacade.refuseAdmission(groupId, admissionId);
+    }
     @Operation(summary = "방 검색하기")
     @GetMapping("/search/{searchString}")
     public GroupBriefInfoListResponse searchOpenGroups(@PathVariable(value = "searchString") String searchString) {
