@@ -108,6 +108,13 @@ public class GroupController {
         return categoryService.saveCategory(createCategoryRequest);
     }
 
+
+    @Operation(summary = "방 검색하기")
+    @GetMapping("/search/{searchString}")
+    public GroupBriefInfoListResponse searchOpenGroups(@PathVariable(value = "searchString") String searchString) {
+        return groupService.searchOpenGroups(searchString);
+    }
+
     @Operation(summary = "방장 권한 멤버 추가")
     @PostMapping("/{id}/members")
     public GroupResponse addMembers(

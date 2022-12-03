@@ -17,4 +17,5 @@ public interface GroupRepository extends JpaRepository<Group, Long> {
 
     List<Group> findAllByGroupTypeAndCategory(GroupType groupType,Category category);
 
+    List<Group> findByGroupTypeAndTitleContaining(GroupType groupType,String searchString);
 }

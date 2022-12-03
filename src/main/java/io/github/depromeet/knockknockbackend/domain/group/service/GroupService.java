@@ -327,6 +327,15 @@ public class GroupService {
         return new GroupBriefInfoListResponse(groupBriefInfoDtos);
     }
 
+
+    public GroupBriefInfoListResponse searchOpenGroups(String searchString) {
+
+        List<Group> groupList = groupRepository.findByGroupTypeAndTitleContaining(GroupType.OPEN,
+            searchString);
+
+        return getGroupBriefInfoListResponse(groupList);
+    }
+
     public GroupResponse addMembersToGroup(Long groupId, AddFriendToGroupRequest addFriendToGroupRequest) {
         User reqUser = userUtils.getUserFromSecurityContext();
         Group group = queryGroup(groupId);
