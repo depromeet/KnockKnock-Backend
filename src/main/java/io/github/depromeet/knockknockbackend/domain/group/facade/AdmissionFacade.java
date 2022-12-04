@@ -2,6 +2,7 @@ package io.github.depromeet.knockknockbackend.domain.group.facade;
 
 
 import io.github.depromeet.knockknockbackend.domain.group.domain.Group;
+import io.github.depromeet.knockknockbackend.domain.group.domain.GroupUsers;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.AddFriendToGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.AdmissionInfoDto;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.AdmissionInfoListResponse;
@@ -52,9 +53,12 @@ public class AdmissionFacade {
     }
 
     public GroupResponse addMembersToGroup(Long groupId, List<Long> requestMemberIds) {
+        // 이미 방안에 들어갔는지 검증
         Group group = groupService.queryGroup(groupId);
+        GroupUsers groupUsers = group.getGroupUsers();
+        groupUsers.validInviteUsersAlreadyEnterGroup(requestMemberIds);
+        // 내 친구 목록 불러오기
         Long userId = SecurityUtils.getCurrentUserId();
-
         List<Long> myFriendList = relationUtils.findMyFriendUserIdList(userId);
 
         //요청한 목록 중에서 내 친구 인 사람
@@ -66,7 +70,9 @@ public class AdmissionFacade {
             !myFriendList.contains(id)
         ).collect(Collectors.toList());
 
+        // 초대 요청 보내기
         admissionService.requestAdmissions(group ,requestAdmissionIds);
+        // 내 친구 목록에 있는 사람들은 그냥 방안에 넣기
         return groupService.addMembersToGroup(groupId ,addMemberList);
     }
 }

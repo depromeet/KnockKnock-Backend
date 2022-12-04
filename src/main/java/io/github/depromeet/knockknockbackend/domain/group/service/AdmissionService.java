@@ -105,5 +105,13 @@ public class AdmissionService {
 
 
     public void requestAdmissions(Group group, List<Long> requestAdmissionIds) {
+        User reqUser = userUtils.getUserFromSecurityContext();
+        GroupUsers groupUsers = group.getGroupUsers();
+        groupUsers.validUserIsAlreadyEnterGroup(reqUser);
+
+        //TODO : 요청시 알림 넣어주기?
+        Admission admission = Admission.createAdmission(reqUser, group);
+        admissionRepository.save(admission);
+
     }
 }

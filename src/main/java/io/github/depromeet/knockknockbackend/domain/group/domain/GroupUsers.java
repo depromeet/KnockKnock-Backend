@@ -104,4 +104,12 @@ public class GroupUsers {
         groupUserList.removeIf(groupUser -> groupUser.getUserId().equals(userId));
     }
 
+    public void validInviteUsersAlreadyEnterGroup(List<Long> requestMemberIds){
+        boolean checkInviteUsersAlreadyEnterGroup = getUserIds().stream()
+            .anyMatch(id -> requestMemberIds.contains(id));
+        if(checkInviteUsersAlreadyEnterGroup){
+            throw AlreadyGroupEnterException.EXCEPTION;
+        }
+    }
+
 }
