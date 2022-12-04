@@ -8,9 +8,7 @@ import java.util.Optional;
 public interface CustomRelationRepository {
     List<Relation> findFriendList(Long userId);
 
-    Optional<Relation> isAlreadyRequested(Long currentUserId, Long sendUserId);
-
-    Optional<Relation> isPendingRequest(Long currentUserId, Long sendUserId);
+    Optional<Relation> findRelationBySendUserIdAndReceiveUserId(Long sendUserId, Long receiveUserId);
 
     boolean isFriend(Long currentUserId, Long userId);
 }

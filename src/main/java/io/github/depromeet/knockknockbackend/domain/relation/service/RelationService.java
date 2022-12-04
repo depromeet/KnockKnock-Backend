@@ -40,11 +40,11 @@ public class RelationService implements UserRelationService {
     }
 
     public HttpStatus sendFriendRequest(SendFriendRequest request) {
-        if(relationRepository.isAlreadyRequested(SecurityUtils.getCurrentUserId(), request.getUserId()).isPresent()) {
+        if(relationRepository.findRelationBySendUserIdAndReceiveUserId(SecurityUtils.getCurrentUserId(), request.getUserId()).isPresent()) {
             throw AlreadySendRequestException.EXCEPTION;
         }
 
-        Relation relation = relationRepository.isPendingRequest(SecurityUtils.getCurrentUserId(), request.getUserId())
+        Relation relation = relationRepository.findRelationBySendUserIdAndReceiveUserId(request.getUserId(), SecurityUtils.getCurrentUserId())
                 .orElse(null);
 
         if(relation != null) {
