@@ -104,4 +104,6 @@ public class AdmissionService {
     }
 
 
+    public void requestAdmissions(Group group, List<Long> requestAdmissionIds) {
+    }
 }

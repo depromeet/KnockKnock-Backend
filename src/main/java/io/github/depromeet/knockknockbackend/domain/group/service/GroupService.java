@@ -336,11 +336,10 @@ public class GroupService {
         return getGroupBriefInfoListResponse(groupList);
     }
 
-    public GroupResponse addMembersToGroup(Long groupId, AddFriendToGroupRequest addFriendToGroupRequest) {
+    public GroupResponse addMembersToGroup(Long groupId, List<Long> requestMemberIds) {
         User reqUser = userUtils.getUserFromSecurityContext();
         Group group = queryGroup(groupId);
 
-        List<Long> requestMemberIds = addFriendToGroupRequest.getMemberIds();
         GroupUsers groupUsers = group.getGroupUsers();
         List<Long> groupUserIds = groupUsers.getUserIds();
 
@@ -350,7 +349,7 @@ public class GroupService {
 
         List<User> findUserList = userUtils.findByIdIn(requestMemberIds);
         // 요청받은 유저 아이디 목록이 디비에 존재하는 지 확인
-        validReqMemberNotExist(findUserList, addFriendToGroupRequest.getMemberIds());
+        validReqMemberNotExist(findUserList, requestMemberIds);
 
         groupUsers.addMembers(findUserList ,group);
 

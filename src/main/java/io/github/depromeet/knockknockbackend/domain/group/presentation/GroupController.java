@@ -154,7 +154,7 @@ public class GroupController {
     public GroupResponse addMembers(
         @PathVariable(value = "id") Long groupId,
         @Valid @RequestBody AddFriendToGroupRequest addFriendToGroupRequest){
-        return groupService.addMembersToGroup(groupId , addFriendToGroupRequest);
+        return admissionFacade.addMembersToGroup(groupId , addFriendToGroupRequest.getMemberIds());
     }
 
     @Operation(summary = "멤버 제거 ( 방장일 경우 본인빼고 모든인원 , 멤버일경우 나만)")
