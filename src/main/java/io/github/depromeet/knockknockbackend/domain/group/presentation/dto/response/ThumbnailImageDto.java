@@ -1,7 +1,9 @@
 package io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response;
 
 import io.github.depromeet.knockknockbackend.domain.group.domain.Thumbnail;
+import lombok.Getter;
 
+@Getter
 public class ThumbnailImageDto {
 
 
