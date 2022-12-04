@@ -1,5 +1,7 @@
 package io.github.depromeet.knockknockbackend.global.utils.relation;
 
-public interface RelationUtils {
+import java.util.List;
 
+public interface RelationUtils {
+    List<Long> findMyFriendUserIdList(Long myId);
 }
