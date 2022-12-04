@@ -16,8 +16,10 @@ import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.respo
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupBriefInfoListResponse;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupResponse;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.ThumbnailListResponse;
+import io.github.depromeet.knockknockbackend.domain.group.service.BackgroundImageService;
 import io.github.depromeet.knockknockbackend.domain.group.service.CategoryService;
 import io.github.depromeet.knockknockbackend.domain.group.service.GroupService;
+import io.github.depromeet.knockknockbackend.domain.group.service.ThumbnailImageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -49,6 +51,9 @@ public class GroupController {
     private final CategoryService categoryService;
 
     private final AdmissionFacade admissionFacade;
+
+    private final ThumbnailImageService thumbnailImageService;
+    private final BackgroundImageService backgroundImageService;
 
     @Operation(summary = "공개 그룹을 만듭니다")
     @PostMapping("/open")
@@ -169,7 +174,6 @@ public class GroupController {
     @GetMapping("/asset/backgrounds")
     public BackgroundListResponse getBackgroundImageUrls(){
         return backgroundImageService.getAllBackgroundImage();
-
     }
 
     @Operation(summary = "썸네일 이미지")
