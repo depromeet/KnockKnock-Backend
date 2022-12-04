@@ -9,11 +9,13 @@ import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.reque
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.UpdateGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.AdmissionInfoDto;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.AdmissionInfoListResponse;
+import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.BackgroundListResponse;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.CategoryDto;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.CategoryListResponse;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.CreateGroupResponse;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupBriefInfoListResponse;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupResponse;
+import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.ThumbnailListResponse;
 import io.github.depromeet.knockknockbackend.domain.group.service.CategoryService;
 import io.github.depromeet.knockknockbackend.domain.group.service.GroupService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -161,6 +163,19 @@ public class GroupController {
     @DeleteMapping("/{id}/members/{user_id}")
     public GroupResponse deleteMemberFromGroup(@PathVariable(value = "id") Long groupId, @PathVariable(value = "user_id") Long userId){
         return this.groupService.deleteMemberFromGroup(groupId , userId);
+    }
+
+    @Operation(summary = "백그라운드 이미지")
+    @GetMapping("/asset/backgrounds")
+    public BackgroundListResponse getBackgroundImageUrls(){
+        return backgroundImageService.getAllBackgroundImage();
+
+    }
+
+    @Operation(summary = "썸네일 이미지")
+    @GetMapping("/asset/thumbnails")
+    public ThumbnailListResponse getThumbnailImageUrls(){
+        return thumbnailImageService.getAllBackgroundImage();
     }
 
 }
