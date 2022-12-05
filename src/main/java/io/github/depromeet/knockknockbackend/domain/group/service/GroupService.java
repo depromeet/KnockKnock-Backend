@@ -5,6 +5,7 @@ import io.github.depromeet.knockknockbackend.domain.group.domain.Group;
 import io.github.depromeet.knockknockbackend.domain.group.domain.Group.GroupBuilder;
 import io.github.depromeet.knockknockbackend.domain.group.domain.Category;
 import io.github.depromeet.knockknockbackend.domain.group.domain.GroupType;
+import io.github.depromeet.knockknockbackend.domain.group.domain.GroupUser;
 import io.github.depromeet.knockknockbackend.domain.group.domain.GroupUsers;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.CategoryRepository;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.GroupRepository;
@@ -20,6 +21,7 @@ import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.reque
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.CreateGroupResponse;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupBriefInfoDto;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupBriefInfoListResponse;
+import io.github.depromeet.knockknockbackend.global.utils.security.SecurityUtils;
 import io.github.depromeet.knockknockbackend.global.utils.user.UserUtils;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupResponse;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
@@ -267,12 +269,15 @@ public class GroupService {
      * @return GroupBriefInfoListResponse
      */
     public Slice<GroupBriefInfoDto> findAllJoinedGroups(PageRequest pageRequest) {
-        User reqUser = userUtils.getUserFromSecurityContext();
-        GroupUsers groupUsers = GroupUsers.from(groupUserRepository.findAllByUser(reqUser));
+        Long reqUserId = SecurityUtils.getCurrentUserId();
 
-        List<Group> groupList = groupUsers.getGroupList();
+        Slice<GroupUser> sliceGroupUsers = groupUserRepository.findJoinedGroupUser(
+            reqUserId, pageRequest);
 
-        return getGroupBriefInfoListResponse(groupList);
+        return sliceGroupUsers.map(groupUser -> {
+            Group group = groupUser.getGroup();
+            return new GroupBriefInfoDto(group.getGroupBaseInfoVo(), group.getMemberCount());
+        });
     }
 
     /**
@@ -286,14 +291,16 @@ public class GroupService {
             return findAllJoinedGroups(pageRequest);
         }
 
-        User reqUser = userUtils.getUserFromSecurityContext();
+        Long reqUserId = SecurityUtils.getCurrentUserId();
         GroupType groupType = GroupType.valueOf(groupInTypeRequest.getValue());
 
-        GroupUsers groupUsers = GroupUsers.from(
-            groupUserRepository.findJoinedGroupUserByGroupType(reqUser, groupType));
-        List<Group> groupList = groupUsers.getGroupList();
+        Slice<GroupUser> sliceGroupUsers = groupUserRepository.findJoinedGroupUserByGroupType(
+            reqUserId, groupType, pageRequest);
 
-        return getGroupBriefInfoListResponse(groupList);
+        return sliceGroupUsers.map(groupUser -> {
+            Group group = groupUser.getGroup();
+            return new GroupBriefInfoDto(group.getGroupBaseInfoVo(), group.getMemberCount());
+        });
     }
 
     /**
