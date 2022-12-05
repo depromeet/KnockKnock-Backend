@@ -50,17 +50,17 @@ public class GroupUsers {
             .collect(Collectors.toList());
     }
 
-    public void validReqUserIsGroupHost(User reqUser) {
+    public void validReqUserIsGroupHost(Long reqUserId) {
         groupUserList.stream()
-            .filter(groupUser -> groupUser.getUser().equals(reqUser) && groupUser.getIsHost())
+            .filter(groupUser -> groupUser.getUserId().equals(reqUserId) && groupUser.getIsHost())
             .findFirst()
             .orElseThrow(() -> NotHostException.EXCEPTION);
     }
 
-    public Boolean checkReqUserGroupHost(User reqUser) {
+    public Boolean checkReqUserGroupHost(Long reqUserId) {
         return groupUserList.stream()
             .anyMatch(groupUser ->
-                groupUser.getIsHost() && groupUser.getUser().getId().equals(reqUser.getId()));
+                groupUser.getIsHost() && groupUser.getUserId().equals(reqUserId));
 
     }
 

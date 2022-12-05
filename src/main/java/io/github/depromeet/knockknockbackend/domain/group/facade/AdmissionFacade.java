@@ -71,8 +71,8 @@ public class AdmissionFacade {
         ).collect(Collectors.toList());
 
         // 초대 요청 보내기
-        admissionService.requestAdmissions(group ,requestAdmissionIds);
+        admissionService.requestAdmissions(group ,requestAdmissionIds , userId);
         // 내 친구 목록에 있는 사람들은 그냥 방안에 넣기
-        return groupService.addMembersToGroup(groupId ,addMemberList);
+        return groupService.addMembersToGroup(group ,addMemberList , userId);
     }
 }
