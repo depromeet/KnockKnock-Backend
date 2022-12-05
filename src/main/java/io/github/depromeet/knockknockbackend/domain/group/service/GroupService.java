@@ -210,13 +210,13 @@ public class GroupService {
      * @return GroupResponse
      */
     public GroupResponse updateGroup(Long groupId , UpdateGroupRequest updateGroupRequest) {
+        Long reqUserId = SecurityUtils.getCurrentUserId();
         Group group = queryGroup(groupId);
-        User reqUser = userUtils.getUserFromSecurityContext();
 
         // 그룹 유저 일급 컬랙션
         GroupUsers groupUsers = group.getGroupUsers();
         // reqUser 가 호스트인지 확인하는 메서드
-        groupUsers.validReqUserIsGroupHost(reqUser);
+        groupUsers.validReqUserIsGroupHost(reqUserId);
         Category category = queryGroupCategoryById(updateGroupRequest.getCategoryId());
         group.updateGroup(updateGroupRequest.toUpdateGroupDto(), category);
 
@@ -232,11 +232,13 @@ public class GroupService {
      * @param groupId
      */
     public void deleteGroup(Long groupId) {
+        Long reqUserId = SecurityUtils.getCurrentUserId();
+
         Group group = queryGroup(groupId);
         User reqUser = userUtils.getUserFromSecurityContext();
         GroupUsers groupUsers = group.getGroupUsers();
 
-        groupUsers.validReqUserIsGroupHost(reqUser);
+        groupUsers.validReqUserIsGroupHost(reqUserId);
 
         // 캐스케이드 타입 all로 줬습니다.!
         // 그룹지우면 그룹유저 미들 테이블 삭제됩니다.
@@ -249,11 +251,12 @@ public class GroupService {
      * @return GroupResponse
      */
     public GroupResponse getGroupDetailById(Long groupId) {
+        Long reqUserId = SecurityUtils.getCurrentUserId();
+
         Group group = queryGroup(groupId);
-        User reqUser = userUtils.getUserFromSecurityContext();
         GroupUsers groupUsers = group.getGroupUsers();
 
-        Boolean iHost = groupUsers.checkReqUserGroupHost(reqUser);
+        Boolean iHost = groupUsers.checkReqUserGroupHost(reqUserId);
 
         return new GroupResponse(
             group.getGroupBaseInfoVo(),
@@ -341,42 +344,37 @@ public class GroupService {
             group -> new GroupBriefInfoDto(group.getGroupBaseInfoVo(), group.getMemberCount()));
     }
 
-    public GroupResponse addMembersToGroup(Long groupId, AddFriendToGroupRequest addFriendToGroupRequest) {
-        User reqUser = userUtils.getUserFromSecurityContext();
-        Group group = queryGroup(groupId);
 
-        List<Long> requestMemberIds = addFriendToGroupRequest.getMemberIds();
+    public GroupResponse addMembersToGroup(Group group, List<Long> requestMemberIds, Long userId) {
+        Long reqUserId = SecurityUtils.getCurrentUserId();
+
         GroupUsers groupUsers = group.getGroupUsers();
-        List<Long> groupUserIds = groupUsers.getUserIds();
-
-        requestMemberIds.removeIf(groupUserIds::contains);
-
-        groupUsers.validReqUserIsGroupHost(reqUser);
-
         List<User> findUserList = userUtils.findByIdIn(requestMemberIds);
         // 요청받은 유저 아이디 목록이 디비에 존재하는 지 확인
-        validReqMemberNotExist(findUserList, addFriendToGroupRequest.getMemberIds());
+        validReqMemberNotExist(findUserList, requestMemberIds);
 
         groupUsers.addMembers(findUserList ,group);
-
-        return new GroupResponse(group.getGroupBaseInfoVo(),groupUsers.getUserInfoVoList(),true);
+        return new GroupResponse(group.getGroupBaseInfoVo(),
+            groupUsers.getUserInfoVoList(),
+            groupUsers.checkReqUserGroupHost(reqUserId));
     }
 
     public GroupResponse deleteMemberFromGroup(Long groupId, Long userId) {
-        User reqUser = userUtils.getUserFromSecurityContext();
+        Long reqUserId = SecurityUtils.getCurrentUserId();
+
         Group group = queryGroup(groupId);
         GroupUsers groupUsers = group.getGroupUsers();
 
         // 일반 유저가 본인 스스로 방에서 나갈때
-        if(reqUser.getId().equals(userId)){
-            if(groupUsers.checkReqUserGroupHost(reqUser))
+        if(reqUserId.equals(userId)){
+            if(groupUsers.checkReqUserGroupHost(reqUserId))
                 throw HostCanNotLeaveGroupException.EXCEPTION;
             groupUsers.removeUserByUserId(userId);
             return new GroupResponse(group.getGroupBaseInfoVo(),groupUsers.getUserInfoVoList(),false);
         }
 
         // 방장의 권한으로 내쫓을때
-        groupUsers.validReqUserIsGroupHost(reqUser);
+        groupUsers.validReqUserIsGroupHost(reqUserId);
         groupUsers.removeUserByUserId(userId);
         return new GroupResponse(group.getGroupBaseInfoVo(),groupUsers.getUserInfoVoList(),true);
 
@@ -385,10 +383,11 @@ public class GroupService {
     public GroupInviteLinkResponse createGroupInviteLink(Long groupId) {
         Group group = queryGroup(groupId);
         GroupUsers groupUsers = group.getGroupUsers();
-        User reqUser = userUtils.getUserFromSecurityContext();
+        Long reqUserId = SecurityUtils.getCurrentUserId();
+
 
         // 요청한 유저가 멤버가 아니라면 링크 발급이 안되어야 한다.
-        if(!groupUsers.checkUserIsAlreadyEnterGroup(reqUser)){
+        if(!groupUsers.checkUserIsAlreadyEnterGroup(reqUserId)){
             throw NotMemberException.EXCEPTION;
         }
 
@@ -397,7 +396,7 @@ public class GroupService {
         InviteTokenRedisEntity tokenRedisEntity = InviteTokenRedisEntity.builder()
             .token(token)
             .groupId(groupId)
-            .issuerId(reqUser.getId())
+            .issuerId(reqUserId)
             .ttl(24L)
             .build();
 
@@ -419,9 +418,9 @@ public class GroupService {
         User reqUser = userUtils.getUserFromSecurityContext();
 
         // 유저가 이미 방안에 들어가있는지 검증
-        groupUsers.validUserIsAlreadyEnterGroup(reqUser);
+        groupUsers.validUserIsAlreadyEnterGroup(reqUser.getId());
 
-        groupUsers.addMember(reqUser,group);
+        groupUsers.addMember(reqUser, group);
 
         return new GroupResponse(
                 group.getGroupBaseInfoVo(),

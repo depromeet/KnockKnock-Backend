@@ -1,5 +1,7 @@
 package io.github.depromeet.knockknockbackend.domain.group.service;
 
-public interface GroupUtils {
+import io.github.depromeet.knockknockbackend.domain.group.domain.Group;
 
+public interface GroupUtils {
+    Group queryGroup(Long groupId);
 }

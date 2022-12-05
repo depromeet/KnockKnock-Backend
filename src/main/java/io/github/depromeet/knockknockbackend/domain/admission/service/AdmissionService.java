@@ -10,6 +10,7 @@ import io.github.depromeet.knockknockbackend.domain.admission.exception.Admissio
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.AdmissionInfoDto;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.AdmissionInfoListResponse;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
+import io.github.depromeet.knockknockbackend.global.utils.security.SecurityUtils;
 import io.github.depromeet.knockknockbackend.global.utils.user.UserUtils;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,9 +39,9 @@ public class AdmissionService {
             .build();
     }
 
-    private void validReqUserIsGroupHost(Group group, User reqUser) {
+    private void validReqUserIsGroupHost(Group group, Long userId) {
         GroupUsers groupUsers = group.getGroupUsers();
-        groupUsers.validReqUserIsGroupHost(reqUser);
+        groupUsers.validReqUserIsGroupHost(userId);
     }
 
     /**
@@ -49,7 +50,7 @@ public class AdmissionService {
     public AdmissionInfoDto requestAdmission(Group group) {
         User reqUser = userUtils.getUserFromSecurityContext();
         GroupUsers groupUsers = group.getGroupUsers();
-        groupUsers.validUserIsAlreadyEnterGroup(reqUser);
+        groupUsers.validUserIsAlreadyEnterGroup(reqUser.getId());
         
         //TODO : 요청시 알림 넣어주기?
         Admission admission = Admission.createAdmission(reqUser, group);
@@ -63,9 +64,9 @@ public class AdmissionService {
      * 방장이 요청상태가 PENDING 인 그룹 가입 요청을 가져옵니다.
      */
     public AdmissionInfoListResponse getAdmissions(Group group) {
+        Long userId = SecurityUtils.getCurrentUserId();
 
-        User reqUser = userUtils.getUserFromSecurityContext();
-        validReqUserIsGroupHost(group, reqUser);
+        validReqUserIsGroupHost(group, userId);
 
         List<Admission> Admissions = admissionRepository.findByGroupAndAdmissionState(group ,
             AdmissionState.PENDING);
@@ -82,8 +83,9 @@ public class AdmissionService {
      * 방장이 그룹 가입 요청을 승인합니다.
      */
     public AdmissionInfoDto acceptAdmission(Group group , Long admissionId) {
-        User reqUser = userUtils.getUserFromSecurityContext();
-        validReqUserIsGroupHost(group, reqUser);
+        Long reqUserId = SecurityUtils.getCurrentUserId();
+
+        validReqUserIsGroupHost(group, reqUserId);
 
         Admission admission = queryAdmission(admissionId);
         admission.acceptAdmission();
@@ -94,8 +96,9 @@ public class AdmissionService {
      * 방장이 그룹 가입 요청을 거절합니다.
      */
     public AdmissionInfoDto refuseAdmission(Group group , Long admissionId) {
-        User reqUser = userUtils.getUserFromSecurityContext();
-        validReqUserIsGroupHost(group, reqUser);
+        Long userId = SecurityUtils.getCurrentUserId();
+
+        validReqUserIsGroupHost(group, userId);
 
         Admission admission = queryAdmission(admissionId);
         admission.refuseAdmission();
@@ -103,5 +106,16 @@ public class AdmissionService {
         return getAdmissionInfoDto(admission);
     }
 
+    public void requestAdmissions(Group group, List<Long> requestAdmissionIds, Long userId) {
+        User reqUser = userUtils.getUserFromSecurityContext();
+        GroupUsers groupUsers = group.getGroupUsers();
+        Long reqUserId = SecurityUtils.getCurrentUserId();
 
+        groupUsers.validUserIsAlreadyEnterGroup(reqUserId);
+
+        //TODO : 요청시 알림 넣어주기?
+        Admission admission = Admission.createAdmission(reqUser, group);
+        admissionRepository.save(admission);
+
+    }
 }
