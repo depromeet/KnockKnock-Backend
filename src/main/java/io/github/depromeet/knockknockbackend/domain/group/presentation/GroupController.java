@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.domain.group.presentation;
 
+import io.github.depromeet.knockknockbackend.domain.group.domain.Group;
 import io.github.depromeet.knockknockbackend.domain.group.facade.AdmissionFacade;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.AddFriendToGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateCategoryRequest;
@@ -12,6 +13,7 @@ import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.respo
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.CategoryDto;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.CategoryListResponse;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.CreateGroupResponse;
+import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupBriefInfoDto;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupBriefInfoListResponse;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupResponse;
 import io.github.depromeet.knockknockbackend.domain.group.service.CategoryService;
@@ -24,6 +26,9 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -97,9 +102,12 @@ public class GroupController {
         , in = ParameterIn.QUERY)
     @Operation(summary = "방 찾기")
     @GetMapping("/open")
-    public GroupBriefInfoListResponse getAllOpenGroups(@RequestParam(value = "category" ,required = false  ) Long categoryId) {
-
-        return groupService.findOpenGroupByCategory(categoryId);
+    public Slice<GroupBriefInfoDto> getAllOpenGroups(
+        @RequestParam(value = "category" ) Long categoryId,
+        @RequestParam(value = "page", defaultValue = "0") Integer page,
+        @RequestParam(value = "size" ,defaultValue = "10") Integer size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        return groupService.findOpenGroupByCategory(categoryId ,pageRequest);
     }
 
     @GetMapping("/categories")
