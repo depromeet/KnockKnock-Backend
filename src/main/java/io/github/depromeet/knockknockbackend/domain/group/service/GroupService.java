@@ -20,14 +20,12 @@ import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.reque
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.UpdateGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.CreateGroupResponse;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupBriefInfoDto;
-import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupBriefInfoListResponse;
 import io.github.depromeet.knockknockbackend.global.utils.security.SecurityUtils;
 import io.github.depromeet.knockknockbackend.global.utils.user.UserUtils;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupResponse;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.global.exception.UserNotFoundException;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
@@ -322,21 +320,6 @@ public class GroupService {
             group -> new GroupBriefInfoDto(group.getGroupBaseInfoVo(), group.getMemberCount()));
     }
 
-
-    /**
-     * 중복된 그룹리스트에 대한 정보를 반환하는 코드를 추출했습니다.
-     * @return GroupBriefInfoListResponse
-     */
-    private GroupBriefInfoListResponse getGroupBriefInfoListResponse(List<Group> groupList) {
-        List<GroupBriefInfoDto> groupBriefInfoDtos = groupList.stream()
-            .map(group ->
-                new GroupBriefInfoDto(
-                    group.getGroupBaseInfoVo(),
-                    group.getMemberCount()))
-            .collect(Collectors.toList());
-
-        return new GroupBriefInfoListResponse(groupBriefInfoDtos);
-    }
 
 
     public Slice<GroupBriefInfoDto> searchOpenGroups(String searchString ,PageRequest pageRequest) {
