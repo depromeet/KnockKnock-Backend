@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.domain.notification.domain;
 
+import io.github.depromeet.knockknockbackend.domain.group.domain.Group;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import java.time.LocalDateTime;
 import javax.persistence.Convert;
@@ -9,6 +10,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import lombok.AccessLevel;
@@ -39,7 +41,9 @@ public class Notification {
     @Convert(converter = AlarmTypeConverter.class)
     private AlarmType alarmType;
 
-    //+그룹아이디
+    @JoinColumn(name = "group_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Group group;
 
     @JoinColumn(name = "send_user_id")
     @OneToOne(fetch = FetchType.LAZY)
