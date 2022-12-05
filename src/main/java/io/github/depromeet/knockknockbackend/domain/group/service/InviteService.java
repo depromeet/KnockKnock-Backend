@@ -46,6 +46,8 @@ public class InviteService {
     public Invite acceptInvite(Long inviteId){
         Invite invite = queryInvite(inviteId);
         invite.acceptInvite();
+        //TODO: 멤버 추가 해줘야함
+
         return invite;
     }
     public Invite refuseInvite(Long inviteId){

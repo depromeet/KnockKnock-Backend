@@ -2,20 +2,10 @@ package io.github.depromeet.knockknockbackend.domain.group.facade;
 
 
 import io.github.depromeet.knockknockbackend.domain.group.domain.Group;
-import io.github.depromeet.knockknockbackend.domain.group.domain.GroupType;
-import io.github.depromeet.knockknockbackend.domain.group.domain.GroupUsers;
-import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.AddFriendToGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.AdmissionInfoDto;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.AdmissionInfoListResponse;
-import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupResponse;
 import io.github.depromeet.knockknockbackend.domain.group.service.AdmissionService;
 import io.github.depromeet.knockknockbackend.domain.group.service.GroupService;
-import io.github.depromeet.knockknockbackend.domain.user.domain.User;
-import io.github.depromeet.knockknockbackend.global.utils.relation.RelationUtils;
-import io.github.depromeet.knockknockbackend.global.utils.security.SecurityUtils;
-import io.github.depromeet.knockknockbackend.global.utils.user.UserUtils;
-import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;

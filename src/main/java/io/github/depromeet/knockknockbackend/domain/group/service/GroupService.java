@@ -6,7 +6,6 @@ import io.github.depromeet.knockknockbackend.domain.group.domain.Group.GroupBuil
 import io.github.depromeet.knockknockbackend.domain.group.domain.Category;
 import io.github.depromeet.knockknockbackend.domain.group.domain.GroupType;
 import io.github.depromeet.knockknockbackend.domain.group.domain.GroupUsers;
-import io.github.depromeet.knockknockbackend.domain.group.domain.InviteState;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.CategoryRepository;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.GroupRepository;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.GroupUserRepository;
