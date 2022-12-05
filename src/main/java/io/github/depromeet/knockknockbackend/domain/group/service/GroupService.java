@@ -266,7 +266,7 @@ public class GroupService {
      * 내가 들어가 있는 그룹목록을 가져옵니다.
      * @return GroupBriefInfoListResponse
      */
-    public GroupBriefInfoListResponse findAllJoinedGroups() {
+    public Slice<GroupBriefInfoDto> findAllJoinedGroups(PageRequest pageRequest) {
         User reqUser = userUtils.getUserFromSecurityContext();
         GroupUsers groupUsers = GroupUsers.from(groupUserRepository.findAllByUser(reqUser));
 
@@ -280,7 +280,7 @@ public class GroupService {
      * @param groupInTypeRequest
      * @return GroupBriefInfoListResponse
      */
-    public GroupBriefInfoListResponse findJoinedGroupByType(GroupInTypeRequest groupInTypeRequest) {
+    public Slice<GroupBriefInfoDto> findJoinedGroupByType(GroupInTypeRequest groupInTypeRequest,PageRequest pageRequest) {
 
         if(groupInTypeRequest == GroupInTypeRequest.ALL){
             return findAllJoinedGroups();

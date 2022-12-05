@@ -89,12 +89,15 @@ public class GroupController {
         , in = ParameterIn.QUERY)
     @Operation(summary = "참여중인 그룹 목록 전체 홀로외침 친구들 방 필터링")
     @GetMapping("/joined")
-    public GroupBriefInfoListResponse getParticipatingGroups(
-        @RequestParam("type") GroupInTypeRequest groupInTypeRequest){
+    public Slice<GroupBriefInfoDto> getParticipatingGroups(
+        @RequestParam("type") GroupInTypeRequest groupInTypeRequest,
+        @RequestParam(value = "page", defaultValue = "0") Integer page,
+        @RequestParam(value = "size" ,defaultValue = "10") Integer size){
+        PageRequest pageRequest = PageRequest.of(page, size);
         if(groupInTypeRequest == GroupInTypeRequest.ALL){
-            return groupService.findAllJoinedGroups();
+            return groupService.findAllJoinedGroups(pageRequest);
         }
-        return groupService.findJoinedGroupByType(groupInTypeRequest);
+        return groupService.findJoinedGroupByType(groupInTypeRequest,pageRequest);
     }
 
 
