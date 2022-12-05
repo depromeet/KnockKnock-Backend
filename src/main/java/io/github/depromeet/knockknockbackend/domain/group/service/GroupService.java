@@ -339,12 +339,13 @@ public class GroupService {
     }
 
 
-    public GroupBriefInfoListResponse searchOpenGroups(String searchString) {
+    public Slice<GroupBriefInfoDto> searchOpenGroups(String searchString ,PageRequest pageRequest) {
 
-        List<Group> groupList = groupRepository.findByGroupTypeAndTitleContaining(GroupType.OPEN,
-            searchString);
+        Slice<Group> groupList = groupRepository
+            .findByGroupTypeAndTitleContaining(GroupType.OPEN ,searchString,pageRequest);
 
-        return getGroupBriefInfoListResponse(groupList);
+        return groupList.map(
+            group -> new GroupBriefInfoDto(group.getGroupBaseInfoVo(), group.getMemberCount()));
     }
 
     public GroupResponse addMembersToGroup(Long groupId, AddFriendToGroupRequest addFriendToGroupRequest) {

@@ -24,5 +24,5 @@ public interface GroupRepository extends JpaRepository<Group, Long> {
         + "where G.group_type = :#{#groupType.getType()} and G.category_id = :category order by coalesce(N.send_at , G.created_date) DESC" , nativeQuery = true)
     Slice<Group> findSliceByGroupTypeAndCategory(@Param("groupType") GroupType groupType ,@Param("category") Category category , Pageable pageable);
 
-    List<Group> findByGroupTypeAndTitleContaining(GroupType groupType,String searchString);
+    Slice<Group> findByGroupTypeAndTitleContaining(GroupType groupType,String searchString,PageRequest pageRequest);
 }

@@ -155,8 +155,13 @@ public class GroupController {
     }
     @Operation(summary = "방 검색하기")
     @GetMapping("/search/{searchString}")
-    public GroupBriefInfoListResponse searchOpenGroups(@PathVariable(value = "searchString") String searchString) {
-        return groupService.searchOpenGroups(searchString);
+    public Slice<GroupBriefInfoDto> searchOpenGroups(
+        @PathVariable(value = "searchString") String searchString,
+        @RequestParam(value = "page", defaultValue = "0") Integer page,
+        @RequestParam(value = "size" ,defaultValue = "10") Integer size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+
+        return groupService.searchOpenGroups(searchString,pageRequest);
     }
 
     @Operation(summary = "방장 권한 멤버 추가")
