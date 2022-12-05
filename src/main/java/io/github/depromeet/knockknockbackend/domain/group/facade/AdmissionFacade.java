@@ -2,6 +2,7 @@ package io.github.depromeet.knockknockbackend.domain.group.facade;
 
 
 import io.github.depromeet.knockknockbackend.domain.group.domain.Group;
+import io.github.depromeet.knockknockbackend.domain.group.domain.GroupType;
 import io.github.depromeet.knockknockbackend.domain.group.domain.GroupUsers;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.AddFriendToGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.AdmissionInfoDto;
@@ -59,19 +60,23 @@ public class AdmissionFacade {
         GroupUsers groupUsers = group.getGroupUsers();
         groupUsers.validInviteUsersAlreadyEnterGroup(requestMemberIds);
         // 내 친구 목록 불러오기
+
         List<Long> myFriendList = relationUtils.findMyFriendUserIdList(reqUserId);
+
+        //요청한 목록 중에서 내 친구 아닌 사람
+        // 초대 요청 보내기
+        if(group.getGroupType().equals(GroupType.OPEN)){
+            List<Long> requestAdmissionIds = requestMemberIds.stream().filter(id ->
+                !myFriendList.contains(id)
+            ).collect(Collectors.toList());
+            admissionService.requestAdmissions(group ,requestAdmissionIds , reqUserId);
+        }
 
         //요청한 목록 중에서 내 친구 인 사람
         List<Long> addMemberList = requestMemberIds.stream().filter(id ->
             myFriendList.contains(id)
         ).collect(Collectors.toList());
-        //요청한 목록 중에서 내 친구 아닌 사람
-        List<Long> requestAdmissionIds = requestMemberIds.stream().filter(id ->
-            !myFriendList.contains(id)
-        ).collect(Collectors.toList());
 
-        // 초대 요청 보내기
-        admissionService.requestAdmissions(group ,requestAdmissionIds , reqUserId);
         // 내 친구 목록에 있는 사람들은 그냥 방안에 넣기
         return groupService.addMembersToGroup(group ,addMemberList , reqUserId);
     }

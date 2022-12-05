@@ -149,7 +149,7 @@ public class GroupController {
         return groupService.searchOpenGroups(searchString);
     }
 
-    @Operation(summary = "방장 권한 멤버 추가")
+    @Operation(summary = "멤버 초대 하기 , 요청한 목록이 내친구일때는 바로 초대, 아닐경우 초대")
     @PostMapping("/{id}/members")
     public GroupResponse addMembers(
         @PathVariable(value = "id") Long groupId,
