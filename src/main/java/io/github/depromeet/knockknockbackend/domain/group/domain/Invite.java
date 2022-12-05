@@ -20,7 +20,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@Table(name = "tbl_group_admission")
+@Table(name = "tbl_group_invite")
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Invite extends BaseTimeEntity {
