@@ -107,14 +107,14 @@ public class AdmissionService {
     }
 
 
-    public void requestAdmissions(Group group, List<Long> requestAdmissionIds, Long userId) {
-        User reqUser = userUtils.getUserFromSecurityContext();
-        GroupUsers groupUsers = group.getGroupUsers();
-        groupUsers.validUserIsAlreadyEnterGroup(reqUser);
-
+    public List<Admission> requestAdmissions(Group group, List<Long> requestAdmissionIds, Long reqUserId) {
+        List<User> users = userUtils.findByIdIn(requestAdmissionIds);
         //TODO : 요청시 알림 넣어주기?
-        Admission admission = Admission.createAdmission(reqUser, group);
-        admissionRepository.save(admission);
 
+        List<Admission> admissionList = users.stream()
+            .map(user -> Admission.createAdmission(user, group))
+            .collect(Collectors.toList());
+        admissionRepository.saveAll(admissionList);
+        return admissionList;
     }
 }

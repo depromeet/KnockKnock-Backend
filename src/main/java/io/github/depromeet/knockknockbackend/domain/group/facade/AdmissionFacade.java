@@ -51,15 +51,15 @@ public class AdmissionFacade {
         Group group = groupService.queryGroup(groupId);
         return admissionService.refuseAdmission(group,admissionId);
     }
-
     public GroupResponse addMembersToGroup(Long groupId, List<Long> requestMemberIds) {
+        Long reqUserId = SecurityUtils.getCurrentUserId();
+
         // 이미 방안에 들어갔는지 검증
         Group group = groupService.queryGroup(groupId);
         GroupUsers groupUsers = group.getGroupUsers();
         groupUsers.validInviteUsersAlreadyEnterGroup(requestMemberIds);
         // 내 친구 목록 불러오기
-        Long userId = SecurityUtils.getCurrentUserId();
-        List<Long> myFriendList = relationUtils.findMyFriendUserIdList(userId);
+        List<Long> myFriendList = relationUtils.findMyFriendUserIdList(reqUserId);
 
         //요청한 목록 중에서 내 친구 인 사람
         List<Long> addMemberList = requestMemberIds.stream().filter(id ->
@@ -71,8 +71,8 @@ public class AdmissionFacade {
         ).collect(Collectors.toList());
 
         // 초대 요청 보내기
-        admissionService.requestAdmissions(group ,requestAdmissionIds , userId);
+        admissionService.requestAdmissions(group ,requestAdmissionIds , reqUserId);
         // 내 친구 목록에 있는 사람들은 그냥 방안에 넣기
-        return groupService.addMembersToGroup(group ,addMemberList , userId);
+        return groupService.addMembersToGroup(group ,addMemberList , reqUserId);
     }
 }

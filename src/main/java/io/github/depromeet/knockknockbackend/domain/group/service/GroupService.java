@@ -341,7 +341,9 @@ public class GroupService {
         Long reqUserId = SecurityUtils.getCurrentUserId();
 
         GroupUsers groupUsers = group.getGroupUsers();
+        // 친구 리스트 찾은거에 유저 캐시 포함되어서 크게 차인 없을듯...?
         List<User> findUserList = userUtils.findByIdIn(requestMemberIds);
+
         groupUsers.addMembers(findUserList ,group);
         return new GroupResponse(group.getGroupBaseInfoVo(),
             groupUsers.getUserInfoVoList(),
