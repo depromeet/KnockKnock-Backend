@@ -35,18 +35,26 @@ public class User {
     private String profilePath;
 
     @Builder
-    public User(String nickname, String oauthProvider, String oauthId , String email) {
+    public User(Long id, String nickname, String oauthProvider, String oauthId , String email) {
+        this.id = id;
         this.nickname = nickname;
         this.oauthProvider = oauthProvider;
         this.oauthId = oauthId;
         this.email = email;
     }
+
     public UserInfoVO getUserInfo() {
         return new UserInfoVO(id, nickname, profilePath);
     }
 
     public void changeNickname(String nickname) {
         this.nickname = nickname;
+    }
+
+    public static User of(Long userId) {
+        return User.builder()
+            .id(userId)
+            .build();
     }
 
 }
