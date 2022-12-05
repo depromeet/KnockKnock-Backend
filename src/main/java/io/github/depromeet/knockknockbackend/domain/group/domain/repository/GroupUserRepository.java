@@ -12,6 +12,14 @@ public interface GroupUserRepository extends JpaRepository<GroupUser, Long> {
 
     List<GroupUser> findAllByUser(User user);
 
-    @Query("select GU from GroupUser as GU join fetch GU.group where GU.user = :reqUser and GU.group.groupType = :groupType")
+    @Query(value = "select GU.* from tbl_group_user as GU "
+        + "inner join ("
+        +   "select G.* , N.send_at from tbl_group as G left outer join tbl_notification as N on "
+        +   "N.id = "
+        +       "(select id from tbl_notification where group_id = G.id order by id DESC limit 1)"
+        +   ") as joinGroup "
+        + "on joinGroup.id = GU.group_id and joinGroup.group_type = :groupType "
+        + "where GU.user_id = :reqUser "
+        + "order by coalesce(joinGroup.send_at , joinGroup.created_date) DESC",nativeQuery = true)
     List<GroupUser> findJoinedGroupUserByGroupType(@Param("reqUser") User reqUser,@Param("groupType") GroupType groupType);
 }

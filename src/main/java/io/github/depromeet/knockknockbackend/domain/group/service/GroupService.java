@@ -283,7 +283,7 @@ public class GroupService {
     public Slice<GroupBriefInfoDto> findJoinedGroupByType(GroupInTypeRequest groupInTypeRequest,PageRequest pageRequest) {
 
         if(groupInTypeRequest == GroupInTypeRequest.ALL){
-            return findAllJoinedGroups();
+            return findAllJoinedGroups(pageRequest);
         }
 
         User reqUser = userUtils.getUserFromSecurityContext();
