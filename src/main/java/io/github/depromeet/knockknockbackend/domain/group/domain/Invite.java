@@ -29,9 +29,12 @@ public class Invite extends BaseTimeEntity {
     private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "receive_id")
+    @JoinColumn(name = "receiver_id")
     private User receiver;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sender_id")
+    private User sender;
     @ManyToOne
     @JoinColumn(name = "group_id")
     private Group group;
@@ -41,17 +44,19 @@ public class Invite extends BaseTimeEntity {
 
 
     @Builder
-    public Invite(User receiver, Group group,
+    public Invite(User receiver, User sender,Group group,
         InviteState inviteState) {
         this.receiver = receiver;
+        this.sender = sender;
         this.group = group;
         this.inviteState = inviteState;
     }
 
-    public static Invite createInvite(User receiver, Group group){
+    public static Invite createInvite(User receiver,User sender, Group group){
         return Invite.builder()
             .inviteState(InviteState.PENDING)
             .receiver(receiver)
+            .sender(sender)
             .group(group)
             .build();
     }

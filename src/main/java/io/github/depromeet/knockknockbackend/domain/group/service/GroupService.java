@@ -342,10 +342,6 @@ public class GroupService {
         return getGroupBriefInfoListResponse(groupList);
     }
 
-    public GroupResponse addMembersToGroup(Group group, List<Long> requestMemberIds, Long userId) {
-
-    }
-
     public GroupResponse addMembersToGroup(Long groupId, List<Long> requestMemberIds) {
         Long reqUserId = SecurityUtils.getCurrentUserId();
 
@@ -357,23 +353,22 @@ public class GroupService {
 
         List<Long> myFriendList = relationUtils.findMyFriendUserIdList(reqUserId);
 
-        //요청한 목록 중에서 내 친구 아닌 사람
+        // 그룹이 오픈 그룹이면
         // 초대 요청 보내기
         if(group.getGroupType().equals(GroupType.OPEN)){
-            List<Long> sendInviteUserIds = requestMemberIds.stream().filter(id ->
-                !myFriendList.contains(id)
-            ).collect(Collectors.toList());
-            inviteService.makeInvites(group ,sendInviteUserIds , reqUserId);
+            List<Long> sendInviteUserIds = requestMemberIds.stream()
+                .filter(id -> !myFriendList.contains(id))
+                .collect(Collectors.toList());
+            inviteService.makeInvites(group ,sendInviteUserIds);
         }
 
         //요청한 목록 중에서 내 친구 인 사람
-        List<Long> addMemberList = requestMemberIds.stream().filter(id ->
-            myFriendList.contains(id)
-        ).collect(Collectors.toList());
+        List<Long> addMemberList = requestMemberIds.stream()
+            .filter(myFriendList::contains)
+            .collect(Collectors.toList());
 
         List<User> findUserList = userUtils.findByIdIn(addMemberList);
         // 내 친구 목록에 있는 사람들은 그냥 방안에 넣기
-
         groupUsers.addMembers(findUserList ,group);
         return new GroupResponse(group.getGroupBaseInfoVo(),
             groupUsers.getUserInfoVoList(),
