@@ -106,15 +106,4 @@ public class AdmissionService {
         return getAdmissionInfoDto(admission);
     }
 
-
-    public List<Admission> requestAdmissions(Group group, List<Long> requestAdmissionIds, Long reqUserId) {
-        List<User> users = userUtils.findByIdIn(requestAdmissionIds);
-        //TODO : 요청시 알림 넣어주기?
-
-        List<Admission> admissionList = users.stream()
-            .map(user -> Admission.createAdmission(user, group))
-            .collect(Collectors.toList());
-        admissionRepository.saveAll(admissionList);
-        return admissionList;
-    }
 }

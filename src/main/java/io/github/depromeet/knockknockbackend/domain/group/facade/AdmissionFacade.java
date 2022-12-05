@@ -28,8 +28,6 @@ public class AdmissionFacade {
     private final AdmissionService admissionService;
     private final GroupService groupService;
 
-    private final RelationUtils relationUtils;
-
     public AdmissionInfoDto requestAdmission(Long groupId) {
         Group group = groupService.queryGroup(groupId);
         return admissionService.requestAdmission(group);
@@ -51,33 +49,5 @@ public class AdmissionFacade {
     public AdmissionInfoDto refuseAdmission(Long groupId, Long admissionId) {
         Group group = groupService.queryGroup(groupId);
         return admissionService.refuseAdmission(group,admissionId);
-    }
-    public GroupResponse addMembersToGroup(Long groupId, List<Long> requestMemberIds) {
-        Long reqUserId = SecurityUtils.getCurrentUserId();
-
-        // 이미 방안에 들어갔는지 검증
-        Group group = groupService.queryGroup(groupId);
-        GroupUsers groupUsers = group.getGroupUsers();
-        groupUsers.validInviteUsersAlreadyEnterGroup(requestMemberIds);
-        // 내 친구 목록 불러오기
-
-        List<Long> myFriendList = relationUtils.findMyFriendUserIdList(reqUserId);
-
-        //요청한 목록 중에서 내 친구 아닌 사람
-        // 초대 요청 보내기
-        if(group.getGroupType().equals(GroupType.OPEN)){
-            List<Long> requestAdmissionIds = requestMemberIds.stream().filter(id ->
-                !myFriendList.contains(id)
-            ).collect(Collectors.toList());
-            admissionService.requestAdmissions(group ,requestAdmissionIds , reqUserId);
-        }
-
-        //요청한 목록 중에서 내 친구 인 사람
-        List<Long> addMemberList = requestMemberIds.stream().filter(id ->
-            myFriendList.contains(id)
-        ).collect(Collectors.toList());
-
-        // 내 친구 목록에 있는 사람들은 그냥 방안에 넣기
-        return groupService.addMembersToGroup(group ,addMemberList , reqUserId);
     }
 }

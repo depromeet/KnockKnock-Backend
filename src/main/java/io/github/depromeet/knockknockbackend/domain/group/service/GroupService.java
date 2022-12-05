@@ -6,6 +6,7 @@ import io.github.depromeet.knockknockbackend.domain.group.domain.Group.GroupBuil
 import io.github.depromeet.knockknockbackend.domain.group.domain.Category;
 import io.github.depromeet.knockknockbackend.domain.group.domain.GroupType;
 import io.github.depromeet.knockknockbackend.domain.group.domain.GroupUsers;
+import io.github.depromeet.knockknockbackend.domain.group.domain.InviteState;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.CategoryRepository;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.GroupRepository;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.GroupUserRepository;
@@ -19,6 +20,7 @@ import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.reque
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.CreateGroupResponse;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupBriefInfoDto;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupBriefInfoListResponse;
+import io.github.depromeet.knockknockbackend.global.utils.relation.RelationUtils;
 import io.github.depromeet.knockknockbackend.global.utils.security.SecurityUtils;
 import io.github.depromeet.knockknockbackend.global.utils.user.UserUtils;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupResponse;
@@ -43,7 +45,10 @@ public class GroupService {
     private final ThumbnailImageService thumbnailImageService;
     private final BackgroundImageService backgroundImageService;
 
+    private final InviteService inviteService;
     private final UserUtils userUtils;
+    private final RelationUtils relationUtils;
+
 
     /**
      * 카테고리 정보를 가져옵니다.
@@ -338,16 +343,42 @@ public class GroupService {
     }
 
     public GroupResponse addMembersToGroup(Group group, List<Long> requestMemberIds, Long userId) {
+
+    }
+
+    public GroupResponse addMembersToGroup(Long groupId, List<Long> requestMemberIds) {
         Long reqUserId = SecurityUtils.getCurrentUserId();
 
+        // 이미 방안에 들어갔는지 검증
+        Group group = queryGroup(groupId);
         GroupUsers groupUsers = group.getGroupUsers();
-        // 친구 리스트 찾은거에 유저 캐시 포함되어서 크게 차인 없을듯...?
-        List<User> findUserList = userUtils.findByIdIn(requestMemberIds);
+        groupUsers.validInviteUsersAlreadyEnterGroup(requestMemberIds);
+        // 내 친구 목록 불러오기
+
+        List<Long> myFriendList = relationUtils.findMyFriendUserIdList(reqUserId);
+
+        //요청한 목록 중에서 내 친구 아닌 사람
+        // 초대 요청 보내기
+        if(group.getGroupType().equals(GroupType.OPEN)){
+            List<Long> sendInviteUserIds = requestMemberIds.stream().filter(id ->
+                !myFriendList.contains(id)
+            ).collect(Collectors.toList());
+            inviteService.makeInvites(group ,sendInviteUserIds , reqUserId);
+        }
+
+        //요청한 목록 중에서 내 친구 인 사람
+        List<Long> addMemberList = requestMemberIds.stream().filter(id ->
+            myFriendList.contains(id)
+        ).collect(Collectors.toList());
+
+        List<User> findUserList = userUtils.findByIdIn(addMemberList);
+        // 내 친구 목록에 있는 사람들은 그냥 방안에 넣기
 
         groupUsers.addMembers(findUserList ,group);
         return new GroupResponse(group.getGroupBaseInfoVo(),
             groupUsers.getUserInfoVoList(),
             groupUsers.checkReqUserGroupHost(reqUserId));
+
     }
 
     public GroupResponse deleteMemberFromGroup(Long groupId, Long userId) {
