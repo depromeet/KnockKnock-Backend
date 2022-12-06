@@ -14,6 +14,7 @@ import io.github.depromeet.knockknockbackend.domain.group.domain.repository.Invi
 import io.github.depromeet.knockknockbackend.domain.group.exception.CategoryNotFoundException;
 import io.github.depromeet.knockknockbackend.domain.group.exception.GroupNotFoundException;
 import io.github.depromeet.knockknockbackend.domain.group.exception.HostCanNotLeaveGroupException;
+import io.github.depromeet.knockknockbackend.domain.group.exception.InvalidInviteTokenException;
 import io.github.depromeet.knockknockbackend.domain.group.exception.NotMemberException;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.AddFriendToGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateFriendGroupRequest;
@@ -408,7 +409,26 @@ public class GroupService {
         return GroupInviteLinkResponse.from(token);
     }
 
-    public GroupResponse checkGroupInviteLink(Long groupId, String code) {
-        return null;
+    public GroupResponse checkGroupInviteLink(Long groupId, String token) {
+        InviteTokenRedisEntity inviteToken = inviteTokenRedisEntityRepository.findByToken(
+                token)
+            .orElseThrow(() -> InvalidInviteTokenException.EXCEPTION);
+
+        if(!inviteToken.getGroupId().equals(groupId)){
+            throw InvalidInviteTokenException.EXCEPTION;
+        }
+
+        Group group = queryGroup(groupId);
+        GroupUsers groupUsers = group.getGroupUsers();
+        User reqUser = userUtils.getUserFromSecurityContext();
+
+        // 유저가 이미 방안에 들어가있는지 검증
+        groupUsers.validUserIsAlreadyEnterGroup(reqUser);
+
+        groupUsers.addMember(reqUser,group);
+
+        return new GroupResponse(group.getGroupBaseInfoVo(),
+            groupUsers.getUserInfoVoList(),
+            false);
     }
 }

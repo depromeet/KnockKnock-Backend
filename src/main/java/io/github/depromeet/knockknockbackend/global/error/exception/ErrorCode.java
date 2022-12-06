@@ -40,8 +40,8 @@ public enum ErrorCode {
     ADMISSION_NOT_FOUND(404,"GROUP-404-4", "ADMISSION Not Found"),
 
     HOST_CAN_NOT_LEAVE(400 , "GROUP-400-2","Host can not leave from own group" ),
-    NOT_GROUP_MEMBER(400 , "GROUP-400-3","Not member of group");
-
+    NOT_GROUP_MEMBER(400 , "GROUP-400-3","Not member of group"),
+    INVALID_INVITE_TOKEN(400 , "GROUP-400-4","invalid invite token");
 
 
     private int status;
