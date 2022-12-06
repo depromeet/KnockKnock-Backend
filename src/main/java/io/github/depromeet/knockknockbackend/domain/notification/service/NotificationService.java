@@ -49,7 +49,7 @@ public class NotificationService {
 
         deviceTokenOptional.ifPresentOrElse(
             deviceToken -> {
-                if (deviceToken.getUserId().equals(currentUserId)) {
+                if (deviceToken.getUser().getId().equals(currentUserId)) {
                     deviceTokenRepository.save(
                         deviceToken.changeToken(request.getToken()));
                 } else {
