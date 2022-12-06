@@ -10,6 +10,7 @@ import io.github.depromeet.knockknockbackend.domain.group.domain.InviteTokenRedi
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.CategoryRepository;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.GroupRepository;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.GroupUserRepository;
+import io.github.depromeet.knockknockbackend.domain.group.domain.repository.InviteTokenRedisEntityRepository;
 import io.github.depromeet.knockknockbackend.domain.group.exception.CategoryNotFoundException;
 import io.github.depromeet.knockknockbackend.domain.group.exception.GroupNotFoundException;
 import io.github.depromeet.knockknockbackend.domain.group.exception.HostCanNotLeaveGroupException;
@@ -28,7 +29,6 @@ import io.github.depromeet.knockknockbackend.global.utils.user.UserUtils;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupResponse;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.global.exception.UserNotFoundException;
-import io.github.depromeet.knockknockbackend.global.utils.security.SecurityUtils;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -51,6 +51,8 @@ public class GroupService {
     private final UserUtils userUtils;
 
     private final TokenGenerator tokenGenerator;
+
+    private final InviteTokenRedisEntityRepository inviteTokenRedisEntityRepository;
 
     /**
      * 카테고리 정보를 가져옵니다.
@@ -393,13 +395,17 @@ public class GroupService {
         }
 
         String token = tokenGenerator.nextString();
+
         InviteTokenRedisEntity tokenRedisEntity = InviteTokenRedisEntity.builder()
             .token(token)
             .groupId(groupId)
             .issuerId(reqUser.getId())
+            .ttl(24L)
             .build();
 
+        inviteTokenRedisEntityRepository.save(tokenRedisEntity);
 
+        return GroupInviteLinkResponse.from(token);
     }
 
     public GroupResponse checkGroupInviteLink(Long groupId, String code) {

@@ -10,4 +10,7 @@ public class GroupInviteLinkResponse {
 
     private String link;
 
+    public static GroupInviteLinkResponse from(String link){
+        return new GroupInviteLinkResponse(link);
+    }
 }

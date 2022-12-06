@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.domain.group.domain;
 
+import java.util.concurrent.TimeUnit;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.data.annotation.Id;
@@ -20,7 +21,7 @@ public class InviteTokenRedisEntity {
     @Indexed
     private Long issuerId;
 
-    @TimeToLive // TTL
+    @TimeToLive(unit = TimeUnit.HOURS) // TTL
     private Long ttl;
 
     @Builder
