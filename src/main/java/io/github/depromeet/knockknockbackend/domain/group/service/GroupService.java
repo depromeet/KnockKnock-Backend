@@ -6,6 +6,7 @@ import io.github.depromeet.knockknockbackend.domain.group.domain.Group.GroupBuil
 import io.github.depromeet.knockknockbackend.domain.group.domain.Category;
 import io.github.depromeet.knockknockbackend.domain.group.domain.GroupType;
 import io.github.depromeet.knockknockbackend.domain.group.domain.GroupUsers;
+import io.github.depromeet.knockknockbackend.domain.group.domain.InviteTokenRedisEntity;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.CategoryRepository;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.GroupRepository;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.GroupUserRepository;
@@ -22,6 +23,7 @@ import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.respo
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupBriefInfoDto;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupBriefInfoListResponse;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupInviteLinkResponse;
+import io.github.depromeet.knockknockbackend.global.utils.generate.TokenGenerator;
 import io.github.depromeet.knockknockbackend.global.utils.user.UserUtils;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupResponse;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
@@ -47,6 +49,8 @@ public class GroupService {
     private final BackgroundImageService backgroundImageService;
 
     private final UserUtils userUtils;
+
+    private final TokenGenerator tokenGenerator;
 
     /**
      * 카테고리 정보를 가져옵니다.
@@ -388,6 +392,12 @@ public class GroupService {
             throw NotMemberException.EXCEPTION;
         }
 
+        String token = tokenGenerator.nextString();
+        InviteTokenRedisEntity tokenRedisEntity = InviteTokenRedisEntity.builder()
+            .token(token)
+            .groupId(groupId)
+            .issuerId(reqUser.getId())
+            .build();
 
 
     }

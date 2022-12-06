@@ -15,7 +15,7 @@ public class InviteTokenRedisEntity {
     private String token;
 
     @Indexed
-    private String groupId;
+    private Long groupId;
 
     @Indexed
     private Long issuerId;
@@ -24,7 +24,7 @@ public class InviteTokenRedisEntity {
     private Long ttl;
 
     @Builder
-    public InviteTokenRedisEntity(String groupId, String token, Long issuerId , Long ttl) {
+    public InviteTokenRedisEntity(Long groupId, String token, Long issuerId , Long ttl) {
         this.groupId = groupId;
         this.issuerId = issuerId;
         this.token = token;
