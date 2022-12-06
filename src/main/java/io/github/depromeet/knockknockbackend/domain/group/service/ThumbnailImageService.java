@@ -29,11 +29,10 @@ public class ThumbnailImageService {
 
     public ThumbnailListResponse getAllBackgroundImage(){
 
-        List<Thumbnail> thumbnailImages = thumbnailRepository.findAll();
-
-        List<ThumbnailImageDto> thumbnailImageDtoList = thumbnailImages.stream().map(
-                ThumbnailImageDto::new)
+        List<ThumbnailImageDto> thumbnailImageDtos = thumbnailRepository.findAll()
+            .stream()
+            .map(ThumbnailImageDto::new)
             .collect(Collectors.toList());
-        return new ThumbnailListResponse(thumbnailImageDtoList);
+        return new ThumbnailListResponse(thumbnailImageDtos);
     }
 }

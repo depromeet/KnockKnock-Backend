@@ -29,10 +29,10 @@ public class BackgroundImageService {
 
     public BackgroundListResponse getAllBackgroundImage(){
 
-        List<BackgroundImage> backgroundImages = backGroundImageRepository.findAll();
-
-        List<BackgroundImageDto> backgroundImageDtoList = backgroundImages.stream().map(BackgroundImageDto::new)
+        List<BackgroundImageDto> backgroundImageDtos = backGroundImageRepository.findAll()
+            .stream()
+            .map(BackgroundImageDto::new)
             .collect(Collectors.toList());
-        return new BackgroundListResponse(backgroundImageDtoList);
+        return new BackgroundListResponse(backgroundImageDtos);
     }
 }
