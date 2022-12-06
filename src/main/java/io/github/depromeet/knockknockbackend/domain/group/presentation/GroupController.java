@@ -58,13 +58,13 @@ public class GroupController {
     @Operation(summary = "공개 그룹을 만듭니다")
     @PostMapping("/open")
     public CreateGroupResponse createOpenGroup(@Valid @RequestBody CreateOpenGroupRequest createOpenGroupRequest){
-        return this.groupService.createOpenGroup(createOpenGroupRequest);
+        return groupService.createOpenGroup(createOpenGroupRequest);
     }
 
     @Operation(summary = "친구 그룹을 만듭니다")
     @PostMapping("/friend")
     public CreateGroupResponse createFriendGroup(@Valid @RequestBody CreateFriendGroupRequest createFriendGroupRequest){
-        return this.groupService.createFriendGroup(createFriendGroupRequest);
+        return groupService.createFriendGroup(createFriendGroupRequest);
     }
 
     @Operation(summary = "방장 권한 그룹 설정")
@@ -167,7 +167,7 @@ public class GroupController {
     @Operation(summary = "멤버 제거 ( 방장일 경우 본인빼고 모든인원 , 멤버일경우 나만)")
     @DeleteMapping("/{id}/members/{user_id}")
     public GroupResponse deleteMemberFromGroup(@PathVariable(value = "id") Long groupId, @PathVariable(value = "user_id") Long userId){
-        return this.groupService.deleteMemberFromGroup(groupId , userId);
+        return groupService.deleteMemberFromGroup(groupId , userId);
     }
 
     @Operation(summary = "백그라운드 이미지")
