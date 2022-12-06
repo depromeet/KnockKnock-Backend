@@ -14,14 +14,18 @@ import org.springframework.data.repository.query.Param;
 public interface GroupRepository extends JpaRepository<Group, Long> {
 
 
-    @Query(value = "select G.* , N.send_at from tbl_group as G left outer join tbl_notification as N on "
-        + "N.id = (select id from tbl_notification where group_id = G.id order by id DESC limit 1)"
-        + "where G.group_type = :#{#groupType.getType()} order by coalesce(N.send_at , G.created_date) DESC" , nativeQuery = true)
+    @Query(value = "select G.* , N.send_at from tbl_group as G "
+        + "left outer join tbl_notification as N on N.id = "
+        +       "(select id from tbl_notification where group_id = G.id order by id DESC limit 1)"
+        + "where G.group_type = :#{#groupType.getType()} "
+        + "order by coalesce(N.send_at , G.created_date) DESC" , nativeQuery = true)
     Slice<Group> findSliceByGroupType(@Param("groupType") GroupType groupType, PageRequest pageRequest);
 
-    @Query(value = "select G.* , N.send_at from tbl_group as G left outer join tbl_notification as N on "
-        + "N.id = (select id from tbl_notification where group_id = G.id order by id DESC limit 1)"
-        + "where G.group_type = :#{#groupType.getType()} and G.category_id = :category order by coalesce(N.send_at , G.created_date) DESC" , nativeQuery = true)
+    @Query(value = "select G.* , N.send_at from tbl_group as G "
+        + "left outer join tbl_notification as N on N.id = "
+        +       "(select id from tbl_notification where group_id = G.id order by id DESC limit 1)"
+        + "where G.group_type = :#{#groupType.getType()} and G.category_id = :category "
+        + "order by coalesce(N.send_at , G.created_date) DESC" , nativeQuery = true)
     Slice<Group> findSliceByGroupTypeAndCategory(@Param("groupType") GroupType groupType ,@Param("category") Category category , Pageable pageable);
 
     Slice<Group> findByGroupTypeAndTitleContaining(GroupType groupType,String searchString,PageRequest pageRequest);
