@@ -80,13 +80,40 @@ public class NotificationService {
     @Transactional
     public void sendInstance(SendInstanceRequest request) {
         Long sendUserId = SecurityUtils.getCurrentUserId();
-        List<DeviceToken> deviceTokens = getTokensOfGroupUserSettingAlarm(request.getGroupId());
-        List<String> tokens = deviceTokens.stream()
-            .filter(deviceToken -> !deviceToken.getUser().getId().equals(sendUserId))
-            .map(DeviceToken::getToken)
-            .collect(Collectors.toList());
 
-        MulticastMessage multicastMessage = MulticastMessage.builder()
+        List<String> tokens = getTokens(request, sendUserId);
+        MulticastMessage multicastMessage = makeMulticastMessageForFcm(request, tokens);
+
+        try {
+            BatchResponse batchResponse = FirebaseMessaging.getInstance()
+                .sendMulticast(multicastMessage);
+            if (batchResponse.getFailureCount() >= 1) {
+                handleFcmMessagingException(batchResponse);
+            }
+        } catch (FirebaseMessagingException e) {
+            log.error("[**FCM notification sending Error] {} ", e.getMessage());
+            throw new FcmResponseException();
+        }
+
+        notificationRepository.save(Notification.of(request.getContent(), request.getImageUrl(),
+            Group.of(request.getGroupId()), User.of(sendUserId), LocalDateTime.now()));
+    }
+
+    private void handleFcmMessagingException(BatchResponse batchResponse) {
+        log.error(
+            "[**FCM notification sending Error] successCount : {}, failureCount : {} ",
+            batchResponse.getSuccessCount(), batchResponse.getFailureCount());
+        batchResponse.getResponses()
+            .forEach(sendResponse -> log.error(
+                "[**FCM notification sending Error] errorCode: {}, errorMessage : {}",
+                sendResponse.getException().getErrorCode(),
+                sendResponse.getException().getMessage()));
+
+        throw new FcmResponseException();
+    }
+
+    private MulticastMessage makeMulticastMessageForFcm(SendInstanceRequest request, List<String> tokens) {
+        return MulticastMessage.builder()
             .setNotification(
                 com.google.firebase.messaging.Notification.builder()
                     .setBody(request.getContent())
@@ -94,35 +121,18 @@ public class NotificationService {
                     .build())
             .addAllTokens(tokens)
             .build();
-
-        try {
-            BatchResponse batchResponse = FirebaseMessaging.getInstance().sendMulticast(multicastMessage);
-
-            int successCount = batchResponse.getSuccessCount();
-            int failureCount = batchResponse.getFailureCount();
-            if (failureCount >= 1) {
-                log.error(
-                    "[**FCM notification sending Error] tokens.size : {}, successCount : {}, failureCount : {} ",
-                    tokens.size(), successCount, failureCount);
-                batchResponse.getResponses()
-                    .forEach(sendResponse -> log.error(
-                        "[**FCM notification sending Error] errorCode: {}, errorMessage : {}",
-                        sendResponse.getException().getErrorCode(),
-                        sendResponse.getException().getMessage()));
-
-                throw new FcmResponseException();
-            }
-        } catch (FirebaseMessagingException e) {
-            log.error(e.getMessage());
-            throw new FcmResponseException();
-        }
-
-        notificationRepository.save(Notification.of(request.getContent(), request.getImageUrl(),
-            Group.of(request.getGroupId()), User.of(sendUserId), LocalDateTime.now()));
-
     }
 
-    private List<DeviceToken> getTokensOfGroupUserSettingAlarm(Long groupId) {
+    private List<String> getTokens(SendInstanceRequest request, Long sendUserId) {
+        List<DeviceToken> deviceTokens = getDeviceTokensOfGroupUserSettingAlarm(request.getGroupId());
+
+        return deviceTokens.stream()
+            .filter(deviceToken -> !deviceToken.getUser().getId().equals(sendUserId))
+            .map(DeviceToken::getToken)
+            .collect(Collectors.toList());
+    }
+
+    private List<DeviceToken> getDeviceTokensOfGroupUserSettingAlarm(Long groupId) {
         int hour = LocalDateTime.now().getHour();
         Boolean nightOption = null;
         if (hour >= NightCondition.START_TIME.getHour() &&
