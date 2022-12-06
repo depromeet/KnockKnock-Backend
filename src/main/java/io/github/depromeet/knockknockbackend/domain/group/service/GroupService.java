@@ -5,7 +5,6 @@ import io.github.depromeet.knockknockbackend.domain.group.domain.Group;
 import io.github.depromeet.knockknockbackend.domain.group.domain.Group.GroupBuilder;
 import io.github.depromeet.knockknockbackend.domain.group.domain.Category;
 import io.github.depromeet.knockknockbackend.domain.group.domain.GroupType;
-import io.github.depromeet.knockknockbackend.domain.group.domain.GroupUser;
 import io.github.depromeet.knockknockbackend.domain.group.domain.GroupUsers;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.CategoryRepository;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.GroupRepository;
@@ -13,6 +12,7 @@ import io.github.depromeet.knockknockbackend.domain.group.domain.repository.Grou
 import io.github.depromeet.knockknockbackend.domain.group.exception.CategoryNotFoundException;
 import io.github.depromeet.knockknockbackend.domain.group.exception.GroupNotFoundException;
 import io.github.depromeet.knockknockbackend.domain.group.exception.HostCanNotLeaveGroupException;
+import io.github.depromeet.knockknockbackend.domain.group.exception.NotMemberException;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.AddFriendToGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateFriendGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateOpenGroupRequest;
@@ -379,6 +379,17 @@ public class GroupService {
     }
 
     public GroupInviteLinkResponse createGroupInviteLink(Long groupId) {
+        Group group = queryGroup(groupId);
+        GroupUsers groupUsers = group.getGroupUsers();
+        User reqUser = userUtils.getUserFromSecurityContext();
+
+        // 요청한 유저가 멤버가 아니라면 링크 발급이 안되어야 한다.
+        if(!groupUsers.checkUserIsAlreadyEnterGroup(reqUser)){
+            throw NotMemberException.EXCEPTION;
+        }
+
+
+
     }
 
     public GroupResponse checkGroupInviteLink(Long groupId, String code) {
