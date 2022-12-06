@@ -133,10 +133,8 @@ public class NotificationService {
     }
 
     private List<DeviceToken> getDeviceTokensOfGroupUserSettingAlarm(Long groupId) {
-        int hour = LocalDateTime.now().getHour();
         Boolean nightOption = null;
-        if (hour >= NightCondition.START_TIME.getHour() &&
-            hour < NightCondition.END_TIME.getHour()) {
+        if (NightCondition.isNight()) {
             nightOption = true;
         }
 
