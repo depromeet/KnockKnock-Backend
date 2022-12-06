@@ -21,6 +21,7 @@ import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.reque
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.CreateGroupResponse;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupBriefInfoDto;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupBriefInfoListResponse;
+import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupInviteLinkResponse;
 import io.github.depromeet.knockknockbackend.global.utils.user.UserUtils;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupResponse;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
@@ -375,5 +376,12 @@ public class GroupService {
         groupUsers.removeUserByUserId(userId);
         return new GroupResponse(group.getGroupBaseInfoVo(),groupUsers.getUserInfoVoList(),true);
 
+    }
+
+    public GroupInviteLinkResponse createGroupInviteLink(Long groupId) {
+    }
+
+    public GroupResponse checkGroupInviteLink(Long groupId, String code) {
+        return null;
     }
 }

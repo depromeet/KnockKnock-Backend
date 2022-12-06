@@ -13,6 +13,7 @@ import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.respo
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.CategoryListResponse;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.CreateGroupResponse;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupBriefInfoListResponse;
+import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupInviteLinkResponse;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupResponse;
 import io.github.depromeet.knockknockbackend.domain.group.service.CategoryService;
 import io.github.depromeet.knockknockbackend.domain.group.service.GroupService;
@@ -161,6 +162,22 @@ public class GroupController {
     @DeleteMapping("/{id}/members/{user_id}")
     public GroupResponse deleteMemberFromGroup(@PathVariable(value = "id") Long groupId, @PathVariable(value = "user_id") Long userId){
         return this.groupService.deleteMemberFromGroup(groupId , userId);
+    }
+
+
+    @Operation(summary = "그룹 초대 토큰 발급")
+    @GetMapping("/{id}/members/invite")
+    public GroupInviteLinkResponse createGroupInviteLink(
+        @PathVariable(value = "id") Long groupId){
+        return groupService.createGroupInviteLink(groupId);
+    }
+
+    @Operation(summary = "그룹 초대 토큰 검증 & 그룹 가입")
+    @PostMapping("/{id}/members/invite/{code}")
+    public GroupResponse checkGroupInviteLink(
+        @PathVariable(value = "id") Long groupId,
+        @PathVariable(value = "code") String code){
+        return groupService.checkGroupInviteLink(groupId,code);
     }
 
 }
