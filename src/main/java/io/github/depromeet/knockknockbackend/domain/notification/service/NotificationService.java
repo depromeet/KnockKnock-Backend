@@ -1,23 +1,36 @@
 package io.github.depromeet.knockknockbackend.domain.notification.service;
 
+import com.google.firebase.messaging.BatchResponse;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.FirebaseMessagingException;
+import com.google.firebase.messaging.MulticastMessage;
+import io.github.depromeet.knockknockbackend.domain.group.domain.Group;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.DeviceToken;
+import io.github.depromeet.knockknockbackend.domain.notification.domain.NightCondition;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.Notification;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.repository.DeviceTokenRepository;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.repository.NotificationRepository;
+import io.github.depromeet.knockknockbackend.domain.notification.exception.FcmResponseException;
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.request.RegisterFcmTokenRequest;
+import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.request.SendInstanceRequest;
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.response.QueryAlarmHistoryResponse;
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.response.QueryAlarmHistoryResponseElement;
+import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.global.utils.security.SecurityUtils;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class NotificationService {
@@ -62,6 +75,62 @@ public class NotificationService {
             () -> deviceTokenRepository.save(
                 DeviceToken.of(currentUserId, request.getDeviceId(), request.getToken()))
         );
+    }
+
+    @Transactional
+    public void sendInstance(SendInstanceRequest request) {
+        Long sendUserId = SecurityUtils.getCurrentUserId();
+        List<DeviceToken> deviceTokens = getTokensOfGroupUserSettingAlarm(request.getGroupId());
+        List<String> tokens = deviceTokens.stream()
+            .filter(deviceToken -> !deviceToken.getUser().getId().equals(sendUserId))
+            .map(DeviceToken::getToken)
+            .collect(Collectors.toList());
+
+        MulticastMessage multicastMessage = MulticastMessage.builder()
+            .setNotification(
+                com.google.firebase.messaging.Notification.builder()
+                    .setBody(request.getContent())
+                    .setImage(request.getImageUrl())
+                    .build())
+            .addAllTokens(tokens)
+            .build();
+
+        try {
+            BatchResponse batchResponse = FirebaseMessaging.getInstance().sendMulticast(multicastMessage);
+
+            int successCount = batchResponse.getSuccessCount();
+            int failureCount = batchResponse.getFailureCount();
+            if (failureCount >= 1) {
+                log.error(
+                    "[**FCM notification sending Error] tokens.size : {}, successCount : {}, failureCount : {} ",
+                    tokens.size(), successCount, failureCount);
+                batchResponse.getResponses()
+                    .forEach(sendResponse -> log.error(
+                        "[**FCM notification sending Error] errorCode: {}, errorMessage : {}",
+                        sendResponse.getException().getErrorCode(),
+                        sendResponse.getException().getMessage()));
+
+                throw new FcmResponseException();
+            }
+        } catch (FirebaseMessagingException e) {
+            log.error(e.getMessage());
+            throw new FcmResponseException();
+        }
+
+        notificationRepository.save(Notification.of(request.getContent(), request.getImageUrl(),
+            Group.of(request.getGroupId()), User.of(sendUserId), LocalDateTime.now()));
+
+    }
+
+    private List<DeviceToken> getTokensOfGroupUserSettingAlarm(Long groupId) {
+        int hour = LocalDateTime.now().getHour();
+        Boolean nightOption = null;
+        if (hour >= NightCondition.START_TIME.getHour() &&
+            hour < NightCondition.END_TIME.getHour()) {
+            nightOption = true;
+        }
+
+        return deviceTokenRepository.findUserByGroupIdAndNewOption(groupId, true, nightOption);
     }
 
 }
