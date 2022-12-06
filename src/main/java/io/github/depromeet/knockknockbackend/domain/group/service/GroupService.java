@@ -410,10 +410,9 @@ public class GroupService {
     }
 
     public GroupResponse checkGroupInviteLink(Long groupId, String token) {
-        InviteTokenRedisEntity inviteToken = inviteTokenRedisEntityRepository.findByToken(
-                token)
+        InviteTokenRedisEntity inviteToken = inviteTokenRedisEntityRepository.findById(token)
             .orElseThrow(() -> InvalidInviteTokenException.EXCEPTION);
-
+        System.out.println("asdfsadfasdf");
         if(!inviteToken.getGroupId().equals(groupId)){
             throw InvalidInviteTokenException.EXCEPTION;
         }

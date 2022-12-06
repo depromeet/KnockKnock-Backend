@@ -6,5 +6,4 @@ import org.springframework.data.repository.CrudRepository;
 
 public interface InviteTokenRedisEntityRepository extends CrudRepository<InviteTokenRedisEntity, String> {
 
-    Optional<InviteTokenRedisEntity> findByToken(String token);
 }
