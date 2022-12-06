@@ -1,6 +1,7 @@
 package io.github.depromeet.knockknockbackend.domain.notification.presentation;
 
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.request.RegisterFcmTokenRequest;
+import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.request.SendInstanceRequest;
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.response.QueryAlarmHistoryResponse;
 import io.github.depromeet.knockknockbackend.domain.notification.service.NotificationService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -37,5 +38,12 @@ public class NotificationController {
         notificationService.registerFcmToken(request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
+
+    @PostMapping("/instance")
+    public ResponseEntity<Void> sendInstance(@RequestBody SendInstanceRequest request) {
+        notificationService.sendInstance(request);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
 
 }
