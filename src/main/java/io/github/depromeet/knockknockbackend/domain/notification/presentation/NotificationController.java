@@ -30,7 +30,7 @@ public class NotificationController {
     private final NotificationService notificationService;
 
     @Operation(summary = "최신 푸쉬알림 리스트")
-    @GetMapping("/history")
+    @GetMapping
     public QueryAlarmHistoryResponse queryAlarmHistoryByUserId(
         @PageableDefault(size = 5, sort = "sendAt", direction = Direction.DESC) Pageable pageable) {
         return notificationService.queryAlarmHistoryByUserId(pageable);
@@ -51,7 +51,7 @@ public class NotificationController {
     }
 
     @Operation(summary = "알림방 푸쉬알림 리스트")
-    @GetMapping("/history/{group_id}")
+    @GetMapping("/{group_id}")
     public QueryAlarmHistoryResponse queryHistoryByGroupId(
         @PageableDefault(size = 20, sort = "sendAt", direction = Direction.DESC) Pageable pageable,
         @PathVariable(value = "group_id") Long groupId) {
