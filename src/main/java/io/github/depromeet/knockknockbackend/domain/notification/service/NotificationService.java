@@ -26,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,6 +50,17 @@ public class NotificationService {
         List<QueryAlarmHistoryResponseElement> result = alarmHistory.stream()
             .map(notificationMapper::toDtoForQueryAlarmHistory)
             .collect(Collectors.toList());
+
+        return null;
+//        return new QueryAlarmHistoryResponse(result);
+    }
+
+    @Transactional
+    public QueryAlarmHistoryResponse queryHistoryByGroupId(Pageable pageable, Long groupId) {
+        Slice<Notification> alarmHistory = notificationRepository.findAllByGroupId(groupId, pageable);
+        Slice<QueryAlarmHistoryResponseElement> result = alarmHistory
+            .map(Notification::getNotificationBaseInfoVo)
+            .map(QueryAlarmHistoryResponseElement::from);
 
         return new QueryAlarmHistoryResponse(result);
     }

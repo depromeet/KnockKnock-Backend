@@ -13,6 +13,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,6 +44,13 @@ public class NotificationController {
     public ResponseEntity<Void> sendInstance(@RequestBody SendInstanceRequest request) {
         notificationService.sendInstance(request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @GetMapping("/history/{group_id}")
+    public QueryAlarmHistoryResponse queryHistoryByGroupId(
+        @PageableDefault(size = 20, sort = "sendAt", direction = Direction.DESC) Pageable pageable,
+        @PathVariable(value = "group_id") Long groupId) {
+        return notificationService.queryHistoryByGroupId(pageable, groupId);
     }
 
 
