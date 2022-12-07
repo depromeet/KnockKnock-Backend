@@ -1,6 +1,7 @@
 package io.github.depromeet.knockknockbackend.domain.notification.domain;
 
 import io.github.depromeet.knockknockbackend.domain.group.domain.Group;
+import io.github.depromeet.knockknockbackend.domain.notification.domain.vo.NotificationBaseInfoVo;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.global.database.BaseTimeEntity;
 import java.time.LocalDateTime;
@@ -60,6 +61,17 @@ public class Notification extends BaseTimeEntity {
             .group(group)
             .sendUser(sendUser)
             .sendAt(sendAt)
+            .build();
+    }
+
+    public NotificationBaseInfoVo getNotificationBaseInfoVo() {
+        return NotificationBaseInfoVo.builder()
+            .notificationId(id)
+            .title(title)
+            .content(content)
+            .imageUrl(imageUrl)
+            .sendAt(sendAt)
+            .sendUserId(sendUser.getId())
             .build();
     }
 
