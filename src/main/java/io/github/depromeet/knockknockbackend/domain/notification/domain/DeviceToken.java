@@ -33,9 +33,9 @@ public class DeviceToken extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
+    @Column(unique = true)
     private String deviceId;
 
-    @Column(unique = true)
     private String token;
 
 
