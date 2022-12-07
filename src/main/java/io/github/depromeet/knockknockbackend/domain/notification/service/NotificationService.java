@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -40,19 +39,17 @@ public class NotificationService {
     private final DeviceTokenRepository deviceTokenRepository;
     private final EntityManager entityManager;
 
-    private final NotificationMapper notificationMapper;
 
     @Transactional
     public QueryAlarmHistoryResponse queryAlarmHistoryByUserId(Pageable pageable) {
-        Page<Notification> alarmHistory = notificationRepository.findAllByReceiveUserId(
+        Slice<Notification> alarmHistory = notificationRepository.findAllByReceiveUserId(
             SecurityUtils.getCurrentUserId(), pageable);
 
-        List<QueryAlarmHistoryResponseElement> result = alarmHistory.stream()
-            .map(notificationMapper::toDtoForQueryAlarmHistory)
-            .collect(Collectors.toList());
+        Slice<QueryAlarmHistoryResponseElement> result = alarmHistory
+            .map(Notification::getNotificationBaseInfoVo)
+            .map(QueryAlarmHistoryResponseElement::from);
 
-        return null;
-//        return new QueryAlarmHistoryResponse(result);
+        return new QueryAlarmHistoryResponse(result);
     }
 
     @Transactional
