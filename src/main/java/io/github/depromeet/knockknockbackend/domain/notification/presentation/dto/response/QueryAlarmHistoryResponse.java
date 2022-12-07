@@ -1,14 +1,14 @@
 package io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.response;
 
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.springframework.data.domain.Slice;
 
 
 @Getter
 @AllArgsConstructor
 public class QueryAlarmHistoryResponse {
 
-    private final List<QueryAlarmHistoryResponseElement> alarmHistory;
+    private final Slice<QueryAlarmHistoryResponseElement> alarmHistory;
 
 }
