@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 
 
 @Getter
-@Builder
+@Builder(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "tbl_notification")

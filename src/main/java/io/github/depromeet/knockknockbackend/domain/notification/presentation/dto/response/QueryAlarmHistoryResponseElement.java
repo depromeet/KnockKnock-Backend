@@ -3,14 +3,12 @@ package io.github.depromeet.knockknockbackend.domain.notification.presentation.d
 import io.github.depromeet.knockknockbackend.domain.notification.domain.vo.NotificationBaseInfoVo;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
 
 @Getter
-@Builder
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder(access = AccessLevel.PRIVATE)
 public class QueryAlarmHistoryResponseElement {
     private Long notificationId;
     private String title;
