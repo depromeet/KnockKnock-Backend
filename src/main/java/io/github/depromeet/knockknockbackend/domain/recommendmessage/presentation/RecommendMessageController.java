@@ -2,6 +2,7 @@ package io.github.depromeet.knockknockbackend.domain.recommendmessage.presentati
 
 import io.github.depromeet.knockknockbackend.domain.recommendmessage.presentation.dto.response.QueryRecommendMessageResponse;
 import io.github.depromeet.knockknockbackend.domain.recommendmessage.service.RecommendMessageService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ public class RecommendMessageController {
 
     private final RecommendMessageService recommendMessageService;
 
+    @Operation(summary = "추천메세지 조회")
     @GetMapping
     public QueryRecommendMessageResponse queryRecommendMessageContentByUseY(){
         return recommendMessageService.queryRecommendMessageContentByUseY();
