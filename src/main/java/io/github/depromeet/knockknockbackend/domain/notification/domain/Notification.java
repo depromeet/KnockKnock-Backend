@@ -34,6 +34,8 @@ public class Notification extends BaseTimeEntity {
 
     private LocalDateTime sendAt;
 
+    private String title;
+
     private String content;
 
     private String imageUrl;
@@ -50,8 +52,9 @@ public class Notification extends BaseTimeEntity {
     @OneToOne(fetch = FetchType.LAZY)
     private User receiveUser;
 
-    public static Notification of(String content, String imageUrl, Group group, User sendUser, LocalDateTime sendAt){
+    public static Notification of(String title, String content, String imageUrl, Group group, User sendUser, LocalDateTime sendAt){
         return Notification.builder()
+            .title(title)
             .content(content)
             .imageUrl(imageUrl)
             .group(group)

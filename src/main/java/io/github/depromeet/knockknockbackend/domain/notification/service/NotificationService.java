@@ -95,7 +95,7 @@ public class NotificationService {
             throw new FcmResponseException();
         }
 
-        notificationRepository.save(Notification.of(request.getContent(), request.getImageUrl(),
+        notificationRepository.save(Notification.of(request.getTitle(), request.getContent(), request.getImageUrl(),
             Group.of(request.getGroupId()), User.of(sendUserId), LocalDateTime.now()));
     }
 
