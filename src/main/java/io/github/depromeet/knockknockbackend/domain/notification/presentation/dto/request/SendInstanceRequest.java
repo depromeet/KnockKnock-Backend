@@ -6,6 +6,7 @@ import lombok.Getter;
 public class SendInstanceRequest {
 
     private Long groupId;
+    private String title;
     private String content;
     private String imageUrl;
 

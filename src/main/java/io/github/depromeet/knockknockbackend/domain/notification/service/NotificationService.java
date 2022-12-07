@@ -116,6 +116,7 @@ public class NotificationService {
         return MulticastMessage.builder()
             .setNotification(
                 com.google.firebase.messaging.Notification.builder()
+                    .setTitle(request.getTitle())
                     .setBody(request.getContent())
                     .setImage(request.getImageUrl())
                     .build())
