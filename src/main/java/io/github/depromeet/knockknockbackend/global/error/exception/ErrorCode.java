@@ -39,7 +39,9 @@ public enum ErrorCode {
     ALREADY_GROUP_ENTER(400 , "GROUP-400-3","Already enter group"),
     ADMISSION_NOT_FOUND(404,"GROUP-404-4", "ADMISSION Not Found"),
 
-    HOST_CAN_NOT_LEAVE(400 , "GROUP-400-2","Host can not leave from own group" );
+    HOST_CAN_NOT_LEAVE(400 , "GROUP-400-2","Host can not leave from own group" ),
+
+    REACTION_FORBIDDEN(HttpStatus.FORBIDDEN.value(), "REACTION-403-1", "the user cannot change the reaction");
 
 
 
