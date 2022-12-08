@@ -42,5 +42,10 @@ public class ReactionService {
             });
     }
 
+    @Transactional
+    public void deleteReaction(Long notificationReactionId) {
+        isMyReactionTheNotification(notificationReactionId);
+        notificationReactionRepository.deleteById(notificationReactionId);
+    }
 
 }
