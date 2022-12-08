@@ -64,6 +64,12 @@ public class Notification extends BaseTimeEntity {
             .build();
     }
 
+    public static Notification of(Long notificationId) {
+        return Notification.builder()
+            .id(notificationId)
+            .build();
+    }
+
     public NotificationBaseInfoVo getNotificationBaseInfoVo() {
         return NotificationBaseInfoVo.builder()
             .notificationId(id)
