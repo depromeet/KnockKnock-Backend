@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
 
 
 @Getter
-@Builder
+@Builder(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "tbl_notification")
@@ -53,5 +53,10 @@ public class Notification {
     @OneToOne(fetch = FetchType.LAZY)
     private User receiveUser;
 
+    public static Notification of(Long notificationId) {
+        return Notification.builder()
+            .id(notificationId)
+            .build();
+    }
 
 }
