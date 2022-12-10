@@ -14,11 +14,7 @@ public enum NightCondition {
 
     public static boolean isNight() {
         int nowHour = LocalDateTime.now().getHour();
-        if (nowHour >= NightCondition.START_TIME.hour ||
-            nowHour < NightCondition.END_TIME.hour) {
-            return true;
-        }
-        return false;
+        return nowHour >= NightCondition.START_TIME.hour || nowHour < NightCondition.END_TIME.hour;
     }
 
 }
