@@ -71,7 +71,7 @@ public class NotificationService {
 
         deviceTokenOptional.ifPresentOrElse(
             deviceToken -> {
-                if (deviceToken.getUser().getId().equals(currentUserId)) {
+                if (deviceToken.getUserId().equals(currentUserId)) {
                     deviceTokenRepository.save(
                         deviceToken.changeToken(request.getToken()));
                 } else {
@@ -101,27 +101,36 @@ public class NotificationService {
             }
         } catch (FirebaseMessagingException e) {
             log.error("[**FCM notification sending Error] {} ", e.getMessage());
-            throw new FcmResponseException();
+            throw FcmResponseException.EXCEPTION;
         }
 
-        notificationRepository.save(Notification.of(request.getTitle(), request.getContent(), request.getImageUrl(),
-            Group.of(request.getGroupId()), User.of(sendUserId), LocalDateTime.now()));
+        notificationRepository.save(
+            Notification.of(
+                request.getTitle(), request.getContent(), request.getImageUrl(),
+                Group.of(request.getGroupId()), User.of(sendUserId), LocalDateTime.now()
+            )
+        );
     }
 
     private void handleFcmMessagingException(BatchResponse batchResponse) {
         log.error(
             "[**FCM notification sending Error] successCount : {}, failureCount : {} ",
-            batchResponse.getSuccessCount(), batchResponse.getFailureCount());
+            batchResponse.getSuccessCount(), batchResponse.getFailureCount()
+        );
         batchResponse.getResponses()
-            .forEach(sendResponse -> log.error(
-                "[**FCM notification sending Error] errorCode: {}, errorMessage : {}",
-                sendResponse.getException().getErrorCode(),
-                sendResponse.getException().getMessage()));
+            .forEach(
+                sendResponse -> log.error(
+                    "[**FCM notification sending Error] errorCode: {}, errorMessage : {}",
+                    sendResponse.getException().getErrorCode(),
+                    sendResponse.getException().getMessage()
+                )
+            );
 
-        throw new FcmResponseException();
+        throw FcmResponseException.EXCEPTION;
     }
 
-    private MulticastMessage makeMulticastMessageForFcm(SendInstanceRequest request, List<String> tokens) {
+    private MulticastMessage makeMulticastMessageForFcm(SendInstanceRequest request,
+        List<String> tokens) {
         return MulticastMessage.builder()
             .setNotification(
                 com.google.firebase.messaging.Notification.builder()
@@ -134,10 +143,11 @@ public class NotificationService {
     }
 
     private List<String> getTokens(SendInstanceRequest request, Long sendUserId) {
-        List<DeviceToken> deviceTokens = getDeviceTokensOfGroupUserSettingAlarm(request.getGroupId());
+        List<DeviceToken> deviceTokens = getDeviceTokensOfGroupUserSettingAlarm(
+            request.getGroupId());
 
         return deviceTokens.stream()
-            .filter(deviceToken -> !deviceToken.getUser().getId().equals(sendUserId))
+            .filter(deviceToken -> !deviceToken.getUserId().equals(sendUserId))
             .map(DeviceToken::getToken)
             .collect(Collectors.toList());
     }

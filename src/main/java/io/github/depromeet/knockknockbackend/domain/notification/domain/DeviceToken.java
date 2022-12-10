@@ -38,6 +38,9 @@ public class DeviceToken extends BaseTimeEntity {
 
     private String token;
 
+    public Long getUserId() {
+        return this.user.getId();
+    }
 
     public static DeviceToken of(Long userId, String deviceId, String deviceToken) {
         return DeviceToken.builder()
