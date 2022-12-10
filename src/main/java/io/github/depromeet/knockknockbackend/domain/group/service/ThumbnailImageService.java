@@ -3,7 +3,11 @@ package io.github.depromeet.knockknockbackend.domain.group.service;
 import io.github.depromeet.knockknockbackend.domain.group.domain.Thumbnail;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.ThumbnailRepository;
 import io.github.depromeet.knockknockbackend.domain.group.exception.ThumbNailImageNotFoundException;
+import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.ThumbnailImageDto;
+import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.ThumbnailListResponse;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
@@ -23,4 +27,12 @@ public class ThumbnailImageService {
     }
 
 
+    public ThumbnailListResponse getAllBackgroundImage(){
+
+        List<ThumbnailImageDto> thumbnailImageDtos = thumbnailRepository.findAll()
+            .stream()
+            .map(ThumbnailImageDto::new)
+            .collect(Collectors.toList());
+        return new ThumbnailListResponse(thumbnailImageDtos);
+    }
 }

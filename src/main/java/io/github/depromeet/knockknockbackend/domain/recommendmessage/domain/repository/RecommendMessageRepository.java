@@ -5,6 +5,6 @@ import org.springframework.data.repository.CrudRepository;
 
 public interface RecommendMessageRepository extends CrudRepository<RecommendMessage, Long> {
 
-    RecommendMessage findAllByUseYn(boolean useYn);
+    RecommendMessage findAllByEnable(boolean enable);
 
 }
