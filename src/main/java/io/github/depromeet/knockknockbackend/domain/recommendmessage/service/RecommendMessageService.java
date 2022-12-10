@@ -21,8 +21,10 @@ public class RecommendMessageService {
 
         return new QueryRecommendMessageResponse(
             recommendMessage.getRecommendMessageContents().stream()
-                .map(recommendMessageContent -> new QueryRecommendMessageResponseElement(
-                    recommendMessageContent.getContent()))
-                .collect(Collectors.toList()));
+                .map(recommendMessageContent ->
+                    new QueryRecommendMessageResponseElement(recommendMessageContent.getContent())
+                ).collect(Collectors.toList())
+        );
     }
+
 }
