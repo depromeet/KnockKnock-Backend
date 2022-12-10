@@ -40,7 +40,7 @@ public class NotificationService {
     private final EntityManager entityManager;
 
 
-    @Transactional
+    @Transactional(readOnly = true)
     public QueryAlarmHistoryResponse queryAlarmHistoryByUserId(Pageable pageable) {
         Slice<Notification> alarmHistory = notificationRepository.findAllByReceiveUserId(
             SecurityUtils.getCurrentUserId(), pageable);
@@ -52,7 +52,7 @@ public class NotificationService {
         return new QueryAlarmHistoryResponse(result);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public QueryAlarmHistoryResponse queryHistoryByGroupId(Pageable pageable, Long groupId) {
         Slice<Notification> alarmHistory = notificationRepository.findAllByGroupId(groupId, pageable);
         Slice<QueryAlarmHistoryResponseElement> result = alarmHistory
