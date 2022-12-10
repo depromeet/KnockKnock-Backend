@@ -34,7 +34,7 @@ public class NotificationReaction extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JoinColumn(name = "notification_id")
+    @JoinColumn(name = "notification_id", updatable = false)
     @ManyToOne(fetch = FetchType.LAZY)
     private Notification notification;
 
@@ -42,17 +42,22 @@ public class NotificationReaction extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Reaction reaction;
 
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", updatable = false)
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
-    public static NotificationReaction of(Long id, Notification notification, Reaction reaction, User user) {
+    public static NotificationReaction of(Long id, Reaction reaction) {
         return NotificationReaction.builder()
             .id(id)
+            .reaction(reaction)
+            .build();
+    }
+
+    public static NotificationReaction of(Notification notification, Reaction reaction, User user) {
+        return NotificationReaction.builder()
             .notification(notification)
             .reaction(reaction)
             .user(user)
             .build();
     }
-
 }
