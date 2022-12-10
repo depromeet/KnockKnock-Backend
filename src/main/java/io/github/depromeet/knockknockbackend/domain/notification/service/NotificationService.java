@@ -62,7 +62,7 @@ public class NotificationService {
 
         deviceTokenOptional.ifPresentOrElse(
             deviceToken -> {
-                if (deviceToken.getUser().getId().equals(currentUserId)) {
+                if (deviceToken.getUserId().equals(currentUserId)) {
                     deviceTokenRepository.save(
                         deviceToken.changeToken(request.getToken()));
                 } else {
@@ -128,7 +128,7 @@ public class NotificationService {
         List<DeviceToken> deviceTokens = getDeviceTokensOfGroupUserSettingAlarm(request.getGroupId());
 
         return deviceTokens.stream()
-            .filter(deviceToken -> !deviceToken.getUser().getId().equals(sendUserId))
+            .filter(deviceToken -> !deviceToken.getUserId().equals(sendUserId))
             .map(DeviceToken::getToken)
             .collect(Collectors.toList());
     }
