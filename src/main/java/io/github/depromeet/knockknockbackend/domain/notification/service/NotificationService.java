@@ -106,7 +106,8 @@ public class NotificationService {
     private void handleFcmMessagingException(BatchResponse batchResponse) {
         log.error(
             "[**FCM notification sending Error] successCount : {}, failureCount : {} ",
-            batchResponse.getSuccessCount(), batchResponse.getFailureCount());
+            batchResponse.getSuccessCount(), batchResponse.getFailureCount()
+        );
         batchResponse.getResponses()
             .forEach(
                 sendResponse -> log.error(
