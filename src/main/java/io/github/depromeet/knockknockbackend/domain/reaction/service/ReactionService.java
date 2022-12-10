@@ -34,18 +34,18 @@ public class ReactionService {
             ));
     }
 
+    @Transactional
+    public void deleteReaction(Long notificationReactionId) {
+        validateMyReactionTheNotification(notificationReactionId);
+        notificationReactionRepository.deleteById(notificationReactionId);
+    }
+
     private void validateMyReactionTheNotification(Long notificationReactionId) {
         notificationReactionRepository.findById(notificationReactionId)
             .ifPresent(notificationReaction -> {
                 if (!notificationReaction.getUser().getId().equals(SecurityUtils.getCurrentUserId()))
                     throw ReactionForbiddenException.EXCEPTION;
             });
-    }
-
-    @Transactional
-    public void deleteReaction(Long notificationReactionId) {
-        validateMyReactionTheNotification(notificationReactionId);
-        notificationReactionRepository.deleteById(notificationReactionId);
     }
 
 }
