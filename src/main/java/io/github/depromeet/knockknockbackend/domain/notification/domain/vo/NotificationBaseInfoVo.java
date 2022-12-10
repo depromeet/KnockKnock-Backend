@@ -1,6 +1,7 @@
 package io.github.depromeet.knockknockbackend.domain.notification.domain.vo;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -14,4 +15,5 @@ public class NotificationBaseInfoVo {
     private String imageUrl;
     private LocalDateTime sendAt;
     private final Long sendUserId;
+    private final List<NotificationReactionInfoVo> notificationReactionInfoVos;
 }
