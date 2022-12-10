@@ -21,6 +21,15 @@ public class ReactionService {
 
     @Transactional
     public void registerReaction(RegisterReactionRequest request) {
+        notificationReactionRepository.save(
+            NotificationReaction.of(
+                Notification.of(request.getNotificationId()),
+                Reaction.of(request.getReactionId()),
+                userUtils.getUserFromSecurityContext()
+            ));
+    }
+
+    public void changeReaction(RegisterReactionRequest request) {
         if (request.getNotificationReactionId() != null) {
             validateMyReactionTheNotification(request.getNotificationReactionId());
         }
@@ -28,9 +37,7 @@ public class ReactionService {
         notificationReactionRepository.save(
             NotificationReaction.of(
                 request.getNotificationReactionId(),
-                Notification.of(request.getNotificationId()),
-                Reaction.of(request.getReactionId()),
-                userUtils.getUserFromSecurityContext()
+                Reaction.of(request.getReactionId())
             ));
     }
 

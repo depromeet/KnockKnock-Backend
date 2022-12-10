@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,10 +26,17 @@ public class ReactionController {
     private final ReactionService reactionService;
 
     @ResponseStatus(HttpStatus.CREATED)
-    @Operation(summary = "알림에 리액션 등록/수정")
+    @Operation(summary = "알림에 리액션 등록")
     @PostMapping
     public void registerReaction(@RequestBody RegisterReactionRequest request) {
         reactionService.registerReaction(request);
+    }
+
+    @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "알림에 리액션 수정")
+    @PatchMapping
+    public void changeReaction(@RequestBody RegisterReactionRequest request) {
+        reactionService.changeReaction(request);
     }
 
     @ResponseStatus(HttpStatus.OK)
