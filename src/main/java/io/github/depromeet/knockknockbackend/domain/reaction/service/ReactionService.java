@@ -21,31 +21,38 @@ public class ReactionService {
 
     @Transactional
     public void registerReaction(RegisterReactionRequest request) {
-        if (request.getNotificationReactionId() != null) {
-            isMyReactionTheNotification(request.getNotificationReactionId());
-        }
-
         notificationReactionRepository.save(
             NotificationReaction.of(
-                request.getNotificationReactionId(),
                 Notification.of(request.getNotificationId()),
                 Reaction.of(request.getReactionId()),
                 userUtils.getUserFromSecurityContext()
             ));
     }
 
-    private void isMyReactionTheNotification(Long notificationReactionId) {
+    public void changeReaction(RegisterReactionRequest request) {
+        if (request.getNotificationReactionId() != null) {
+            validateMyReactionTheNotification(request.getNotificationReactionId());
+        }
+
+        notificationReactionRepository.save(
+            NotificationReaction.of(
+                request.getNotificationReactionId(),
+                Reaction.of(request.getReactionId())
+            ));
+    }
+
+    @Transactional
+    public void deleteReaction(Long notificationReactionId) {
+        validateMyReactionTheNotification(notificationReactionId);
+        notificationReactionRepository.deleteById(notificationReactionId);
+    }
+
+    private void validateMyReactionTheNotification(Long notificationReactionId) {
         notificationReactionRepository.findById(notificationReactionId)
             .ifPresent(notificationReaction -> {
                 if (!notificationReaction.getUser().getId().equals(SecurityUtils.getCurrentUserId()))
                     throw ReactionForbiddenException.EXCEPTION;
             });
-    }
-
-    @Transactional
-    public void deleteReaction(Long notificationReactionId) {
-        isMyReactionTheNotification(notificationReactionId);
-        notificationReactionRepository.deleteById(notificationReactionId);
     }
 
 }
