@@ -7,12 +7,12 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @SecurityRequirement(name = "access-token")
@@ -24,16 +24,16 @@ public class ReactionController {
 
     private final ReactionService reactionService;
 
+    @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "알림에 리액션 등록/수정")
     @PostMapping
-    public ResponseEntity<Void> registerReaction(@RequestBody RegisterReactionRequest request) {
+    public void registerReaction(@RequestBody RegisterReactionRequest request) {
         reactionService.registerReaction(request);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    @ResponseStatus(HttpStatus.OK)
     @DeleteMapping("{notification_reaction_id}")
-    public ResponseEntity<Void> deleteReaction(@PathVariable("notification_reaction_id") Long notificationReactionId) {
+    public void deleteReaction(@PathVariable("notification_reaction_id") Long notificationReactionId) {
         reactionService.deleteReaction(notificationReactionId);
-        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }
