@@ -30,7 +30,7 @@ public class RecommendMessage extends BaseTimeEntity {
 
     private String title;
 
-    private boolean useYn;
+    private boolean enable;
 
     @Builder.Default
     @OneToMany(mappedBy = "recommendMessage")
