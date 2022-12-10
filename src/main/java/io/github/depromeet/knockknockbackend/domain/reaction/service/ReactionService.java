@@ -22,7 +22,7 @@ public class ReactionService {
     @Transactional
     public void registerReaction(RegisterReactionRequest request) {
         if (request.getNotificationReactionId() != null) {
-            isMyReactionTheNotification(request.getNotificationReactionId());
+            validateMyReactionTheNotification(request.getNotificationReactionId());
         }
 
         notificationReactionRepository.save(
@@ -34,7 +34,7 @@ public class ReactionService {
             ));
     }
 
-    private void isMyReactionTheNotification(Long notificationReactionId) {
+    private void validateMyReactionTheNotification(Long notificationReactionId) {
         notificationReactionRepository.findById(notificationReactionId)
             .ifPresent(notificationReaction -> {
                 if (!notificationReaction.getUser().getId().equals(SecurityUtils.getCurrentUserId()))
@@ -44,7 +44,7 @@ public class ReactionService {
 
     @Transactional
     public void deleteReaction(Long notificationReactionId) {
-        isMyReactionTheNotification(notificationReactionId);
+        validateMyReactionTheNotification(notificationReactionId);
         notificationReactionRepository.deleteById(notificationReactionId);
     }
 
