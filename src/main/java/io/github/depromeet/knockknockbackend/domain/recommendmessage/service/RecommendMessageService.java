@@ -17,7 +17,7 @@ public class RecommendMessageService {
 
     @Transactional
     public QueryRecommendMessageResponse queryRecommendMessageContentByUseY() {
-        RecommendMessage recommendMessage = recommendMessageRepository.findAllByUseYn(true);
+        RecommendMessage recommendMessage = recommendMessageRepository.findAllByEnable(true);
 
         return new QueryRecommendMessageResponse(
             recommendMessage.getRecommendMessageContents().stream()
