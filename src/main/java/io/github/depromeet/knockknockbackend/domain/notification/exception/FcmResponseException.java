@@ -6,7 +6,7 @@ import io.github.depromeet.knockknockbackend.global.error.exception.KnockExcepti
 public class FcmResponseException extends KnockException {
     public static final KnockException EXCEPTION = new FcmResponseException();
 
-    public FcmResponseException() {
+    private FcmResponseException() {
         super(ErrorCode.NOTIFICATION_FCM_FAIL_SEND);
     }
 }

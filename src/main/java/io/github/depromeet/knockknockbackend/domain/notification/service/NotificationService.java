@@ -92,7 +92,7 @@ public class NotificationService {
             }
         } catch (FirebaseMessagingException e) {
             log.error("[**FCM notification sending Error] {} ", e.getMessage());
-            throw new FcmResponseException();
+            throw FcmResponseException.EXCEPTION;
         }
 
         notificationRepository.save(Notification.of(request.getTitle(), request.getContent(), request.getImageUrl(),
@@ -109,7 +109,7 @@ public class NotificationService {
                 sendResponse.getException().getErrorCode(),
                 sendResponse.getException().getMessage()));
 
-        throw new FcmResponseException();
+        throw FcmResponseException.EXCEPTION;
     }
 
     private MulticastMessage makeMulticastMessageForFcm(SendInstanceRequest request, List<String> tokens) {
