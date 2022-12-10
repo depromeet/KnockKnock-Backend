@@ -95,8 +95,12 @@ public class NotificationService {
             throw FcmResponseException.EXCEPTION;
         }
 
-        notificationRepository.save(Notification.of(request.getTitle(), request.getContent(), request.getImageUrl(),
-            Group.of(request.getGroupId()), User.of(sendUserId), LocalDateTime.now()));
+        notificationRepository.save(
+            Notification.of(
+                request.getTitle(), request.getContent(), request.getImageUrl(),
+                Group.of(request.getGroupId()), User.of(sendUserId), LocalDateTime.now()
+            )
+        );
     }
 
     private void handleFcmMessagingException(BatchResponse batchResponse) {
@@ -104,15 +108,19 @@ public class NotificationService {
             "[**FCM notification sending Error] successCount : {}, failureCount : {} ",
             batchResponse.getSuccessCount(), batchResponse.getFailureCount());
         batchResponse.getResponses()
-            .forEach(sendResponse -> log.error(
-                "[**FCM notification sending Error] errorCode: {}, errorMessage : {}",
-                sendResponse.getException().getErrorCode(),
-                sendResponse.getException().getMessage()));
+            .forEach(
+                sendResponse -> log.error(
+                    "[**FCM notification sending Error] errorCode: {}, errorMessage : {}",
+                    sendResponse.getException().getErrorCode(),
+                    sendResponse.getException().getMessage()
+                )
+            );
 
         throw FcmResponseException.EXCEPTION;
     }
 
-    private MulticastMessage makeMulticastMessageForFcm(SendInstanceRequest request, List<String> tokens) {
+    private MulticastMessage makeMulticastMessageForFcm(SendInstanceRequest request,
+        List<String> tokens) {
         return MulticastMessage.builder()
             .setNotification(
                 com.google.firebase.messaging.Notification.builder()
@@ -125,7 +133,8 @@ public class NotificationService {
     }
 
     private List<String> getTokens(SendInstanceRequest request, Long sendUserId) {
-        List<DeviceToken> deviceTokens = getDeviceTokensOfGroupUserSettingAlarm(request.getGroupId());
+        List<DeviceToken> deviceTokens = getDeviceTokensOfGroupUserSettingAlarm(
+            request.getGroupId());
 
         return deviceTokens.stream()
             .filter(deviceToken -> !deviceToken.getUserId().equals(sendUserId))
