@@ -104,7 +104,7 @@ public class GroupUsers {
         groupUserList.removeIf(groupUser -> groupUser.getUserId().equals(userId));
     }
 
-    public void addMember(User reqUser ,Group group) {
+    public void addMember(User reqUser, Group group) {
         GroupUser groupUser = new GroupUser(group, reqUser, false);
         groupUserList.add(groupUser);
     }

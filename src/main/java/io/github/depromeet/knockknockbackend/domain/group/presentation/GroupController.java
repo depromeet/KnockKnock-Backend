@@ -168,7 +168,8 @@ public class GroupController {
     @Operation(summary = "그룹 초대 토큰 발급")
     @GetMapping("/{id}/members/invite")
     public GroupInviteLinkResponse createGroupInviteLink(
-        @PathVariable(value = "id") Long groupId){
+        @PathVariable(value = "id") Long groupId
+    ){
         return groupService.createGroupInviteLink(groupId);
     }
 
@@ -176,7 +177,8 @@ public class GroupController {
     @PostMapping("/{id}/members/invite/{code}")
     public GroupResponse checkGroupInviteLink(
         @PathVariable(value = "id") Long groupId,
-        @PathVariable(value = "code") String code){
+        @PathVariable(value = "code") String code
+    ){
         return groupService.checkGroupInviteLink(groupId,code);
     }
 
