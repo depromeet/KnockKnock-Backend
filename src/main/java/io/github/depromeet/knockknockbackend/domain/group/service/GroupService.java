@@ -17,7 +17,6 @@ import io.github.depromeet.knockknockbackend.domain.group.exception.GroupNotFoun
 import io.github.depromeet.knockknockbackend.domain.group.exception.HostCanNotLeaveGroupException;
 import io.github.depromeet.knockknockbackend.domain.group.exception.InvalidInviteTokenException;
 import io.github.depromeet.knockknockbackend.domain.group.exception.NotMemberException;
-import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.AddFriendToGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateFriendGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateOpenGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.GroupInTypeRequest;
@@ -41,7 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class GroupService {
+public class GroupService implements GroupUtils {
 
     private final GroupRepository groupRepository;
     private final GroupUserRepository groupUserRepository;
@@ -72,9 +71,23 @@ public class GroupService {
      * @param groupId 그룹 아이디
      * @return
      */
+    @Override
     public Group queryGroup(Long groupId) {
         return groupRepository.findById(groupId)
             .orElseThrow(() -> GroupNotFoundException.EXCEPTION);
+    }
+
+    @Override
+    public void validReqUserIsGroupHost(Group group, Long userId) {
+        GroupUsers groupUsers = group.getGroupUsers();
+        groupUsers.validReqUserIsGroupHost(userId);
+    }
+
+    @Override
+    public void validUserIsAlreadyEnterGroup(Group group, Long userId) {
+        GroupUsers groupUsers = group.getGroupUsers();
+        Long reqUserId = SecurityUtils.getCurrentUserId();
+        groupUsers.validUserIsAlreadyEnterGroup(reqUserId);
     }
 
 
