@@ -100,8 +100,13 @@ public class GroupService {
     public CreateGroupResponse createOpenGroup(CreateOpenGroupRequest createOpenGroupRequest) {
         // 요청자 정보 시큐리티에서 가져옴
         User reqUser = userUtils.getUserFromSecurityContext();
+
+        List<Long> memberIds = createOpenGroupRequest.getMemberIds();
+        if(!memberIds.contains(reqUser.getId())){
+            memberIds.add(reqUser.getId());
+        }
         //요청받은 id 목록들로 디비에서 조회
-        List<User> findUserList = userUtils.findByIdIn(createOpenGroupRequest.getMemberIds());
+        List<User> findUserList = userUtils.findByIdIn(memberIds);
 
         // 요청받은 유저 아이디 목록이 디비에 존재하는 지 확인
         validReqMemberNotExist(findUserList, createOpenGroupRequest.getMemberIds());
@@ -127,7 +132,9 @@ public class GroupService {
 
         //TODO : 요청 받은 memeberId가 친구 목록에 속해있는지 검증.
         List<Long> memberIds = createFriendGroupRequest.getMemberIds();
-
+        if(!memberIds.contains(reqUser.getId())){
+            memberIds.add(reqUser.getId());
+        }
         //요청받은 id 목록들로 디비에서 조회
         List<User> requestUserList = userUtils.findByIdIn(memberIds);
         // 그룹 만들기
