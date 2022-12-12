@@ -58,4 +58,15 @@ public class Notification extends BaseTimeEntity {
             .build();
     }
 
+    public static Notification of(String title, String content, String imageUrl, Group group,
+        User sendUser, LocalDateTime sendAt) {
+        return Notification.builder()
+            .title(title)
+            .content(content)
+            .imageUrl(imageUrl)
+            .group(group)
+            .sendUser(sendUser)
+            .sendAt(sendAt)
+            .build();
+    }
 }

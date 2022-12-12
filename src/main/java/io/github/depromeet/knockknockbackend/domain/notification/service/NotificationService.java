@@ -14,7 +14,6 @@ import io.github.depromeet.knockknockbackend.domain.notification.exception.FcmRe
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.request.RegisterFcmTokenRequest;
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.request.SendInstanceRequest;
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.response.QueryAlarmHistoryResponse;
-import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.response.QueryAlarmHistoryResponseElement;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.global.utils.security.SecurityUtils;
 import java.time.LocalDateTime;
@@ -39,18 +38,10 @@ public class NotificationService {
     private final DeviceTokenRepository deviceTokenRepository;
     private final EntityManager entityManager;
 
-    private final NotificationMapper notificationMapper;
 
     @Transactional
     public QueryAlarmHistoryResponse queryAlarmHistoryByUserId(Pageable pageable) {
-        Page<Notification> alarmHistory = notificationRepository.findAllByReceiveUserId(
-            SecurityUtils.getCurrentUserId(), pageable);
-
-        List<QueryAlarmHistoryResponseElement> result = alarmHistory.stream()
-            .map(notificationMapper::toDtoForQueryAlarmHistory)
-            .collect(Collectors.toList());
-
-        return new QueryAlarmHistoryResponse(result);
+        return null;
     }
 
     @Transactional
