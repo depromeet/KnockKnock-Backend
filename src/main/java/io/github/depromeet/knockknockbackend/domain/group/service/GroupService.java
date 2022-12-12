@@ -100,8 +100,6 @@ public class GroupService {
     public CreateGroupResponse createOpenGroup(CreateOpenGroupRequest createOpenGroupRequest) {
         // 요청자 정보 시큐리티에서 가져옴
         User reqUser = userUtils.getUserFromSecurityContext();
-        // 혹시 본인 아이디 멤버로 넣었으면 지워버리기.
-        createOpenGroupRequest.getMemberIds().removeIf(id -> reqUser.getId().equals(id));
         //요청받은 id 목록들로 디비에서 조회
         List<User> findUserList = userUtils.findByIdIn(createOpenGroupRequest.getMemberIds());
 
