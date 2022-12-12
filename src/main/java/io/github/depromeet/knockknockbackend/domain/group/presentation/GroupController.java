@@ -1,6 +1,5 @@
 package io.github.depromeet.knockknockbackend.domain.group.presentation;
 
-import io.github.depromeet.knockknockbackend.domain.group.facade.AdmissionFacade;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.AddFriendToGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateCategoryRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateFriendGroupRequest;

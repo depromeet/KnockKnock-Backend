@@ -1,12 +1,12 @@
-package io.github.depromeet.knockknockbackend.domain.group.service;
+package io.github.depromeet.knockknockbackend.domain.admission.service;
 
 
-import io.github.depromeet.knockknockbackend.domain.group.domain.Admission;
-import io.github.depromeet.knockknockbackend.domain.group.domain.AdmissionState;
+import io.github.depromeet.knockknockbackend.domain.admission.domain.Admission;
+import io.github.depromeet.knockknockbackend.domain.admission.domain.AdmissionState;
 import io.github.depromeet.knockknockbackend.domain.group.domain.Group;
 import io.github.depromeet.knockknockbackend.domain.group.domain.GroupUsers;
-import io.github.depromeet.knockknockbackend.domain.group.domain.repository.AdmissionRepository;
-import io.github.depromeet.knockknockbackend.domain.group.exception.AdmissionNotFoundException;
+import io.github.depromeet.knockknockbackend.domain.admission.domain.repository.AdmissionRepository;
+import io.github.depromeet.knockknockbackend.domain.admission.exception.AdmissionNotFoundException;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.AdmissionInfoDto;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.AdmissionInfoListResponse;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
