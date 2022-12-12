@@ -373,6 +373,13 @@ public class GroupService implements GroupUtils {
             groupUsers.checkReqUserGroupHost(reqUserId));
     }
 
+    @Override
+    public void addMemberToGroup(Group group, User newUser) {
+        GroupUsers groupUsers = group.getGroupUsers();
+        groupUsers.validUserIsAlreadyEnterGroup(newUser.getId());
+        groupUsers.addMember(newUser ,group);
+    }
+
     public GroupResponse deleteMemberFromGroup(Long groupId, Long userId) {
         Long reqUserId = SecurityUtils.getCurrentUserId();
 

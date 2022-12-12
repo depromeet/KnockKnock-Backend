@@ -92,6 +92,8 @@ public class AdmissionService implements AdmissionUsecase {
         Admission admission = queryAdmission(admissionId);
         admission.acceptAdmission();
 
+        groupUtils.addMemberToGroup(group,admission.getRequester());
+
         return getAdmissionInfoDto(admission);
     }
     /**
