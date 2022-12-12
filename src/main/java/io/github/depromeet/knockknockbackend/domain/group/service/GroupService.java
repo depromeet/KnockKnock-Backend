@@ -7,12 +7,16 @@ import io.github.depromeet.knockknockbackend.domain.group.domain.Category;
 import io.github.depromeet.knockknockbackend.domain.group.domain.GroupType;
 import io.github.depromeet.knockknockbackend.domain.group.domain.GroupUser;
 import io.github.depromeet.knockknockbackend.domain.group.domain.GroupUsers;
+import io.github.depromeet.knockknockbackend.domain.group.domain.InviteTokenRedisEntity;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.CategoryRepository;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.GroupRepository;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.GroupUserRepository;
+import io.github.depromeet.knockknockbackend.domain.group.domain.repository.InviteTokenRedisEntityRepository;
 import io.github.depromeet.knockknockbackend.domain.group.exception.CategoryNotFoundException;
 import io.github.depromeet.knockknockbackend.domain.group.exception.GroupNotFoundException;
 import io.github.depromeet.knockknockbackend.domain.group.exception.HostCanNotLeaveGroupException;
+import io.github.depromeet.knockknockbackend.domain.group.exception.InvalidInviteTokenException;
+import io.github.depromeet.knockknockbackend.domain.group.exception.NotMemberException;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.AddFriendToGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateFriendGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateOpenGroupRequest;
@@ -20,6 +24,8 @@ import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.reque
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.UpdateGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.CreateGroupResponse;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupBriefInfoDto;
+import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupInviteLinkResponse;
+import io.github.depromeet.knockknockbackend.global.utils.generate.TokenGenerator;
 import io.github.depromeet.knockknockbackend.global.utils.security.SecurityUtils;
 import io.github.depromeet.knockknockbackend.global.utils.user.UserUtils;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupResponse;
@@ -46,6 +52,10 @@ public class GroupService {
     private final BackgroundImageService backgroundImageService;
 
     private final UserUtils userUtils;
+
+    private final TokenGenerator tokenGenerator;
+
+    private final InviteTokenRedisEntityRepository inviteTokenRedisEntityRepository;
 
     /**
      * 카테고리 정보를 가져옵니다.
@@ -370,5 +380,52 @@ public class GroupService {
         groupUsers.removeUserByUserId(userId);
         return new GroupResponse(group.getGroupBaseInfoVo(),groupUsers.getUserInfoVoList(),true);
 
+    }
+
+    public GroupInviteLinkResponse createGroupInviteLink(Long groupId) {
+        Group group = queryGroup(groupId);
+        GroupUsers groupUsers = group.getGroupUsers();
+        User reqUser = userUtils.getUserFromSecurityContext();
+
+        // 요청한 유저가 멤버가 아니라면 링크 발급이 안되어야 한다.
+        if(!groupUsers.checkUserIsAlreadyEnterGroup(reqUser)){
+            throw NotMemberException.EXCEPTION;
+        }
+
+        String token = tokenGenerator.nextString();
+
+        InviteTokenRedisEntity tokenRedisEntity = InviteTokenRedisEntity.builder()
+            .token(token)
+            .groupId(groupId)
+            .issuerId(reqUser.getId())
+            .ttl(24L)
+            .build();
+
+        inviteTokenRedisEntityRepository.save(tokenRedisEntity);
+
+        return GroupInviteLinkResponse.from(token);
+    }
+
+    public GroupResponse checkGroupInviteLink(Long groupId, String token) {
+        InviteTokenRedisEntity inviteToken = inviteTokenRedisEntityRepository.findById(token)
+            .orElseThrow(() -> InvalidInviteTokenException.EXCEPTION);
+
+        if(!inviteToken.getGroupId().equals(groupId)){
+            throw InvalidInviteTokenException.EXCEPTION;
+        }
+
+        Group group = queryGroup(groupId);
+        GroupUsers groupUsers = group.getGroupUsers();
+        User reqUser = userUtils.getUserFromSecurityContext();
+
+        // 유저가 이미 방안에 들어가있는지 검증
+        groupUsers.validUserIsAlreadyEnterGroup(reqUser);
+
+        groupUsers.addMember(reqUser,group);
+
+        return new GroupResponse(
+                group.getGroupBaseInfoVo(),
+                groupUsers.getUserInfoVoList(),
+                false);
     }
 }
