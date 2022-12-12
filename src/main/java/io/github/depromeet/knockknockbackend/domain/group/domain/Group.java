@@ -4,6 +4,7 @@ package io.github.depromeet.knockknockbackend.domain.group.domain;
 import io.github.depromeet.knockknockbackend.domain.group.domain.vo.GroupBaseInfoVo;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.UpdateGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.service.dto.UpdateGroupDto;
+import io.github.depromeet.knockknockbackend.domain.notification.domain.Notification;
 import io.github.depromeet.knockknockbackend.global.database.BaseTimeEntity;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,7 +55,8 @@ public class Group extends BaseTimeEntity {
     @JoinColumn(name = "category_id")
     private Category category;
 
-
+    @OneToMany(mappedBy = "group")
+    private List<Notification> notifications = new ArrayList<>();
     @Builder
     public Group(Long id, String title, String description, String thumbnailPath, String backgroundImagePath,
         Boolean publicAccess , Category category ,GroupType groupType) {

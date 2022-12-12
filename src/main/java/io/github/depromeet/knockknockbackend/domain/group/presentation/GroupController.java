@@ -13,7 +13,7 @@ import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.respo
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.CategoryDto;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.CategoryListResponse;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.CreateGroupResponse;
-import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupBriefInfoListResponse;
+import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupBriefInfoDto;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupResponse;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.ThumbnailListResponse;
 import io.github.depromeet.knockknockbackend.domain.group.service.BackgroundImageService;
@@ -28,6 +28,8 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -91,12 +93,15 @@ public class GroupController {
         , in = ParameterIn.QUERY)
     @Operation(summary = "참여중인 그룹 목록 전체 홀로외침 친구들 방 필터링")
     @GetMapping("/joined")
-    public GroupBriefInfoListResponse getParticipatingGroups(
-        @RequestParam("type") GroupInTypeRequest groupInTypeRequest){
+    public Slice<GroupBriefInfoDto> getParticipatingGroups(
+        @RequestParam("type") GroupInTypeRequest groupInTypeRequest,
+        @RequestParam(value = "page", defaultValue = "0") Integer page,
+        @RequestParam(value = "size" ,defaultValue = "10") Integer size){
+        PageRequest pageRequest = PageRequest.of(page, size);
         if(groupInTypeRequest == GroupInTypeRequest.ALL){
-            return groupService.findAllJoinedGroups();
+            return groupService.findAllJoinedGroups(pageRequest);
         }
-        return groupService.findJoinedGroupByType(groupInTypeRequest);
+        return groupService.findJoinedGroupByType(groupInTypeRequest,pageRequest);
     }
 
 
@@ -104,9 +109,12 @@ public class GroupController {
         , in = ParameterIn.QUERY)
     @Operation(summary = "방 찾기")
     @GetMapping("/open")
-    public GroupBriefInfoListResponse getAllOpenGroups(@RequestParam(value = "category" ,required = false  ) Long categoryId) {
-
-        return groupService.findOpenGroupByCategory(categoryId);
+    public Slice<GroupBriefInfoDto> getAllOpenGroups(
+        @RequestParam(value = "category" ) Long categoryId,
+        @RequestParam(value = "page", defaultValue = "0") Integer page,
+        @RequestParam(value = "size" ,defaultValue = "10") Integer size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        return groupService.findOpenGroupByCategory(categoryId ,pageRequest);
     }
 
     @GetMapping("/categories")
@@ -152,8 +160,13 @@ public class GroupController {
     }
     @Operation(summary = "방 검색하기")
     @GetMapping("/search/{searchString}")
-    public GroupBriefInfoListResponse searchOpenGroups(@PathVariable(value = "searchString") String searchString) {
-        return groupService.searchOpenGroups(searchString);
+    public Slice<GroupBriefInfoDto> searchOpenGroups(
+        @PathVariable(value = "searchString") String searchString,
+        @RequestParam(value = "page", defaultValue = "0") Integer page,
+        @RequestParam(value = "size" ,defaultValue = "10") Integer size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+
+        return groupService.searchOpenGroups(searchString,pageRequest);
     }
 
     @Operation(summary = "방장 권한 멤버 추가")
