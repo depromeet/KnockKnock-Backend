@@ -9,14 +9,18 @@ import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.reque
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.UpdateGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.AdmissionInfoDto;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.AdmissionInfoListResponse;
+import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.BackgroundListResponse;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.CategoryDto;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.CategoryListResponse;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.CreateGroupResponse;
-import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupBriefInfoListResponse;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupInviteLinkResponse;
+import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupBriefInfoDto;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupResponse;
+import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.ThumbnailListResponse;
+import io.github.depromeet.knockknockbackend.domain.group.service.BackgroundImageService;
 import io.github.depromeet.knockknockbackend.domain.group.service.CategoryService;
 import io.github.depromeet.knockknockbackend.domain.group.service.GroupService;
+import io.github.depromeet.knockknockbackend.domain.group.service.ThumbnailImageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -25,6 +29,8 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -49,16 +55,19 @@ public class GroupController {
 
     private final AdmissionFacade admissionFacade;
 
+    private final ThumbnailImageService thumbnailImageService;
+    private final BackgroundImageService backgroundImageService;
+
     @Operation(summary = "공개 그룹을 만듭니다")
     @PostMapping("/open")
     public CreateGroupResponse createOpenGroup(@Valid @RequestBody CreateOpenGroupRequest createOpenGroupRequest){
-        return this.groupService.createOpenGroup(createOpenGroupRequest);
+        return groupService.createOpenGroup(createOpenGroupRequest);
     }
 
     @Operation(summary = "친구 그룹을 만듭니다")
     @PostMapping("/friend")
     public CreateGroupResponse createFriendGroup(@Valid @RequestBody CreateFriendGroupRequest createFriendGroupRequest){
-        return this.groupService.createFriendGroup(createFriendGroupRequest);
+        return groupService.createFriendGroup(createFriendGroupRequest);
     }
 
     @Operation(summary = "방장 권한 그룹 설정")
@@ -85,12 +94,15 @@ public class GroupController {
         , in = ParameterIn.QUERY)
     @Operation(summary = "참여중인 그룹 목록 전체 홀로외침 친구들 방 필터링")
     @GetMapping("/joined")
-    public GroupBriefInfoListResponse getParticipatingGroups(
-        @RequestParam("type") GroupInTypeRequest groupInTypeRequest){
+    public Slice<GroupBriefInfoDto> getParticipatingGroups(
+        @RequestParam("type") GroupInTypeRequest groupInTypeRequest,
+        @RequestParam(value = "page", defaultValue = "0") Integer page,
+        @RequestParam(value = "size" ,defaultValue = "10") Integer size){
+        PageRequest pageRequest = PageRequest.of(page, size);
         if(groupInTypeRequest == GroupInTypeRequest.ALL){
-            return groupService.findAllJoinedGroups();
+            return groupService.findAllJoinedGroups(pageRequest);
         }
-        return groupService.findJoinedGroupByType(groupInTypeRequest);
+        return groupService.findJoinedGroupByType(groupInTypeRequest,pageRequest);
     }
 
 
@@ -98,9 +110,12 @@ public class GroupController {
         , in = ParameterIn.QUERY)
     @Operation(summary = "방 찾기")
     @GetMapping("/open")
-    public GroupBriefInfoListResponse getAllOpenGroups(@RequestParam(value = "category" ,required = false  ) Long categoryId) {
-
-        return groupService.findOpenGroupByCategory(categoryId);
+    public Slice<GroupBriefInfoDto> getAllOpenGroups(
+        @RequestParam(value = "category" ) Long categoryId,
+        @RequestParam(value = "page", defaultValue = "0") Integer page,
+        @RequestParam(value = "size" ,defaultValue = "10") Integer size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        return groupService.findOpenGroupByCategory(categoryId ,pageRequest);
     }
 
     @GetMapping("/categories")
@@ -146,8 +161,13 @@ public class GroupController {
     }
     @Operation(summary = "방 검색하기")
     @GetMapping("/search/{searchString}")
-    public GroupBriefInfoListResponse searchOpenGroups(@PathVariable(value = "searchString") String searchString) {
-        return groupService.searchOpenGroups(searchString);
+    public Slice<GroupBriefInfoDto> searchOpenGroups(
+        @PathVariable(value = "searchString") String searchString,
+        @RequestParam(value = "page", defaultValue = "0") Integer page,
+        @RequestParam(value = "size" ,defaultValue = "10") Integer size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+
+        return groupService.searchOpenGroups(searchString,pageRequest);
     }
 
     @Operation(summary = "방장 권한 멤버 추가")
@@ -161,7 +181,19 @@ public class GroupController {
     @Operation(summary = "멤버 제거 ( 방장일 경우 본인빼고 모든인원 , 멤버일경우 나만)")
     @DeleteMapping("/{id}/members/{user_id}")
     public GroupResponse deleteMemberFromGroup(@PathVariable(value = "id") Long groupId, @PathVariable(value = "user_id") Long userId){
-        return this.groupService.deleteMemberFromGroup(groupId , userId);
+        return groupService.deleteMemberFromGroup(groupId , userId);
+    }
+
+    @Operation(summary = "백그라운드 이미지")
+    @GetMapping("/asset/backgrounds")
+    public BackgroundListResponse getBackgroundImageUrls(){
+        return backgroundImageService.getAllBackgroundImage();
+    }
+
+    @Operation(summary = "썸네일 이미지")
+    @GetMapping("/asset/thumbnails")
+    public ThumbnailListResponse getThumbnailImageUrls(){
+        return thumbnailImageService.getAllBackgroundImage();
     }
 
 

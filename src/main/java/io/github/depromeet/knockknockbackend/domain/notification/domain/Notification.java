@@ -2,8 +2,8 @@ package io.github.depromeet.knockknockbackend.domain.notification.domain;
 
 import io.github.depromeet.knockknockbackend.domain.group.domain.Group;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
+import io.github.depromeet.knockknockbackend.global.database.BaseTimeEntity;
 import java.time.LocalDateTime;
-import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -21,12 +21,12 @@ import lombok.NoArgsConstructor;
 
 
 @Getter
-@Builder
+@Builder(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "tbl_notification")
 @Entity
-public class Notification {
+public class Notification extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,12 +34,11 @@ public class Notification {
 
     private LocalDateTime sendAt;
 
+    private String title;
+
     private String content;
 
     private String imageUrl;
-
-    @Convert(converter = AlarmTypeConverter.class)
-    private AlarmType alarmType;
 
     @JoinColumn(name = "group_id")
     @ManyToOne(fetch = FetchType.LAZY)
@@ -53,5 +52,10 @@ public class Notification {
     @OneToOne(fetch = FetchType.LAZY)
     private User receiveUser;
 
+    public static Notification of(Long notificationId) {
+        return Notification.builder()
+            .id(notificationId)
+            .build();
+    }
 
 }
