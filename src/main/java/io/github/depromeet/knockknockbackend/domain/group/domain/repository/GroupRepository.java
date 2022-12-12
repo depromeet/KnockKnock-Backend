@@ -11,15 +11,15 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface GroupRepository extends JpaRepository<Group, Long> {
+public interface GroupRepository extends JpaRepository<Group, Long> ,CustomGroupRepository{
 
 
-    @Query(value = "select G.* , N.send_at from tbl_group as G "
-        + "left outer join tbl_notification as N on N.id = "
-        +       "(select id from tbl_notification where group_id = G.id order by id DESC limit 1)"
-        + "where G.group_type = :#{#groupType.getType()} "
-        + "order by coalesce(N.send_at , G.created_date) DESC" , nativeQuery = true)
-    Slice<Group> findSliceByGroupType(@Param("groupType") GroupType groupType, PageRequest pageRequest);
+//    @Query(value = "select G.* , N.send_at from tbl_group as G "
+//        + "left outer join tbl_notification as N on N.id = "
+//        +       "(select id from tbl_notification where group_id = G.id order by id DESC limit 1)"
+//        + "where G.group_type = :#{#groupType.getType()} "
+//        + "order by coalesce(N.send_at , G.created_date) DESC" , nativeQuery = true)
+//    Slice<Group> findSliceByGroupType(@Param("groupType") GroupType groupType, PageRequest pageRequest);
 
     @Query(value = "select G.* , N.send_at from tbl_group as G "
         + "left outer join tbl_notification as N on N.id = "
