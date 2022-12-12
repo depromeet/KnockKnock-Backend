@@ -51,15 +51,9 @@ public class CredentialController {
             content = @Content(schema = @Schema(implementation = AfterOauthResponse.class)))})
     @Operation(summary = "kakao oauth 요청", description = "code를 서버로 요청보냅니다.")
     @GetMapping("/oauth/kakao")
-    public ResponseEntity<AfterOauthResponse> kakaoAuth(OauthCodeRequest oauthCodeRequest){
+    public AfterOauthResponse kakaoAuth(OauthCodeRequest oauthCodeRequest){
         //TODO : 사용자가 로그인 취소시에 code 안넘어옴 별도 처리 필요.
-
-        AfterOauthResponse afterOauthResponse = credentialService.oauthCodeToUser(OauthProvider.KAKAO, oauthCodeRequest.getCode());
-        Boolean isRegistered = afterOauthResponse.getIsRegistered();
-        if(isRegistered){
-            return ResponseEntity.ok(afterOauthResponse);
-        }
-        return new ResponseEntity(afterOauthResponse, HttpStatus.CREATED);
+        return credentialService.oauthCodeToUser(OauthProvider.KAKAO, oauthCodeRequest.getCode());
     }
 
 
@@ -80,13 +74,8 @@ public class CredentialController {
             content = @Content(schema = @Schema(implementation = AfterOauthResponse.class)))})
     @Operation(summary = "google oauth 요청", description = "code를 서버로 요청보냅니다.")
     @GetMapping("/oauth/google")
-    public ResponseEntity<AfterOauthResponse> googleAuth(OauthCodeRequest oauthCodeRequest){
-        AfterOauthResponse afterOauthResponse = credentialService.oauthCodeToUser(OauthProvider.GOOGLE, oauthCodeRequest.getCode());
-        Boolean isRegistered = afterOauthResponse.getIsRegistered();
-        if(isRegistered){
-            return ResponseEntity.ok(afterOauthResponse);
-        }
-        return new ResponseEntity(afterOauthResponse, HttpStatus.CREATED);
+    public AfterOauthResponse googleAuth(OauthCodeRequest oauthCodeRequest){
+        return credentialService.oauthCodeToUser(OauthProvider.GOOGLE, oauthCodeRequest.getCode());
     }
 
 
