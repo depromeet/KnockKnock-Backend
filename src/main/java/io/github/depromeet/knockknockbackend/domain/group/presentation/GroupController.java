@@ -133,7 +133,7 @@ public class GroupController {
     @Operation(summary = "그룹에 가입요청을 합니다.")
     @PostMapping("/{id}/admissions")
     public AdmissionInfoDto admissionToGroup(@PathVariable(value = "id") Long groupId){
-        return admissionFacade.requestAdmission(groupId);
+        return .requestAdmission(groupId);
     }
 
     @Operation(summary = "그룹 가입 요청을 살펴봅니다.")

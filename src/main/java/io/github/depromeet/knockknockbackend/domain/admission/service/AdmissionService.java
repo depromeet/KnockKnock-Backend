@@ -7,6 +7,7 @@ import io.github.depromeet.knockknockbackend.domain.group.domain.Group;
 import io.github.depromeet.knockknockbackend.domain.group.domain.GroupUsers;
 import io.github.depromeet.knockknockbackend.domain.admission.domain.repository.AdmissionRepository;
 import io.github.depromeet.knockknockbackend.domain.admission.exception.AdmissionNotFoundException;
+import io.github.depromeet.knockknockbackend.domain.group.domain.usecase.AdmissionUsecase;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.AdmissionInfoDto;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.AdmissionInfoListResponse;
 import io.github.depromeet.knockknockbackend.domain.group.service.GroupUtils;
@@ -20,7 +21,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class AdmissionService {
+public class AdmissionService implements AdmissionUsecase {
 
     private final AdmissionRepository admissionRepository;
     private final UserUtils userUtils;
@@ -45,6 +46,7 @@ public class AdmissionService {
     /**
      * 그룹 입장요청을 합니다.
      */
+    @Override
     public AdmissionInfoDto requestAdmission(Long groupId) {
         User reqUser = userUtils.getUserFromSecurityContext();
         Group group = groupUtils.queryGroup(groupId);
@@ -61,6 +63,7 @@ public class AdmissionService {
     /**
      * 방장이 요청상태가 PENDING 인 그룹 가입 요청을 가져옵니다.
      */
+    @Override
     public AdmissionInfoListResponse getAdmissions(Long groupId) {
         Long userId = SecurityUtils.getCurrentUserId();
         Group group = groupUtils.queryGroup(groupId);
@@ -80,6 +83,7 @@ public class AdmissionService {
     /**
      * 방장이 그룹 가입 요청을 승인합니다.
      */
+    @Override
     public AdmissionInfoDto acceptAdmission(Long groupId , Long admissionId) {
         Long userId = SecurityUtils.getCurrentUserId();
         Group group = groupUtils.queryGroup(groupId);
@@ -93,6 +97,7 @@ public class AdmissionService {
     /**
      * 방장이 그룹 가입 요청을 거절합니다.
      */
+    @Override
     public AdmissionInfoDto refuseAdmission(Long groupId , Long admissionId) {
         Long userId = SecurityUtils.getCurrentUserId();
         Group group = groupUtils.queryGroup(groupId);
