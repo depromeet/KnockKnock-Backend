@@ -41,7 +41,7 @@ public enum ErrorCode {
 
     HOST_CAN_NOT_LEAVE(400 , "GROUP-400-2","Host can not leave from own group" ),
 
-    NOTIFICATION_FCM_FAIL_SEND(500 , "NOTIFICATION-500-1","Failed to send FCM notification message" );
+    REACTION_FORBIDDEN(HttpStatus.FORBIDDEN.value(), "REACTION-403-1", "the user cannot change the reaction");
 
 
 

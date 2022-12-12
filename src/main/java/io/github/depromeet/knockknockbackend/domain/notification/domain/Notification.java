@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
 
 
 @Getter
-@Builder
+@Builder(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "tbl_notification")
@@ -52,14 +52,9 @@ public class Notification extends BaseTimeEntity {
     @OneToOne(fetch = FetchType.LAZY)
     private User receiveUser;
 
-    public static Notification of(String title, String content, String imageUrl, Group group, User sendUser, LocalDateTime sendAt){
+    public static Notification of(Long notificationId) {
         return Notification.builder()
-            .title(title)
-            .content(content)
-            .imageUrl(imageUrl)
-            .group(group)
-            .sendUser(sendUser)
-            .sendAt(sendAt)
+            .id(notificationId)
             .build();
     }
 
