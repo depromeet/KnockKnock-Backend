@@ -358,8 +358,9 @@ public class GroupService implements GroupUtils {
     }
 
 
-    public GroupResponse addMembersToGroup(Group group, List<Long> requestMemberIds, Long userId) {
+    public GroupResponse addMembersToGroup(Long groupId, List<Long> requestMemberIds) {
         Long reqUserId = SecurityUtils.getCurrentUserId();
+        Group group = queryGroup(groupId);
 
         GroupUsers groupUsers = group.getGroupUsers();
         List<User> findUserList = userUtils.findByIdIn(requestMemberIds);

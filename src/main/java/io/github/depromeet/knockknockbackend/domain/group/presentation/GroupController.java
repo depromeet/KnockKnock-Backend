@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.domain.group.presentation;
 
+import io.github.depromeet.knockknockbackend.domain.group.domain.usecase.AdmissionUsecase;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.AddFriendToGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateCategoryRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateFriendGroupRequest;
@@ -52,7 +53,7 @@ public class GroupController {
 
     private final CategoryService categoryService;
 
-    private final AdmissionFacade admissionFacade;
+    private final AdmissionUsecase admissionUsecase;
 
     private final ThumbnailImageService thumbnailImageService;
     private final BackgroundImageService backgroundImageService;
@@ -133,13 +134,13 @@ public class GroupController {
     @Operation(summary = "그룹에 가입요청을 합니다.")
     @PostMapping("/{id}/admissions")
     public AdmissionInfoDto admissionToGroup(@PathVariable(value = "id") Long groupId){
-        return .requestAdmission(groupId);
+        return admissionUsecase.requestAdmission(groupId);
     }
 
     @Operation(summary = "그룹 가입 요청을 살펴봅니다.")
     @GetMapping("/{id}/admissions")
     public AdmissionInfoListResponse getAdmissionRequest(@PathVariable(value = "id") Long groupId){
-        return admissionFacade.getAdmissions(groupId);
+        return admissionUsecase.getAdmissions(groupId);
     }
 
     @Operation(summary = "그룹 가입요청을 허락합니다.")
@@ -147,7 +148,7 @@ public class GroupController {
     public AdmissionInfoDto acceptAdmissionRequest(
         @PathVariable(value = "id") Long groupId,
         @PathVariable(value = "admission_id") Long admissionId){
-        return admissionFacade.acceptAdmission(groupId,admissionId);
+        return admissionUsecase.acceptAdmission(groupId,admissionId);
     }
 
     @Operation(summary = "그룹 가입요청을 거절합니다.")
@@ -156,7 +157,7 @@ public class GroupController {
         @PathVariable(value = "id") Long groupId,
         @PathVariable(value = "admission_id") Long admissionId
     ) {
-        return admissionFacade.refuseAdmission(groupId, admissionId);
+        return admissionUsecase.refuseAdmission(groupId, admissionId);
     }
     @Operation(summary = "방 검색하기")
     @GetMapping("/search/{searchString}")
@@ -174,7 +175,7 @@ public class GroupController {
     public GroupResponse addMembers(
         @PathVariable(value = "id") Long groupId,
         @Valid @RequestBody AddFriendToGroupRequest addFriendToGroupRequest){
-        return groupService.addMembersToGroup(groupId , addFriendToGroupRequest);
+        return groupService.addMembersToGroup(groupId , addFriendToGroupRequest.getMemberIds());
     }
 
     @Operation(summary = "멤버 제거 ( 방장일 경우 본인빼고 모든인원 , 멤버일경우 나만)")
