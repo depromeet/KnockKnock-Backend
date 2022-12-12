@@ -129,11 +129,11 @@ public class GroupService {
 
         //TODO : 요청 받은 memeberId가 친구 목록에 속해있는지 검증.
         List<Long> memberIds = createFriendGroupRequest.getMemberIds();
-        memberIds.removeIf(id -> reqUser.getId().equals(id));
+
         //요청받은 id 목록들로 디비에서 조회
         List<User> requestUserList = userUtils.findByIdIn(memberIds);
         // 그룹 만들기
-        Group group = makeFriendGroup();
+        Group group = makeFriendGroup(reqUser.getNickname(), memberIds.size());
         groupRepository.save(group);
         // 그룹 유저 리스트만들기
         GroupUsers groupUsers = GroupUsers.createGroupUsers(reqUser, requestUserList, group);
@@ -185,9 +185,9 @@ public class GroupService {
      * 그룹 도메인으로 옮길 예정입니다.
      * @return Group
      */
-    private Group makeFriendGroup() {
+    private Group makeFriendGroup(String reqUserName, Integer memberCount) {
         //defaultCategory
-        Category category = queryGroupCategoryById(1L);
+        Category category = queryGroupCategoryById(Category.defaultEmptyCategoryId);
 
         Group group = Group.builder()
             .publicAccess(false)
@@ -198,7 +198,7 @@ public class GroupService {
                 backgroundImageService.getRandomBackgroundImageUrl()
             )
             .category(category)
-            .title(Group.generateGroupTitle())
+            .title(Group.generateGroupTitle(reqUserName,memberCount))
             .groupType(GroupType.FRIEND).build();
 
         return group;
