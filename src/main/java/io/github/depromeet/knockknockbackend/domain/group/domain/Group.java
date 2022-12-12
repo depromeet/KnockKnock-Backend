@@ -56,8 +56,9 @@ public class Group extends BaseTimeEntity {
 
 
     @Builder
-    public Group(String title, String description, String thumbnailPath, String backgroundImagePath,
+    public Group(Long id, String title, String description, String thumbnailPath, String backgroundImagePath,
         Boolean publicAccess , Category category ,GroupType groupType) {
+        this.id = id;
         this.title = title;
         this.description = description;
         this.thumbnailPath = thumbnailPath;
@@ -95,5 +96,11 @@ public class Group extends BaseTimeEntity {
 
     public int getMemberCount(){
         return this.groupUsers.getMemberCount();
+    }
+
+    public static Group of(Long id) {
+        return Group.builder()
+            .id(id)
+            .build();
     }
 }
