@@ -86,12 +86,12 @@ public class NotificationService {
             throw FcmResponseException.EXCEPTION;
         }
 
-//        notificationRepository.save(
-//            Notification.of(
-//                request.getTitle(), request.getContent(), request.getImageUrl(),
-//                Group.of(request.getGroupId()), User.of(sendUserId), LocalDateTime.now()
-//            )
-//        );
+        notificationRepository.save(
+            Notification.of(
+                request.getTitle(), request.getContent(), request.getImageUrl(),
+                Group.of(request.getGroupId()), User.of(sendUserId), LocalDateTime.now()
+            )
+        );
     }
 
     private void handleFcmMessagingException(BatchResponse batchResponse) {

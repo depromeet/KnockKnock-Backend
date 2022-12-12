@@ -7,6 +7,6 @@ public class FcmResponseException extends KnockException {
     public static final KnockException EXCEPTION = new FcmResponseException();
 
     private FcmResponseException() {
-        super(ErrorCode.NOT_GROUP_MEMBER);
+        super(ErrorCode.NOTIFICATION_FCM_FAIL_SEND);
     }
 }
