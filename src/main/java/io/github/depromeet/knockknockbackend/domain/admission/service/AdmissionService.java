@@ -4,7 +4,6 @@ package io.github.depromeet.knockknockbackend.domain.admission.service;
 import io.github.depromeet.knockknockbackend.domain.admission.domain.Admission;
 import io.github.depromeet.knockknockbackend.domain.admission.domain.AdmissionState;
 import io.github.depromeet.knockknockbackend.domain.group.domain.Group;
-import io.github.depromeet.knockknockbackend.domain.group.domain.GroupUsers;
 import io.github.depromeet.knockknockbackend.domain.admission.domain.repository.AdmissionRepository;
 import io.github.depromeet.knockknockbackend.domain.admission.exception.AdmissionNotFoundException;
 import io.github.depromeet.knockknockbackend.domain.group.domain.usecase.AdmissionUsecase;
@@ -18,7 +17,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+@Transactional
 @Service
 @RequiredArgsConstructor
 public class AdmissionService implements AdmissionUsecase {

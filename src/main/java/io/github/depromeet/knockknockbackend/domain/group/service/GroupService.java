@@ -366,6 +366,9 @@ public class GroupService implements GroupUtils {
         List<User> findUserList = userUtils.findByIdIn(requestMemberIds);
         // 요청받은 유저 아이디 목록이 디비에 존재하는 지 확인
         validReqMemberNotExist(findUserList, requestMemberIds);
+        // TODO : 친구 목록에 존재하는지 확인
+
+        requestMemberIds.forEach(groupUsers::validUserIsAlreadyEnterGroup);
 
         groupUsers.addMembers(findUserList ,group);
         return new GroupResponse(group.getGroupBaseInfoVo(),
