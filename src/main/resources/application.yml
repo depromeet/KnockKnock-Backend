@@ -2,20 +2,28 @@ spring:
   jackson:
     property-naming-strategy: SNAKE_CASE
   datasource:
-    url: ${MYSQL_URL}
+    url: jdbc:mysql://${MYSQL_HOST}:${MYSQL_PORT}/${DB_NAME}?useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true&tinyInt1isBit=false
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       maxLifetime: 580000
+    password: ${MYSQL_PASSWORD}
+    username: ${MYSQL_USERNAME}
   redis:
     host: ${REDIS_HOST:localhost}
     port: ${REDIS_PORT:6379}
-    password: ${REDIS_PASSWORD}
+    password: ${REDIS_PASSWORD:}
   jpa:
     show-sql: ${SHOW_SQL:true}
     properties:
       hibernate:
         format_sql: ${FORMAT_SQL:true}
     open-in-view: false
+    hibernate:
+      ddl-auto: update
+    defer-datasource-initialization: true
+  sql:
+    init:
+      mode: always
 
 auth:
   jwt:
@@ -24,3 +32,27 @@ auth:
     refreshExp: ${JWT_REFRESH_EXP:3600}
     header: ${JWT_HEADER:Authorization}
     prefix: ${JWT_PREFIX:Bearer}
+oauth:
+  kakao:
+    base-url: ${KAKAO_BASE_URL}
+    client-id: ${KAKAO_CLIENT}
+    client-secret: ${KAKAO_SECRET}
+    redirect-url: ${KAKAO_REDIRECT}
+  google:
+    base-url: ${GOOGLE_BASE_URL}
+    client-id: ${GOOGLE_CLIENT}
+    client-secret: ${GOOGLE_SECRET}
+    redirect-url: ${GOOGLE_REDIRECT}
+
+fcm:
+  value: ${FCM_VALUE:empty}
+
+
+springdoc:
+  default-produces-media-type: application/json
+  default-consumes-media-type: application/json
+
+logging:
+  level:
+    io.github.depromeet.knockknockbackend.global.utils.api.client.* : debug
+

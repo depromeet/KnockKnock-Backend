@@ -14,6 +14,11 @@ configurations {
     }
 }
 
+compileJava {
+    options.compilerArgs << '-Amapstruct.defaultComponentModel=spring'
+}
+
+
 repositories {
     mavenCentral()
 }
@@ -28,6 +33,12 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'mysql:mysql-connector-java'
 
+    implementation 'com.querydsl:querydsl-jpa'
+    annotationProcessor(
+            "javax.persistence:javax.persistence-api",
+            "javax.annotation:javax.annotation-api",
+            "com.querydsl:querydsl-apt:5.0.0:jpa")
+
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 
     implementation 'org.springframework.boot:spring-boot-starter-security'
@@ -36,13 +47,31 @@ dependencies {
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:3.1.4'
-
     compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
+
+    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
+
+
+    implementation 'org.springdoc:springdoc-openapi-ui:1.6.12'
+    implementation 'io.github.openfeign:feign-httpclient:12.0'
+
+    implementation 'org.mapstruct:mapstruct:1.4.2.Final'
+    implementation 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+
+    //순서 중요
+    annotationProcessor "org.mapstruct:mapstruct-processor:1.4.1.Final"
+    annotationProcessor "org.projectlombok:lombok-mapstruct-binding:0.2.0"
+    annotationProcessor 'org.projectlombok:lombok'
+
+
 }
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+jar {
+    enabled = false
 }

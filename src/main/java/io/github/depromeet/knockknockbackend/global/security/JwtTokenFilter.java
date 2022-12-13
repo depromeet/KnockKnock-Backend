@@ -1,5 +1,7 @@
 package io.github.depromeet.knockknockbackend.global.security;
 
+import io.github.depromeet.knockknockbackend.global.exception.ExpiredTokenException;
+import io.github.depromeet.knockknockbackend.global.exception.InvalidTokenException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -17,10 +19,15 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+
         String token = jwtTokenProvider.resolveToken(request);
+
         if(token != null) {
             SecurityContextHolder.getContext().setAuthentication(jwtTokenProvider.getAuthentication(token));
         }
+
+        filterChain.doFilter(request, response);
+
     }
 
 }
