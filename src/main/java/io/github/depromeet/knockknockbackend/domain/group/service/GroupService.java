@@ -7,12 +7,16 @@ import io.github.depromeet.knockknockbackend.domain.group.domain.Category;
 import io.github.depromeet.knockknockbackend.domain.group.domain.GroupType;
 import io.github.depromeet.knockknockbackend.domain.group.domain.GroupUser;
 import io.github.depromeet.knockknockbackend.domain.group.domain.GroupUsers;
+import io.github.depromeet.knockknockbackend.domain.group.domain.InviteTokenRedisEntity;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.CategoryRepository;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.GroupRepository;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.GroupUserRepository;
+import io.github.depromeet.knockknockbackend.domain.group.domain.repository.InviteTokenRedisEntityRepository;
 import io.github.depromeet.knockknockbackend.domain.group.exception.CategoryNotFoundException;
 import io.github.depromeet.knockknockbackend.domain.group.exception.GroupNotFoundException;
 import io.github.depromeet.knockknockbackend.domain.group.exception.HostCanNotLeaveGroupException;
+import io.github.depromeet.knockknockbackend.domain.group.exception.InvalidInviteTokenException;
+import io.github.depromeet.knockknockbackend.domain.group.exception.NotMemberException;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.AddFriendToGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateFriendGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateOpenGroupRequest;
@@ -20,15 +24,17 @@ import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.reque
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.UpdateGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.CreateGroupResponse;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupBriefInfoDto;
-import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupBriefInfoListResponse;
+import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupInviteLinkResponse;
+import io.github.depromeet.knockknockbackend.global.utils.generate.TokenGenerator;
+import io.github.depromeet.knockknockbackend.global.utils.security.SecurityUtils;
 import io.github.depromeet.knockknockbackend.global.utils.user.UserUtils;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupResponse;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.global.exception.UserNotFoundException;
-import io.github.depromeet.knockknockbackend.global.utils.security.SecurityUtils;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,6 +52,10 @@ public class GroupService {
     private final BackgroundImageService backgroundImageService;
 
     private final UserUtils userUtils;
+
+    private final TokenGenerator tokenGenerator;
+
+    private final InviteTokenRedisEntityRepository inviteTokenRedisEntityRepository;
 
     /**
      * 카테고리 정보를 가져옵니다.
@@ -256,23 +266,26 @@ public class GroupService {
      * 모든 그룹의 정보를 가져옵니다.
      * @return GroupBriefInfoListResponse
      */
-    public GroupBriefInfoListResponse findAllOpenGroups() {
-        List<Group> groupList = groupRepository.findAllByGroupType(GroupType.OPEN);
+    public Slice<Group> findSliceOpenGroups(PageRequest pageRequest) {
+        Slice<Group> groupList = groupRepository.findSliceByGroupType(GroupType.OPEN , pageRequest);
 
-        return getGroupBriefInfoListResponse(groupList);
+        return groupList;
     }
 
     /**
      * 내가 들어가 있는 그룹목록을 가져옵니다.
      * @return GroupBriefInfoListResponse
      */
-    public GroupBriefInfoListResponse findAllJoinedGroups() {
-        User reqUser = userUtils.getUserFromSecurityContext();
-        GroupUsers groupUsers = GroupUsers.from(groupUserRepository.findAllByUser(reqUser));
+    public Slice<GroupBriefInfoDto> findAllJoinedGroups(PageRequest pageRequest) {
+        Long reqUserId = SecurityUtils.getCurrentUserId();
 
-        List<Group> groupList = groupUsers.getGroupList();
+        Slice<GroupUser> sliceGroupUsers = groupUserRepository.findJoinedGroupUser(
+            reqUserId, pageRequest);
 
-        return getGroupBriefInfoListResponse(groupList);
+        return sliceGroupUsers.map(groupUser -> {
+            Group group = groupUser.getGroup();
+            return new GroupBriefInfoDto(group.getGroupBaseInfoVo(), group.getMemberCount());
+        });
     }
 
     /**
@@ -280,60 +293,52 @@ public class GroupService {
      * @param groupInTypeRequest
      * @return GroupBriefInfoListResponse
      */
-    public GroupBriefInfoListResponse findJoinedGroupByType(GroupInTypeRequest groupInTypeRequest) {
+    public Slice<GroupBriefInfoDto> findJoinedGroupByType(GroupInTypeRequest groupInTypeRequest,PageRequest pageRequest) {
 
         if(groupInTypeRequest == GroupInTypeRequest.ALL){
-            return findAllJoinedGroups();
+            return findAllJoinedGroups(pageRequest);
         }
 
-        User reqUser = userUtils.getUserFromSecurityContext();
+        Long reqUserId = SecurityUtils.getCurrentUserId();
         GroupType groupType = GroupType.valueOf(groupInTypeRequest.getValue());
 
-        GroupUsers groupUsers = GroupUsers.from(
-            groupUserRepository.findJoinedGroupUserByGroupType(reqUser, groupType));
-        List<Group> groupList = groupUsers.getGroupList();
+        Slice<GroupUser> sliceGroupUsers = groupUserRepository.findJoinedGroupUserByGroupType(
+            reqUserId, groupType, pageRequest);
 
-        return getGroupBriefInfoListResponse(groupList);
+        return sliceGroupUsers.map(groupUser -> {
+            Group group = groupUser.getGroup();
+            return new GroupBriefInfoDto(group.getGroupBaseInfoVo(), group.getMemberCount());
+        });
     }
 
     /**
      * 탐색탭에서 카테고리별 오픈 그룹 검색
+     *
      * @return GroupBriefInfoListResponse
      */
-    public GroupBriefInfoListResponse findOpenGroupByCategory(Long categoryId) {
+    public Slice<GroupBriefInfoDto> findOpenGroupByCategory(Long categoryId , PageRequest pageRequest) {
         if (categoryId.equals(Category.defaultEmptyCategoryId)) {
-            return findAllOpenGroups();
+            Slice<Group> allOpenGroups = findSliceOpenGroups(pageRequest);
+            return allOpenGroups.map(
+                group -> new GroupBriefInfoDto(group.getGroupBaseInfoVo(), group.getMemberCount()));
         }
         Category category = queryGroupCategoryById(categoryId);
 
-        List<Group> groupList = groupRepository.findAllByGroupTypeAndCategory(GroupType.OPEN,category);
+        Slice<Group> groupList = groupRepository.findSliceByGroupTypeAndCategory(GroupType.OPEN,category ,pageRequest);
 
-        return getGroupBriefInfoListResponse(groupList);
+        return groupList.map(
+            group -> new GroupBriefInfoDto(group.getGroupBaseInfoVo(), group.getMemberCount()));
     }
 
 
-    /**
-     * 중복된 그룹리스트에 대한 정보를 반환하는 코드를 추출했습니다.
-     * @return GroupBriefInfoListResponse
-     */
-    private GroupBriefInfoListResponse getGroupBriefInfoListResponse(List<Group> groupList) {
-        List<GroupBriefInfoDto> groupBriefInfoDtos = groupList.stream()
-            .map(group ->
-                new GroupBriefInfoDto(
-                    group.getGroupBaseInfoVo(),
-                    group.getMemberCount()))
-            .collect(Collectors.toList());
 
-        return new GroupBriefInfoListResponse(groupBriefInfoDtos);
-    }
+    public Slice<GroupBriefInfoDto> searchOpenGroups(String searchString ,PageRequest pageRequest) {
 
+        Slice<Group> groupList = groupRepository
+            .findByGroupTypeAndTitleContaining(GroupType.OPEN ,searchString,pageRequest);
 
-    public GroupBriefInfoListResponse searchOpenGroups(String searchString) {
-
-        List<Group> groupList = groupRepository.findByGroupTypeAndTitleContaining(GroupType.OPEN,
-            searchString);
-
-        return getGroupBriefInfoListResponse(groupList);
+        return groupList.map(
+            group -> new GroupBriefInfoDto(group.getGroupBaseInfoVo(), group.getMemberCount()));
     }
 
     public GroupResponse addMembersToGroup(Long groupId, AddFriendToGroupRequest addFriendToGroupRequest) {
@@ -375,5 +380,52 @@ public class GroupService {
         groupUsers.removeUserByUserId(userId);
         return new GroupResponse(group.getGroupBaseInfoVo(),groupUsers.getUserInfoVoList(),true);
 
+    }
+
+    public GroupInviteLinkResponse createGroupInviteLink(Long groupId) {
+        Group group = queryGroup(groupId);
+        GroupUsers groupUsers = group.getGroupUsers();
+        User reqUser = userUtils.getUserFromSecurityContext();
+
+        // 요청한 유저가 멤버가 아니라면 링크 발급이 안되어야 한다.
+        if(!groupUsers.checkUserIsAlreadyEnterGroup(reqUser)){
+            throw NotMemberException.EXCEPTION;
+        }
+
+        String token = tokenGenerator.nextString();
+
+        InviteTokenRedisEntity tokenRedisEntity = InviteTokenRedisEntity.builder()
+            .token(token)
+            .groupId(groupId)
+            .issuerId(reqUser.getId())
+            .ttl(24L)
+            .build();
+
+        inviteTokenRedisEntityRepository.save(tokenRedisEntity);
+
+        return GroupInviteLinkResponse.from(token);
+    }
+
+    public GroupResponse checkGroupInviteLink(Long groupId, String token) {
+        InviteTokenRedisEntity inviteToken = inviteTokenRedisEntityRepository.findById(token)
+            .orElseThrow(() -> InvalidInviteTokenException.EXCEPTION);
+
+        if(!inviteToken.getGroupId().equals(groupId)){
+            throw InvalidInviteTokenException.EXCEPTION;
+        }
+
+        Group group = queryGroup(groupId);
+        GroupUsers groupUsers = group.getGroupUsers();
+        User reqUser = userUtils.getUserFromSecurityContext();
+
+        // 유저가 이미 방안에 들어가있는지 검증
+        groupUsers.validUserIsAlreadyEnterGroup(reqUser);
+
+        groupUsers.addMember(reqUser,group);
+
+        return new GroupResponse(
+                group.getGroupBaseInfoVo(),
+                groupUsers.getUserInfoVoList(),
+                false);
     }
 }
