@@ -95,18 +95,18 @@ public class Notification extends BaseTimeEntity {
             .imageUrl(imageUrl)
             .sendAt(sendAt)
             .sendUserId(sendUser.getId())
-            .notificationReactionInfoVo(getNotificationReactionBaseInfoVo(userId))
+            .notificationReactionInfoVo(getNotificationReactionCountInfoVo(userId))
             .build();
     }
 
-    private NotificationReactionInfoVo getNotificationReactionBaseInfoVo(Long userId) {
+    private NotificationReactionInfoVo getNotificationReactionCountInfoVo(Long userId) {
         return NotificationReactionInfoVo.builder()
             .myReactionId(getMyReactionId(userId))
-            .reactionCountInfos(getNotificationReactionInfoVo())
+            .reactionCountInfos(getNotificationReactionCountInfoVo())
             .build();
     }
 
-    private List<NotificationReactionCountInfoVo> getNotificationReactionInfoVo() {
+    private List<NotificationReactionCountInfoVo> getNotificationReactionCountInfoVo() {
         Map<Long, Long> countPerReactions = notificationReactions.stream()
             .collect(
                 groupingBy(notificationReaction ->
