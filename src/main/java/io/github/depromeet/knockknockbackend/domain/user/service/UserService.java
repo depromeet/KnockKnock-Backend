@@ -1,7 +1,8 @@
 package io.github.depromeet.knockknockbackend.domain.user.service;
 
-import io.github.depromeet.knockknockbackend.domain.relation.service.RelationService;
 import io.github.depromeet.knockknockbackend.domain.user.UserRelationService;
+import io.github.depromeet.knockknockbackend.domain.user.presentation.dto.request.ChangeProfileRequest;
+import io.github.depromeet.knockknockbackend.domain.user.presentation.dto.response.UserProfileResponse;
 import io.github.depromeet.knockknockbackend.global.utils.user.UserUtils;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.domain.user.domain.repository.UserRepository;
@@ -45,5 +46,11 @@ public class UserService {
     }
 
 
+    public UserProfileResponse changeProfile(ChangeProfileRequest changeProfileRequest) {
+        User user = userUtils.getUserFromSecurityContext();
+        user.changeProfile(changeProfileRequest.getNickname(),
+            changeProfileRequest.getProfilePath());
 
+        return new UserProfileResponse(user.getUserInfo());
+    }
 }
