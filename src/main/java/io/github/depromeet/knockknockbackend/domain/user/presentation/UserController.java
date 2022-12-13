@@ -5,6 +5,7 @@ import io.github.depromeet.knockknockbackend.domain.user.presentation.dto.reques
 import io.github.depromeet.knockknockbackend.domain.user.presentation.dto.response.QueryUserByNicknameResponse;
 import io.github.depromeet.knockknockbackend.domain.user.presentation.dto.response.UserProfileResponse;
 import io.github.depromeet.knockknockbackend.domain.user.service.UserService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +20,7 @@ import javax.validation.Valid;
 
 @RequiredArgsConstructor
 @RequestMapping("/users")
+@SecurityRequirement(name = "access-token")
 @RestController
 public class UserController {
 
