@@ -42,22 +42,18 @@ public class NotificationService {
 
     @Transactional(readOnly = true)
     public QueryAlarmHistoryResponse queryAlarmHistoryByUserId(Pageable pageable) {
-        Slice<Notification> alarmHistory = notificationRepository.findAllByReceiveUserId(
-            SecurityUtils.getCurrentUserId(), pageable);
-
-        Slice<QueryAlarmHistoryResponseElement> result = alarmHistory
-            .map(Notification::getNotificationBaseInfoVo)
-            .map(QueryAlarmHistoryResponseElement::from);
-
-        return new QueryAlarmHistoryResponse(result);
+        return null;
     }
 
     @Transactional(readOnly = true)
     public QueryAlarmHistoryResponse queryHistoryByGroupId(Pageable pageable, Long groupId) {
-        Slice<Notification> alarmHistory = notificationRepository.findAllByGroupId(groupId, pageable);
-        Slice<QueryAlarmHistoryResponseElement> result = alarmHistory
-            .map(Notification::getNotificationBaseInfoVo)
-            .map(QueryAlarmHistoryResponseElement::from);
+        Slice<Notification> alarmHistory = notificationRepository.findAllByGroupId(groupId,
+            pageable);
+
+        Slice<QueryAlarmHistoryResponseElement> result =
+            alarmHistory
+                .map(notification -> notification.getNotificationBaseInfoVo(SecurityUtils.getCurrentUserId()))
+                .map(QueryAlarmHistoryResponseElement::from);
 
         return new QueryAlarmHistoryResponse(result);
     }
