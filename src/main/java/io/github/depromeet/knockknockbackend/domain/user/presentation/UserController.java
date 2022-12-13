@@ -1,7 +1,9 @@
 package io.github.depromeet.knockknockbackend.domain.user.presentation;
 
 import io.github.depromeet.knockknockbackend.domain.user.presentation.dto.request.ChangeNicknameRequest;
+import io.github.depromeet.knockknockbackend.domain.user.presentation.dto.request.ChangeProfileRequest;
 import io.github.depromeet.knockknockbackend.domain.user.presentation.dto.response.QueryUserByNicknameResponse;
+import io.github.depromeet.knockknockbackend.domain.user.presentation.dto.response.UserProfileResponse;
 import io.github.depromeet.knockknockbackend.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -31,6 +33,11 @@ public class UserController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void changeNickname(@RequestBody @Valid ChangeNicknameRequest request) {
         userService.changeNickname(request.getNickname());
+    }
+
+    @PutMapping("/profile")
+    public UserProfileResponse changeProfile(@RequestBody @Valid ChangeProfileRequest changeProfileRequest) {
+       return userService.changeProfile(changeProfileRequest);
     }
 
 }
