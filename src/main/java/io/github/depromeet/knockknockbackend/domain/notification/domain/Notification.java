@@ -4,8 +4,8 @@ import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.groupingBy;
 import io.github.depromeet.knockknockbackend.domain.group.domain.Group;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.vo.NotificationBaseInfoVo;
-import io.github.depromeet.knockknockbackend.domain.notification.domain.vo.NotificationReactionBaseInfoVo;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.vo.NotificationReactionInfoVo;
+import io.github.depromeet.knockknockbackend.domain.notification.domain.vo.NotificationReactionCountInfoVo;
 import io.github.depromeet.knockknockbackend.domain.reaction.domain.NotificationReaction;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.global.database.BaseTimeEntity;
@@ -95,18 +95,18 @@ public class Notification extends BaseTimeEntity {
             .imageUrl(imageUrl)
             .sendAt(sendAt)
             .sendUserId(sendUser.getId())
-            .notificationReactionBaseInfoVo(getNotificationReactionBaseInfoVo(userId))
+            .notificationReactionInfoVo(getNotificationReactionBaseInfoVo(userId))
             .build();
     }
 
-    private NotificationReactionBaseInfoVo getNotificationReactionBaseInfoVo(Long userId) {
-        return NotificationReactionBaseInfoVo.builder()
+    private NotificationReactionInfoVo getNotificationReactionBaseInfoVo(Long userId) {
+        return NotificationReactionInfoVo.builder()
             .myReactionId(getMyReactionId(userId))
-            .reactionInfo(getNotificationReactionInfoVo())
+            .reactionCountInfos(getNotificationReactionInfoVo())
             .build();
     }
 
-    private List<NotificationReactionInfoVo> getNotificationReactionInfoVo() {
+    private List<NotificationReactionCountInfoVo> getNotificationReactionInfoVo() {
         Map<Long, Long> countPerReactions = notificationReactions.stream()
             .collect(
                 groupingBy(notificationReaction ->
@@ -115,7 +115,7 @@ public class Notification extends BaseTimeEntity {
 
         return countPerReactions.entrySet().stream()
             .map(countOfReactionId ->
-                NotificationReactionInfoVo.builder()
+                NotificationReactionCountInfoVo.builder()
                     .reactionId(countOfReactionId.getKey())
                     .reactionCount(countOfReactionId.getValue().intValue())
                     .build()

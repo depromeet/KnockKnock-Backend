@@ -9,6 +9,6 @@ import org.springframework.data.domain.Slice;
 @AllArgsConstructor
 public class QueryAlarmHistoryResponse {
 
-    private final Slice<QueryAlarmHistoryResponseElement> alarmHistory;
+    private final Slice<QueryAlarmHistoryResponseElement> notifications;
 
 }

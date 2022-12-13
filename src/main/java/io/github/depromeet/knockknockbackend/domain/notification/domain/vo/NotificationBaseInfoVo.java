@@ -13,5 +13,5 @@ public class NotificationBaseInfoVo {
     private String imageUrl;
     private LocalDateTime sendAt;
     private final Long sendUserId;
-    private final NotificationReactionBaseInfoVo notificationReactionBaseInfoVo;
+    private final NotificationReactionInfoVo notificationReactionInfoVo;
 }

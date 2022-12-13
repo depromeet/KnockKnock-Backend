@@ -1,7 +1,7 @@
 package io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.response;
 
 import io.github.depromeet.knockknockbackend.domain.notification.domain.vo.NotificationBaseInfoVo;
-import io.github.depromeet.knockknockbackend.domain.notification.domain.vo.NotificationReactionBaseInfoVo;
+import io.github.depromeet.knockknockbackend.domain.notification.domain.vo.NotificationReactionInfoVo;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -17,7 +17,7 @@ public class QueryAlarmHistoryResponseElement {
     private String imageUrl;
     private LocalDateTime sendAt;
     private Long sendUserId;
-    private NotificationReactionBaseInfoVo reactions;
+    private NotificationReactionInfoVo reactions;
 
     public static QueryAlarmHistoryResponseElement from (NotificationBaseInfoVo notificationBaseInfoVo) {
         return QueryAlarmHistoryResponseElement.builder()
@@ -27,7 +27,7 @@ public class QueryAlarmHistoryResponseElement {
             .imageUrl(notificationBaseInfoVo.getImageUrl())
             .sendAt(notificationBaseInfoVo.getSendAt())
             .sendUserId(notificationBaseInfoVo.getSendUserId())
-            .reactions(notificationBaseInfoVo.getNotificationReactionBaseInfoVo())
+            .reactions(notificationBaseInfoVo.getNotificationReactionInfoVo())
             .build();
     }
 
