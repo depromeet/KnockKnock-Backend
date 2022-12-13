@@ -57,4 +57,8 @@ public class User {
             .build();
     }
 
+    public void changeProfile(String nickname, String profilePath) {
+        this.nickname = nickname;
+        this.profilePath = profilePath;
+    }
 }
