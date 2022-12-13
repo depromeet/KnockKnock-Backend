@@ -52,6 +52,10 @@ public class Notification extends BaseTimeEntity {
     @OneToOne(fetch = FetchType.LAZY)
     private User receiveUser;
 
+    @Builder.Default
+    @OneToMany(mappedBy = "notification", fetch = FetchType.LAZY)
+    private Set<NotificationReaction> notificationReactions = new HashSet<>();
+
     public static Notification of(Long notificationId) {
         return Notification.builder()
             .id(notificationId)
