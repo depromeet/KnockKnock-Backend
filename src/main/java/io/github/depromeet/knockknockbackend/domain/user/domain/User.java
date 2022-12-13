@@ -44,7 +44,7 @@ public class User {
     }
 
     public UserInfoVO getUserInfo() {
-        return new UserInfoVO(id, nickname, profilePath);
+        return new UserInfoVO(id, nickname, profilePath,email);
     }
 
     public void changeNickname(String nickname) {

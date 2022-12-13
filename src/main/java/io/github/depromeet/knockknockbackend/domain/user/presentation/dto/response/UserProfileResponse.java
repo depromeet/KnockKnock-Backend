@@ -10,10 +10,12 @@ public class UserProfileResponse {
     private final Long id;
     private final String nickname;
     private final String profilePath;
+    private final String email;
 
     public UserProfileResponse(UserInfoVO userInfo) {
         this.id = userInfo.getId();
         this.nickname = userInfo.getNickname();
         this.profilePath = userInfo.getProfilePath();
+        this.email = userInfo.getEmail();
     }
 }
