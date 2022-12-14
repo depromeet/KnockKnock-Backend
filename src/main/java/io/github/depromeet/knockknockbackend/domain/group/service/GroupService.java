@@ -6,7 +6,6 @@ import io.github.depromeet.knockknockbackend.domain.group.domain.Group.GroupBuil
 import io.github.depromeet.knockknockbackend.domain.group.domain.Category;
 import io.github.depromeet.knockknockbackend.domain.group.domain.GroupType;
 import io.github.depromeet.knockknockbackend.domain.group.domain.GroupUser;
-import io.github.depromeet.knockknockbackend.domain.group.domain.GroupUsers;
 import io.github.depromeet.knockknockbackend.domain.group.domain.InviteTokenRedisEntity;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.CategoryRepository;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.GroupRepository;
@@ -111,7 +110,7 @@ public class GroupService implements GroupUtils {
         Group group = makeOpenGroup(createOpenGroupRequest,currentUser);
         groupRepository.save(group);
         // 그룹 유저 리스트 추가
-        GroupUsers groupUsers = GroupUsers.createGroupUsers(members, group);
+        group.addMembers(members);
 
         return getGroupResponse(group, currentUser.getId());
     }
@@ -132,7 +131,7 @@ public class GroupService implements GroupUtils {
         Group group = makeFriendGroup(currentUser, memberIds.size());
         groupRepository.save(group);
         // 그룹 유저 리스트만들기
-        GroupUsers groupUsers = GroupUsers.createGroupUsers(members, group);
+        group.addMembers(members);
 
         return getGroupResponse(group, currentUser.getId());
     }
@@ -327,7 +326,6 @@ public class GroupService implements GroupUtils {
         Long currentUserId = SecurityUtils.getCurrentUserId();
         Group group = queryGroup(groupId);
 
-        GroupUsers groupUsers = group.getGroupUsers();
         List<User> findUserList = userUtils.findByIdIn(requestMemberIds);
         // 요청받은 유저 아이디 목록이 디비에 존재하는 지 확인
         validReqMemberNotExist(findUserList, requestMemberIds);
@@ -335,29 +333,26 @@ public class GroupService implements GroupUtils {
 
         requestMemberIds.forEach(group::validUserIsAlreadyEnterGroup);
 
-        groupUsers.addMembers(findUserList ,group);
+        group.addMembers(findUserList);
 
         return getGroupResponse(group, currentUserId);
     }
 
     @Override
     public void addMemberToGroup(Group group, User newUser) {
-        GroupUsers groupUsers = group.getGroupUsers();
         group.validUserIsAlreadyEnterGroup(newUser.getId());
-        groupUsers.addMember(newUser ,group);
+        group.addMember(newUser);
     }
 
     public GroupResponse leaveFromGroup(Long groupId) {
         Long currentUserId = SecurityUtils.getCurrentUserId();
 
         Group group = queryGroup(groupId);
-        GroupUsers groupUsers = group.getGroupUsers();
-
         if(group.checkUserIsHost(currentUserId)) {
             throw HostCanNotLeaveGroupException.EXCEPTION;
         }
 
-        groupUsers.removeUserByUserId(currentUserId);
+        group.removeUserByUserId(currentUserId);
 
         return getGroupResponse(group, currentUserId);
     }
@@ -394,13 +389,12 @@ public class GroupService implements GroupUtils {
         }
 
         Group group = queryGroup(groupId);
-        GroupUsers groupUsers = group.getGroupUsers();
         User currentUser = userUtils.getUserFromSecurityContext();
         Long currentUserId = currentUser.getId();
         // 유저가 이미 방안에 들어가있는지 검증
         group.validUserIsAlreadyEnterGroup(currentUserId);
 
-        groupUsers.addMember(currentUser, group);
+        group.addMember(currentUser);
 
         return getGroupResponse(group, currentUserId);
     }
@@ -408,14 +402,13 @@ public class GroupService implements GroupUtils {
     public GroupResponse deleteMemberFromGroup(Long groupId, Long userId) {
         Long currentUserId = SecurityUtils.getCurrentUserId();
         Group group = queryGroup(groupId);
-        GroupUsers groupUsers = group.getGroupUsers();
         group.validUserIsHost(currentUserId);
 
         if(currentUserId.equals(userId))
             throw HostCanNotLeaveGroupException.EXCEPTION;
 
         // 방장의 권한으로 내쫓을때
-        groupUsers.removeUserByUserId(userId);
+        group.removeUserByUserId(userId);
 
         return getGroupResponse(group, currentUserId);
     }

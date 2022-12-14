@@ -12,6 +12,8 @@ import io.github.depromeet.knockknockbackend.domain.user.domain.vo.UserInfoVO;
 import io.github.depromeet.knockknockbackend.global.database.BaseTimeEntity;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import javax.persistence.CascadeType;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -53,8 +55,8 @@ public class Group extends BaseTimeEntity {
     private GroupType groupType;
 
 
-    @Embedded
-    private GroupUsers groupUsers = new GroupUsers();
+    @OneToMany(mappedBy = "group", cascade = CascadeType.ALL)
+    private List<GroupUser> groupUsers = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
@@ -111,7 +113,7 @@ public class Group extends BaseTimeEntity {
     }
 
     public int getMemberCount(){
-        return this.groupUsers.getMemberCount();
+        return this.groupUsers.size();
     }
 
     public static Group of(Long id) {
@@ -130,15 +132,37 @@ public class Group extends BaseTimeEntity {
     }
 
     public void validUserIsAlreadyEnterGroup(Long userId){
-        groupUsers.validUserIsAlreadyEnterGroup(userId);
+        if(checkUserIsAlreadyEnterGroup(userId))
+            throw AlreadyGroupEnterException.EXCEPTION;
     }
 
     public boolean checkUserIsAlreadyEnterGroup(Long userId) {
-        return groupUsers.checkUserIsAlreadyEnterGroup(userId);
+        return groupUsers.stream()
+            .anyMatch(groupUser ->
+                groupUser.getUserId().equals(userId));
     }
 
     public List<UserInfoVO> getMemberInfoVOs(){
-        return groupUsers.getUserInfoVOs();
+        return groupUsers.stream()
+            .map(GroupUser::getMemberUserInfo)
+            .collect(Collectors.toList());
+    }
+
+    public void addMembers(List<User> newMembers){
+        List<GroupUser> newGroupUsers = newMembers.stream()
+            .map(user -> new GroupUser(this, user))
+            .collect(Collectors.toList());
+
+        groupUsers.addAll(newGroupUsers);
+    }
+
+    public void removeUserByUserId(Long userId){
+        groupUsers.removeIf(groupUser -> groupUser.getUserId().equals(userId));
+    }
+
+    public void addMember(User reqUser) {
+        GroupUser groupUser = new GroupUser(this, reqUser);
+        groupUsers.add(groupUser);
     }
 
 
