@@ -17,5 +17,5 @@ public class ProfileImage {
 
     private String profileImageUrl;
 
-    private Long rank;
+    private Long listOrder;
 }

@@ -38,7 +38,7 @@ public class AssetService implements AssetUtils {
     }
 
     public BackgroundsResponse getAllBackgroundImage(){
-        List<BackgroundImageDto> backgroundImageDtos = backGroundImageRepository.findAllOrderByRank()
+        List<BackgroundImageDto> backgroundImageDtos = backGroundImageRepository.findAllByOrderByListOrderAsc()
             .stream()
             .map(BackgroundImageDto::new)
             .collect(Collectors.toList());
@@ -52,7 +52,7 @@ public class AssetService implements AssetUtils {
     }
 
     public ThumbnailsResponse getAllThumbnailImage(){
-        List<ThumbnailImageDto> thumbnailImageDtos = thumbnailRepository.findAllOrderByRank()
+        List<ThumbnailImageDto> thumbnailImageDtos = thumbnailRepository.findAllByOrderByListOrderAsc()
             .stream()
             .map(ThumbnailImageDto::new)
             .collect(Collectors.toList());
@@ -66,7 +66,7 @@ public class AssetService implements AssetUtils {
     }
 
     public ProfileImagesResponse getAllProfileImages() {
-        List<ProfileImageDto> profileImageDtos = profileImageRepository.findAllOrderByRank()
+        List<ProfileImageDto> profileImageDtos = profileImageRepository.findAllByOrderByListOrderAsc()
             .stream()
             .map(ProfileImageDto::new)
             .collect(Collectors.toList());

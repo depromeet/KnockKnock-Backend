@@ -12,5 +12,5 @@ public interface ThumbnailRepository  extends JpaRepository<Thumbnail, Long> {
     @Query(value = "SELECT * FROM tbl_group_thumbnail order by RAND() limit 1",nativeQuery = true)
     Optional<Thumbnail> findRandomThumbnail();
 
-    List<Thumbnail> findAllOrderByRank();
+    List<Thumbnail> findAllByOrderByListOrderAsc();
 }

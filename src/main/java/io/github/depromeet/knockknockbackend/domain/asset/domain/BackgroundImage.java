@@ -18,5 +18,5 @@ public class BackgroundImage {
 
     private String backgroundImageUrl;
 
-    private Long rank;
+    private Long listOrder;
 }

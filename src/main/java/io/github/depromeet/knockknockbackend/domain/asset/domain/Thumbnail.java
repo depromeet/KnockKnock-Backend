@@ -17,5 +17,5 @@ public class Thumbnail {
 
     private String thumbnailImageUrl;
 
-    private Long rank;
+    private Long listOrder;
 }

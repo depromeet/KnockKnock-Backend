@@ -10,5 +10,5 @@ public interface BackGroundImageRepository  extends JpaRepository<BackgroundImag
     @Query(value = "SELECT * FROM tbl_group_background_image order by RAND() limit 1",nativeQuery = true)
     Optional<BackgroundImage> findRandomBackgroundImage();
 
-    List<BackgroundImage> findAllOrderByRank();
+    List<BackgroundImage> findAllByOrderByListOrderAsc();
 }
