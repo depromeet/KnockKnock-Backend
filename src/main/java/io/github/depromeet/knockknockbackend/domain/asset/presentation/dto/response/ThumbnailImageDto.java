@@ -7,11 +7,11 @@ import lombok.Getter;
 public class ThumbnailImageDto {
 
 
-    private Long thumbnailId;
+    private Long id;
     private String url;
 
     public ThumbnailImageDto(Thumbnail thumbnail) {
-        this.thumbnailId = thumbnail.getId();
+        this.id = thumbnail.getId();
         this.url = thumbnail.getThumbnailImageUrl();
     }
 }

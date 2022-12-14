@@ -45,9 +45,7 @@ public class GroupService implements GroupUtils {
     private final CategoryRepository categoryRepository;
 
 
-    private final ThumbnailImageService thumbnailImageService;
-    private final BackgroundImageService backgroundImageService;
-
+    private final AssetUtils assetUtils;
     private final UserUtils userUtils;
 
     private final TokenGenerator tokenGenerator;
@@ -153,12 +151,12 @@ public class GroupService implements GroupUtils {
             .publicAccess(createOpenGroupRequest.getPublicAccess())
             .thumbnailPath(
                 createOpenGroupRequest.getThumbnailPath() == null ?
-                    thumbnailImageService.getRandomThumbnailUrl() :
+                    assetUtils.getRandomThumbnailUrl() :
                     createOpenGroupRequest.getThumbnailPath()
             )
             .backgroundImagePath(
                 createOpenGroupRequest.getBackgroundImagePath() == null ?
-                    backgroundImageService.getRandomBackgroundImageUrl() :
+                    assetUtils.getRandomBackgroundImageUrl() :
                     createOpenGroupRequest.getBackgroundImagePath()
             )
             .description(createOpenGroupRequest.getDescription())
@@ -188,10 +186,10 @@ public class GroupService implements GroupUtils {
         return Group.builder()
             .publicAccess(false)
             .thumbnailPath(
-                thumbnailImageService.getRandomThumbnailUrl()
+                assetUtils.getRandomThumbnailUrl()
             )
             .backgroundImagePath(
-                backgroundImageService.getRandomBackgroundImageUrl()
+                assetUtils.getRandomBackgroundImageUrl()
             )
             .category(category)
             .title(Group.generateGroupTitle(host.getNickname(),memberCount))

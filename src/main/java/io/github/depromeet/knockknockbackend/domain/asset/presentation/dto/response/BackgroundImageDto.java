@@ -7,11 +7,11 @@ import lombok.Getter;
 @Getter
 public class BackgroundImageDto {
 
-    private Long backgroundId;
+    private Long id;
     private String url;
 
     public BackgroundImageDto(BackgroundImage backgroundImage) {
-        this.backgroundId = backgroundImage.getId();
+        this.id = backgroundImage.getId();
         this.url = backgroundImage.getBackgroundImageUrl();
     }
 }

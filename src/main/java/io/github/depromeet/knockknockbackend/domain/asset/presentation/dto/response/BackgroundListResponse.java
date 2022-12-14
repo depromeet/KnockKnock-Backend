@@ -8,6 +8,6 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class BackgroundListResponse {
-    List<BackgroundImageDto> backgroundList ;
+    List<BackgroundImageDto> backgrounds ;
 
 }

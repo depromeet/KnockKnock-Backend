@@ -8,5 +8,5 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class ThumbnailListResponse {
-    List<ThumbnailImageDto> thumbnailList;
+    List<ThumbnailImageDto> thumbnails;
 }

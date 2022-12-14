@@ -10,6 +10,7 @@ import io.github.depromeet.knockknockbackend.domain.asset.presentation.dto.respo
 import io.github.depromeet.knockknockbackend.domain.asset.presentation.dto.response.BackgroundListResponse;
 import io.github.depromeet.knockknockbackend.domain.asset.presentation.dto.response.ThumbnailImageDto;
 import io.github.depromeet.knockknockbackend.domain.asset.presentation.dto.response.ThumbnailListResponse;
+import io.github.depromeet.knockknockbackend.domain.group.service.AssetUtils;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -18,7 +19,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class AssetService {
+public class AssetService implements AssetUtils {
 
     private final BackGroundImageRepository backGroundImageRepository;
     private final ThumbnailRepository thumbnailRepository;
