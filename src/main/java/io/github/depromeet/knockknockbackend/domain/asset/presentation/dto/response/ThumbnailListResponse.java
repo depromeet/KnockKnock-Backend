@@ -1,6 +1,5 @@
-package io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response;
+package io.github.depromeet.knockknockbackend.domain.asset.presentation.dto.response;
 
-import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
