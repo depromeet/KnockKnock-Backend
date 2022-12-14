@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @SecurityRequirement(name = "access-token")
-@Tag(name = "알람 관련 컨트롤러", description = "")
+@Tag(name = "푸쉬알림 관련 컨트롤러", description = "")
 @RequiredArgsConstructor
 @RequestMapping("/notifications")
 @RestController
