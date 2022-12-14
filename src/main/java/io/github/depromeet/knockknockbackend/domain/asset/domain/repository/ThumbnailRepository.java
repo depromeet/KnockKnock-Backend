@@ -1,4 +1,4 @@
-package io.github.depromeet.knockknockbackend.domain.group.domain.repository;
+package io.github.depromeet.knockknockbackend.domain.asset.domain.repository;
 
 import io.github.depromeet.knockknockbackend.domain.asset.domain.Thumbnail;
 import java.util.Optional;
