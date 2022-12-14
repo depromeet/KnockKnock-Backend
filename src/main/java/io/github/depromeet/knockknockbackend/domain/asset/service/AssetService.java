@@ -1,7 +1,11 @@
 package io.github.depromeet.knockknockbackend.domain.asset.service;
 
 import io.github.depromeet.knockknockbackend.domain.asset.domain.BackgroundImage;
+import io.github.depromeet.knockknockbackend.domain.asset.domain.ProfileImage;
 import io.github.depromeet.knockknockbackend.domain.asset.domain.Thumbnail;
+import io.github.depromeet.knockknockbackend.domain.asset.domain.repository.ProfileImageRepository;
+import io.github.depromeet.knockknockbackend.domain.asset.exception.ProfileImageNotFoundException;
+import io.github.depromeet.knockknockbackend.domain.asset.presentation.dto.response.ProfileImageDto;
 import io.github.depromeet.knockknockbackend.domain.asset.presentation.dto.response.ProfileImagesResponse;
 import io.github.depromeet.knockknockbackend.domain.asset.domain.repository.BackGroundImageRepository;
 import io.github.depromeet.knockknockbackend.domain.asset.domain.repository.ThumbnailRepository;
@@ -25,11 +29,12 @@ public class AssetService implements AssetUtils {
     private final BackGroundImageRepository backGroundImageRepository;
     private final ThumbnailRepository thumbnailRepository;
 
+    private final ProfileImageRepository profileImageRepository;
+
     public String getRandomBackgroundImageUrl() {
-        Optional<BackgroundImage> randomBackground = backGroundImageRepository.findRandomBackgroundImage();
-        // 디비에 썸네일 값이 안채워져있을 때임... 테스트 환경외엔 발생할수 없음!
-        BackgroundImage backgroundImage = randomBackground.orElseThrow(()-> BackgroundImageNotFoundException.EXCEPTION);
-        return backgroundImage.getBackgroundImageUrl();
+        BackgroundImage randomBackground = backGroundImageRepository.findRandomBackgroundImage()
+            .orElseThrow(()-> BackgroundImageNotFoundException.EXCEPTION);
+        return randomBackground.getBackgroundImageUrl();
     }
 
     public BackgroundsResponse getAllBackgroundImage(){
@@ -41,10 +46,9 @@ public class AssetService implements AssetUtils {
     }
 
     public String getRandomThumbnailUrl() {
-        Optional<Thumbnail> randomThumbnail = thumbnailRepository.findRandomThumbnail();
-        // 디비에 썸네일 값이 안채워져있을 때임... 테스트 환경외엔 발생할수 없음!
-        Thumbnail thumbnail = randomThumbnail.orElseThrow(()-> ThumbNailImageNotFoundException.EXCEPTION);
-        return thumbnail.getThumbnailImageUrl();
+        Thumbnail randomThumbnail = thumbnailRepository.findRandomThumbnail()
+            .orElseThrow(()-> ThumbNailImageNotFoundException.EXCEPTION);
+        return randomThumbnail.getThumbnailImageUrl();
     }
 
     public ThumbnailsResponse getAllThumbnailImage(){
@@ -55,6 +59,17 @@ public class AssetService implements AssetUtils {
         return new ThumbnailsResponse(thumbnailImageDtos);
     }
 
+    public ProfileImageDto getRandomProfileImageUrl() {
+        ProfileImage randomProfileImage = profileImageRepository.findRandomProfileImage()
+            .orElseThrow(()-> ProfileImageNotFoundException.EXCEPTION);
+        return new ProfileImageDto(randomProfileImage);
+    }
+
     public ProfileImagesResponse getAllProfileImages() {
+        List<ProfileImageDto> profileImageDtos = profileImageRepository.findAll()
+            .stream()
+            .map(ProfileImageDto::new)
+            .collect(Collectors.toList());
+        return new ProfileImagesResponse(profileImageDtos);
     }
 }

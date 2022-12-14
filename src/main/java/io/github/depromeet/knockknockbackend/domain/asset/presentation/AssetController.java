@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.domain.asset.presentation;
 
+import io.github.depromeet.knockknockbackend.domain.asset.presentation.dto.response.ProfileImageDto;
 import io.github.depromeet.knockknockbackend.domain.asset.presentation.dto.response.ProfileImagesResponse;
 import io.github.depromeet.knockknockbackend.domain.asset.service.AssetService;
 import io.github.depromeet.knockknockbackend.domain.asset.presentation.dto.response.BackgroundsResponse;
@@ -31,6 +32,11 @@ public class AssetController {
     @GetMapping("/profiles")
     public ProfileImagesResponse getAllProfileImages(){
         return assetService.getAllProfileImages();
+    }
+    @Operation(summary = "프로필 이미지 랜덤하게 받기")
+    @GetMapping("/profiles/random")
+    public ProfileImageDto getRandomProfileImageUrl(){
+        return assetService.getRandomProfileImageUrl();
     }
 
 
