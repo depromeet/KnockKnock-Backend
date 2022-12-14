@@ -48,4 +48,9 @@ public class UserController {
        return userService.changeProfile(changeProfileRequest);
     }
 
+    @GetMapping("/profile")
+    public UserProfileResponse getProfile() {
+        return userService.getProfile();
+    }
+
 }

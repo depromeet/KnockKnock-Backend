@@ -53,4 +53,10 @@ public class UserService {
 
         return new UserProfileResponse(user.getUserInfo());
     }
+
+    public UserProfileResponse getProfile() {
+        User user = userUtils.getUserFromSecurityContext();
+
+        return new UserProfileResponse(user.getUserInfo());
+    }
 }
