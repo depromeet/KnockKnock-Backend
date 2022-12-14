@@ -77,19 +77,6 @@ public class GroupService implements GroupUtils {
             .orElseThrow(() -> GroupNotFoundException.EXCEPTION);
     }
 
-    @Override
-    public void validReqUserIsGroupHost(Group group, Long userId) {
-        GroupUsers groupUsers = group.getGroupUsers();
-        groupUsers.validUserIsGroupHost(userId);
-    }
-
-    @Override
-    public void validUserIsAlreadyEnterGroup(Group group, Long userId) {
-        GroupUsers groupUsers = group.getGroupUsers();
-        Long currentUserId = SecurityUtils.getCurrentUserId();
-        groupUsers.validUserIsAlreadyEnterGroup(currentUserId);
-    }
-
 
     /**
      * 방에 집어넣을 유저가 존재하는 유저인지 판단합니다.
@@ -117,21 +104,21 @@ public class GroupService implements GroupUtils {
         List<Long> memberIds = createOpenGroupRequest.getMemberIds();
         addHostUserIdIfNotExist(currentUser.getId(), memberIds);
         //요청받은 id 목록들로 디비에서 조회
-        List<User> findUserList = userUtils.findByIdIn(memberIds);
+        List<User> members = userUtils.findByIdIn(memberIds);
 
         // 요청받은 유저 아이디 목록이 디비에 존재하는 지 확인
-        validReqMemberNotExist(findUserList, createOpenGroupRequest.getMemberIds());
+        validReqMemberNotExist(members, createOpenGroupRequest.getMemberIds());
         // 오픈 그룹 만들기
-        Group group = makeOpenGroup(createOpenGroupRequest);
+        Group group = makeOpenGroup(createOpenGroupRequest,currentUser);
         groupRepository.save(group);
         // 그룹 유저 리스트 추가
-        GroupUsers groupUsers = GroupUsers.createGroupUsers(currentUser, findUserList, group);
-        groupUserRepository.saveAll(groupUsers.getGroupUserList());
+        GroupUsers groupUsers = GroupUsers.createGroupUsers(members, group);
 
         return new CreateGroupResponse(
-            group.getGroupBaseInfoVo() ,
-            groupUsers.getUserInfoVoList()
-            ,true);
+            group.getGroupBaseInfoVo(),
+            groupUsers.getUserInfoVoList(),
+            group.checkUserIsHost(currentUser.getId())
+        );
     }
 
     /**
@@ -145,20 +132,18 @@ public class GroupService implements GroupUtils {
         List<Long> memberIds = createFriendGroupRequest.getMemberIds();
         addHostUserIdIfNotExist(currentUser.getId(), memberIds);
         //요청받은 id 목록들로 디비에서 조회
-        List<User> requestUserList = userUtils.findByIdIn(memberIds);
+        List<User> members = userUtils.findByIdIn(memberIds);
         // 그룹 만들기
-        Group group = makeFriendGroup(currentUser.getNickname(), memberIds.size());
+        Group group = makeFriendGroup(currentUser, memberIds.size());
         groupRepository.save(group);
         // 그룹 유저 리스트만들기
-        GroupUsers groupUsers = GroupUsers.createGroupUsers(currentUser, requestUserList, group);
-
-        groupUserRepository.saveAll(groupUsers.getGroupUserList());
-
+        GroupUsers groupUsers = GroupUsers.createGroupUsers(members, group);
 
         return new CreateGroupResponse(
             group.getGroupBaseInfoVo() ,
-            groupUsers.getUserInfoVoList()
-            ,true);
+            group.getMemberInfoVOs(),
+            group.checkUserIsHost(currentUser.getId())
+        );
     }
 
     private static void addHostUserIdIfNotExist(Long UserId, List<Long> memberIds) {
@@ -173,7 +158,7 @@ public class GroupService implements GroupUtils {
      * 그룹 도메인으로 옮길 예정입니다.
      * @return Group
      */
-    private Group makeOpenGroup(CreateOpenGroupRequest createOpenGroupRequest) {
+    private Group makeOpenGroup(CreateOpenGroupRequest createOpenGroupRequest, User host) {
         GroupBuilder groupBuilder = Group.builder()
             .publicAccess(createOpenGroupRequest.getPublicAccess())
             .thumbnailPath(
@@ -188,7 +173,8 @@ public class GroupService implements GroupUtils {
             )
             .description(createOpenGroupRequest.getDescription())
             .title(createOpenGroupRequest.getTitle())
-            .groupType(GroupType.OPEN);
+            .groupType(GroupType.OPEN)
+            .host(host);
 
         Category category = queryGroupCategoryById(
             createOpenGroupRequest.getCategoryId());
@@ -205,11 +191,11 @@ public class GroupService implements GroupUtils {
      * 그룹 도메인으로 옮길 예정입니다.
      * @return Group
      */
-    private Group makeFriendGroup(String reqUserName, Integer memberCount) {
+    private Group makeFriendGroup(User host, Integer memberCount) {
         //defaultCategory
         Category category = queryGroupCategoryById(Category.defaultEmptyCategoryId);
 
-        Group group = Group.builder()
+        return Group.builder()
             .publicAccess(false)
             .thumbnailPath(
                 thumbnailImageService.getRandomThumbnailUrl()
@@ -218,10 +204,10 @@ public class GroupService implements GroupUtils {
                 backgroundImageService.getRandomBackgroundImageUrl()
             )
             .category(category)
-            .title(Group.generateGroupTitle(reqUserName,memberCount))
-            .groupType(GroupType.FRIEND).build();
-
-        return group;
+            .title(Group.generateGroupTitle(host.getNickname(),memberCount))
+            .groupType(GroupType.FRIEND)
+            .host(host)
+            .build();
     }
 
 
@@ -232,18 +218,16 @@ public class GroupService implements GroupUtils {
     public GroupResponse updateGroup(Long groupId , UpdateGroupRequest updateGroupRequest) {
         Long currentUserId = SecurityUtils.getCurrentUserId();
         Group group = queryGroup(groupId);
+        group.validUserIsHost(currentUserId);
 
-        // 그룹 유저 일급 컬랙션
-        GroupUsers groupUsers = group.getGroupUsers();
-        // reqUser 가 호스트인지 확인하는 메서드
-        groupUsers.validUserIsGroupHost(currentUserId);
         Category category = queryGroupCategoryById(updateGroupRequest.getCategoryId());
         group.updateGroup(updateGroupRequest.toUpdateGroupDto(), category);
 
         return new GroupResponse(
             group.getGroupBaseInfoVo(),
-            groupUsers.getUserInfoVoList()
-            , true);
+            group.getMemberInfoVOs(),
+            group.checkUserIsHost(currentUserId)
+        );
     }
 
 
@@ -255,15 +239,9 @@ public class GroupService implements GroupUtils {
         Long currentUserId = SecurityUtils.getCurrentUserId();
 
         Group group = queryGroup(groupId);
-        User reqUser = userUtils.getUserFromSecurityContext();
-        GroupUsers groupUsers = group.getGroupUsers();
+        group.validUserIsHost(currentUserId);
 
-        groupUsers.validUserIsGroupHost(currentUserId);
-
-        // 캐스케이드 타입 all로 줬습니다.!
-        // 그룹지우면 그룹유저 미들 테이블 삭제됩니다.
         groupRepository.delete(group);
-
     }
 
     /**
@@ -272,16 +250,13 @@ public class GroupService implements GroupUtils {
      */
     public GroupResponse getGroupDetailById(Long groupId) {
         Long currentUserId = SecurityUtils.getCurrentUserId();
-
         Group group = queryGroup(groupId);
-        GroupUsers groupUsers = group.getGroupUsers();
-
-        Boolean iHost = groupUsers.checkUserGroupHost(currentUserId);
 
         return new GroupResponse(
             group.getGroupBaseInfoVo(),
-            groupUsers.getUserInfoVoList(),
-            iHost);
+            group.getMemberInfoVOs(),
+            group.checkUserIsHost(currentUserId)
+        );
     }
 
 
@@ -375,18 +350,21 @@ public class GroupService implements GroupUtils {
         validReqMemberNotExist(findUserList, requestMemberIds);
         // TODO : 친구 목록에 존재하는지 확인
 
-        requestMemberIds.forEach(groupUsers::validUserIsAlreadyEnterGroup);
+        requestMemberIds.forEach(group::validUserIsAlreadyEnterGroup);
 
         groupUsers.addMembers(findUserList ,group);
-        return new GroupResponse(group.getGroupBaseInfoVo(),
-            groupUsers.getUserInfoVoList(),
-            groupUsers.checkUserGroupHost(currentUserId));
+
+        return new GroupResponse(
+            group.getGroupBaseInfoVo(),
+            group.getMemberInfoVOs(),
+            group.checkUserIsHost(currentUserId)
+        );
     }
 
     @Override
     public void addMemberToGroup(Group group, User newUser) {
         GroupUsers groupUsers = group.getGroupUsers();
-        groupUsers.validUserIsAlreadyEnterGroup(newUser.getId());
+        group.validUserIsAlreadyEnterGroup(newUser.getId());
         groupUsers.addMember(newUser ,group);
     }
 
@@ -396,22 +374,24 @@ public class GroupService implements GroupUtils {
         Group group = queryGroup(groupId);
         GroupUsers groupUsers = group.getGroupUsers();
 
-        if(groupUsers.checkUserGroupHost(currentUserId)) {
+        if(group.checkUserIsHost(currentUserId)) {
             throw HostCanNotLeaveGroupException.EXCEPTION;
         }
 
         groupUsers.removeUserByUserId(currentUserId);
-        return new GroupResponse(group.getGroupBaseInfoVo(),groupUsers.getUserInfoVoList(),false);
+        return new GroupResponse(
+            group.getGroupBaseInfoVo(),
+            group.getMemberInfoVOs(),
+            group.checkUserIsHost(currentUserId)
+        );
     }
 
     public GroupInviteLinkResponse createGroupInviteLink(Long groupId) {
         Group group = queryGroup(groupId);
-        GroupUsers groupUsers = group.getGroupUsers();
         Long currentUserId = SecurityUtils.getCurrentUserId();
 
-
         // 요청한 유저가 멤버가 아니라면 링크 발급이 안되어야 한다.
-        if(!groupUsers.checkUserIsAlreadyEnterGroup(currentUserId)){
+        if(!group.checkUserIsAlreadyEnterGroup(currentUserId)){
             throw NotMemberException.EXCEPTION;
         }
 
@@ -439,30 +419,36 @@ public class GroupService implements GroupUtils {
 
         Group group = queryGroup(groupId);
         GroupUsers groupUsers = group.getGroupUsers();
-        User reqUser = userUtils.getUserFromSecurityContext();
-
+        User currentUser = userUtils.getUserFromSecurityContext();
+        Long currentUserId = currentUser.getId();
         // 유저가 이미 방안에 들어가있는지 검증
-        groupUsers.validUserIsAlreadyEnterGroup(reqUser.getId());
+        group.validUserIsAlreadyEnterGroup(currentUserId);
 
-        groupUsers.addMember(reqUser, group);
+        groupUsers.addMember(currentUser, group);
 
         return new GroupResponse(
-                group.getGroupBaseInfoVo(),
-                groupUsers.getUserInfoVoList(),
-                false);
+            group.getGroupBaseInfoVo(),
+            group.getMemberInfoVOs(),
+            group.checkUserIsHost(currentUserId)
+        );
     }
 
     public GroupResponse deleteMemberFromGroup(Long groupId, Long userId) {
         Long currentUserId = SecurityUtils.getCurrentUserId();
         Group group = queryGroup(groupId);
         GroupUsers groupUsers = group.getGroupUsers();
-        groupUsers.validUserIsGroupHost(currentUserId);
+        group.validUserIsHost(currentUserId);
 
         if(currentUserId.equals(userId))
             throw HostCanNotLeaveGroupException.EXCEPTION;
 
         // 방장의 권한으로 내쫓을때
         groupUsers.removeUserByUserId(userId);
-        return new GroupResponse(group.getGroupBaseInfoVo(),groupUsers.getUserInfoVoList(),true);
+
+        return new GroupResponse(
+            group.getGroupBaseInfoVo(),
+            group.getMemberInfoVOs(),
+            group.checkUserIsHost(currentUserId)
+        );
     }
 }
