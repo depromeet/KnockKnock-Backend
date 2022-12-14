@@ -41,8 +41,6 @@ public class GroupUser extends BaseTimeEntity {
     @JoinColumn(name = "user_id" , updatable = false)
     private User user; //유저
 
-    private Boolean isHost;
-
     public UserInfoVO getMemberUserInfo() {
         return this.user.getUserInfo();
     }
@@ -51,11 +49,8 @@ public class GroupUser extends BaseTimeEntity {
         return user.getId();
     }
     @Builder
-    public GroupUser(Group group, User user, Boolean isHost) {
+    public GroupUser(Group group, User user) {
         this.group = group;
         this.user = user;
-        this.isHost = isHost;
     }
-
-
 }

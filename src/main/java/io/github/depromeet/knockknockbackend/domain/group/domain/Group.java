@@ -2,13 +2,17 @@ package io.github.depromeet.knockknockbackend.domain.group.domain;
 
 
 import io.github.depromeet.knockknockbackend.domain.group.domain.vo.GroupBaseInfoVo;
-import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.UpdateGroupRequest;
+import io.github.depromeet.knockknockbackend.domain.group.exception.AlreadyGroupEnterException;
+import io.github.depromeet.knockknockbackend.domain.group.exception.NotHostException;
 import io.github.depromeet.knockknockbackend.domain.group.service.dto.UpdateGroupDto;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.Notification;
+import io.github.depromeet.knockknockbackend.domain.user.domain.User;
+import io.github.depromeet.knockknockbackend.domain.user.domain.vo.UserInfoVO;
 import io.github.depromeet.knockknockbackend.global.database.BaseTimeEntity;
 import java.util.ArrayList;
 import java.util.List;
-import javax.persistence.Embedded;
+import java.util.stream.Collectors;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -19,11 +23,11 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.lang.Nullable;
 
 @Getter
 @Table(name = "tbl_group")
@@ -48,8 +52,8 @@ public class Group extends BaseTimeEntity {
     private GroupType groupType;
 
 
-    @Embedded
-    private GroupUsers groupUsers = new GroupUsers();
+    @OneToMany(mappedBy = "group", cascade = CascadeType.ALL)
+    private List<GroupUser> groupUsers = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
@@ -57,9 +61,13 @@ public class Group extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "group")
     private List<Notification> notifications = new ArrayList<>();
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "host_id")
+    User host;
     @Builder
     public Group(Long id, String title, String description, String thumbnailPath, String backgroundImagePath,
-        Boolean publicAccess , Category category ,GroupType groupType) {
+        Boolean publicAccess , Category category ,GroupType groupType ,User host) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -68,6 +76,7 @@ public class Group extends BaseTimeEntity {
         this.publicAccess = publicAccess;
         this.category = category;
         this.groupType = groupType;
+        this.host = host;
     }
 
     public static String generateGroupTitle(String reqUserName, Integer memberCount){
@@ -86,7 +95,9 @@ public class Group extends BaseTimeEntity {
             .publicAccess(publicAccess)
             .category(category)
             .groupType(groupType)
-            .groupId(id).build();
+            .groupId(id)
+            .hostInfoVO(host.getUserInfo())
+            .build();
     }
 
     public void updateGroup(UpdateGroupDto updateGroupDto,Category category) {
@@ -99,7 +110,7 @@ public class Group extends BaseTimeEntity {
     }
 
     public int getMemberCount(){
-        return this.groupUsers.getMemberCount();
+        return this.groupUsers.size();
     }
 
     public static Group of(Long id) {
@@ -107,4 +118,49 @@ public class Group extends BaseTimeEntity {
             .id(id)
             .build();
     }
+
+    public void validUserIsHost(Long userId){
+        if(!checkUserIsHost(userId)){
+            throw NotHostException.EXCEPTION;
+        }
+    }
+    public Boolean checkUserIsHost(Long userId){
+        return host.getId().equals(userId);
+    }
+
+    public void validUserIsAlreadyEnterGroup(Long userId){
+        if(checkUserIsAlreadyEnterGroup(userId))
+            throw AlreadyGroupEnterException.EXCEPTION;
+    }
+
+    public boolean checkUserIsAlreadyEnterGroup(Long userId) {
+        return groupUsers.stream()
+            .anyMatch(groupUser ->
+                groupUser.getUserId().equals(userId));
+    }
+
+    public List<UserInfoVO> getMemberInfoVOs(){
+        return groupUsers.stream()
+            .map(GroupUser::getMemberUserInfo)
+            .collect(Collectors.toList());
+    }
+
+    public void addMembers(List<User> newMembers){
+        List<GroupUser> newGroupUsers = newMembers.stream()
+            .map(user -> new GroupUser(this, user))
+            .collect(Collectors.toList());
+
+        groupUsers.addAll(newGroupUsers);
+    }
+
+    public void removeUserByUserId(Long userId){
+        groupUsers.removeIf(groupUser -> groupUser.getUserId().equals(userId));
+    }
+
+    public void addMember(User reqUser) {
+        GroupUser groupUser = new GroupUser(this, reqUser);
+        groupUsers.add(groupUser);
+    }
+
+
 }
