@@ -48,12 +48,12 @@ public class GroupUsers {
         return groupUserList.size();
     }
 
-    public void validUserIsAlreadyEnterGroup(Long userId){
+    protected void validUserIsAlreadyEnterGroup(Long userId){
         if(checkUserIsAlreadyEnterGroup(userId))
             throw AlreadyGroupEnterException.EXCEPTION;
     }
 
-    public boolean checkUserIsAlreadyEnterGroup(Long userId) {
+    protected boolean checkUserIsAlreadyEnterGroup(Long userId) {
         return groupUserList.stream()
             .anyMatch(groupUser ->
                 groupUser.getUser().getId().equals(userId));
