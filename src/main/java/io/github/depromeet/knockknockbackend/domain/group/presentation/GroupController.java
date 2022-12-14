@@ -178,7 +178,13 @@ public class GroupController {
         return groupService.addMembersToGroup(groupId , addFriendToGroupRequest.getMemberIds());
     }
 
-    @Operation(summary = "멤버 제거 ( 방장일 경우 본인빼고 모든인원 , 멤버일경우 나만)")
+    @Operation(summary = "그룹에서 나가기 ( 방장은 못나갑니다 )")
+    @DeleteMapping("/{id}/members/leave")
+    public GroupResponse leaveFromGroup(@PathVariable(value = "id") Long groupId){
+        return groupService.leaveFromGroup(groupId);
+    }
+
+    @Operation(summary = "멤버 내쫓기 (방장권한)")
     @DeleteMapping("/{id}/members/{user_id}")
     public GroupResponse deleteMemberFromGroup(@PathVariable(value = "id") Long groupId, @PathVariable(value = "user_id") Long userId){
         return groupService.deleteMemberFromGroup(groupId , userId);

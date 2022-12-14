@@ -269,7 +269,7 @@ public class GroupService implements GroupUtils {
         Group group = queryGroup(groupId);
         GroupUsers groupUsers = group.getGroupUsers();
 
-        Boolean iHost = groupUsers.checkReqUserGroupHost(currentUserId);
+        Boolean iHost = groupUsers.checkUserGroupHost(currentUserId);
 
         return new GroupResponse(
             group.getGroupBaseInfoVo(),
@@ -373,7 +373,7 @@ public class GroupService implements GroupUtils {
         groupUsers.addMembers(findUserList ,group);
         return new GroupResponse(group.getGroupBaseInfoVo(),
             groupUsers.getUserInfoVoList(),
-            groupUsers.checkReqUserGroupHost(currentUserId));
+            groupUsers.checkUserGroupHost(currentUserId));
     }
 
     @Override
@@ -383,25 +383,18 @@ public class GroupService implements GroupUtils {
         groupUsers.addMember(newUser ,group);
     }
 
-    public GroupResponse deleteMemberFromGroup(Long groupId, Long userId) {
+    public GroupResponse leaveFromGroup(Long groupId) {
         Long currentUserId = SecurityUtils.getCurrentUserId();
 
         Group group = queryGroup(groupId);
         GroupUsers groupUsers = group.getGroupUsers();
 
-        // 일반 유저가 본인 스스로 방에서 나갈때
-        if(currentUserId.equals(userId)){
-            if(groupUsers.checkReqUserGroupHost(currentUserId))
-                throw HostCanNotLeaveGroupException.EXCEPTION;
-            groupUsers.removeUserByUserId(userId);
-            return new GroupResponse(group.getGroupBaseInfoVo(),groupUsers.getUserInfoVoList(),false);
+        if(groupUsers.checkUserGroupHost(currentUserId)) {
+            throw HostCanNotLeaveGroupException.EXCEPTION;
         }
 
-        // 방장의 권한으로 내쫓을때
-        groupUsers.validUserIsGroupHost(currentUserId);
-        groupUsers.removeUserByUserId(userId);
-        return new GroupResponse(group.getGroupBaseInfoVo(),groupUsers.getUserInfoVoList(),true);
-
+        groupUsers.removeUserByUserId(currentUserId);
+        return new GroupResponse(group.getGroupBaseInfoVo(),groupUsers.getUserInfoVoList(),false);
     }
 
     public GroupInviteLinkResponse createGroupInviteLink(Long groupId) {
@@ -450,5 +443,19 @@ public class GroupService implements GroupUtils {
                 group.getGroupBaseInfoVo(),
                 groupUsers.getUserInfoVoList(),
                 false);
+    }
+
+    public GroupResponse deleteMemberFromGroup(Long groupId, Long userId) {
+        Long currentUserId = SecurityUtils.getCurrentUserId();
+        Group group = queryGroup(groupId);
+        GroupUsers groupUsers = group.getGroupUsers();
+        groupUsers.validUserIsGroupHost(currentUserId);
+
+        if(currentUserId.equals(userId))
+            throw HostCanNotLeaveGroupException.EXCEPTION;
+
+        // 방장의 권한으로 내쫓을때
+        groupUsers.removeUserByUserId(userId);
+        return new GroupResponse(group.getGroupBaseInfoVo(),groupUsers.getUserInfoVoList(),true);
     }
 }
