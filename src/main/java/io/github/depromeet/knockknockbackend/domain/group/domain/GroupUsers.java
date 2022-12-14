@@ -30,10 +30,9 @@ public class GroupUsers {
         return new GroupUsers(groupUserList);
     }
 
-    public static GroupUsers createGroupUsers(User host , List<User>  requestUserList , Group group){
+    public static GroupUsers createGroupUsers(List<User>  requestUserList , Group group){
         List<GroupUser> requestGroupUserList = requestUserList.stream()
             .map(user -> GroupUser.builder()
-                .isHost(user.getId().equals(host.getId()))
                 .user(user)
                 .group(group).build())
             .collect(Collectors.toList());
@@ -45,29 +44,9 @@ public class GroupUsers {
             .collect(Collectors.toList());
     }
 
-    public void validUserIsGroupHost(Long userId) {
-        groupUserList.stream()
-            .filter(groupUser -> groupUser.getUserId().equals(userId) && groupUser.getIsHost())
-            .findFirst()
-            .orElseThrow(() -> NotHostException.EXCEPTION);
-    }
-
-    public Boolean checkUserGroupHost(Long userId) {
-        return groupUserList.stream()
-            .anyMatch(groupUser ->
-                groupUser.getIsHost() && groupUser.getUserId().equals(userId));
-
-    }
-
     protected int getMemberCount(){
         return groupUserList.size();
     }
-
-    public List<Group> getGroupList(){
-        return groupUserList.stream().map(GroupUser::getGroup).collect(
-            Collectors.toList());
-    }
-
 
     public void validUserIsAlreadyEnterGroup(Long userId){
         if(checkUserIsAlreadyEnterGroup(userId))
@@ -80,17 +59,10 @@ public class GroupUsers {
                 groupUser.getUser().getId().equals(userId));
     }
 
-
-    public List<Long> getUserIds() {
-        return groupUserList.stream()
-            .map(groupUser -> groupUser.getUser().getId())
-            .collect(Collectors.toList());
-    }
-
     public void addMembers(List<User> newMembers , Group group){
 
         List<GroupUser> newGroupUsers = newMembers.stream()
-            .map(user -> new GroupUser(group, user, false))
+            .map(user -> new GroupUser(group, user))
             .collect(Collectors.toList());
         groupUserList.addAll(newGroupUsers);
     }
@@ -100,7 +72,7 @@ public class GroupUsers {
     }
 
     public void addMember(User reqUser, Group group) {
-        GroupUser groupUser = new GroupUser(group, reqUser, false);
+        GroupUser groupUser = new GroupUser(group, reqUser);
         groupUserList.add(groupUser);
     }
 }
