@@ -33,15 +33,10 @@ public class GroupUsers {
     public static GroupUsers createGroupUsers(User host , List<User>  requestUserList , Group group){
         List<GroupUser> requestGroupUserList = requestUserList.stream()
             .map(user -> GroupUser.builder()
-                .isHost(false)
+                .isHost(user.getId().equals(host.getId()))
                 .user(user)
                 .group(group).build())
             .collect(Collectors.toList());
-        GroupUser hostMember = GroupUser.builder()
-            .isHost(true)
-            .user(host)
-            .group(group).build();
-        requestGroupUserList.add(hostMember);
         return new GroupUsers(requestGroupUserList);
     }
 

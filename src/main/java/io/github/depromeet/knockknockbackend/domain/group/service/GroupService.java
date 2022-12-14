@@ -112,11 +112,12 @@ public class GroupService implements GroupUtils {
      */
     public CreateGroupResponse createOpenGroup(CreateOpenGroupRequest createOpenGroupRequest) {
         // 요청자 정보 시큐리티에서 가져옴
-        User reqUser = userUtils.getUserFromSecurityContext();
-        // 혹시 본인 아이디 멤버로 넣었으면 지워버리기.
-        createOpenGroupRequest.getMemberIds().removeIf(id -> reqUser.getId().equals(id));
+        User currentUser = userUtils.getUserFromSecurityContext();
+
+        List<Long> memberIds = createOpenGroupRequest.getMemberIds();
+        addHostUserIdIfNotExist(currentUser.getId(), memberIds);
         //요청받은 id 목록들로 디비에서 조회
-        List<User> findUserList = userUtils.findByIdIn(createOpenGroupRequest.getMemberIds());
+        List<User> findUserList = userUtils.findByIdIn(memberIds);
 
         // 요청받은 유저 아이디 목록이 디비에 존재하는 지 확인
         validReqMemberNotExist(findUserList, createOpenGroupRequest.getMemberIds());
@@ -124,7 +125,7 @@ public class GroupService implements GroupUtils {
         Group group = makeOpenGroup(createOpenGroupRequest);
         groupRepository.save(group);
         // 그룹 유저 리스트 추가
-        GroupUsers groupUsers = GroupUsers.createGroupUsers(reqUser, findUserList, group);
+        GroupUsers groupUsers = GroupUsers.createGroupUsers(currentUser, findUserList, group);
         groupUserRepository.saveAll(groupUsers.getGroupUserList());
 
         return new CreateGroupResponse(
@@ -138,18 +139,18 @@ public class GroupService implements GroupUtils {
      * @return CreateGroupResponse
      */
     public CreateGroupResponse createFriendGroup(CreateFriendGroupRequest createFriendGroupRequest) {
-        User reqUser = userUtils.getUserFromSecurityContext();
+        User currentUser = userUtils.getUserFromSecurityContext();
 
         //TODO : 요청 받은 memeberId가 친구 목록에 속해있는지 검증.
         List<Long> memberIds = createFriendGroupRequest.getMemberIds();
-        memberIds.removeIf(id -> reqUser.getId().equals(id));
+        addHostUserIdIfNotExist(currentUser.getId(), memberIds);
         //요청받은 id 목록들로 디비에서 조회
         List<User> requestUserList = userUtils.findByIdIn(memberIds);
         // 그룹 만들기
-        Group group = makeFriendGroup();
+        Group group = makeFriendGroup(currentUser.getNickname(), memberIds.size());
         groupRepository.save(group);
         // 그룹 유저 리스트만들기
-        GroupUsers groupUsers = GroupUsers.createGroupUsers(reqUser, requestUserList, group);
+        GroupUsers groupUsers = GroupUsers.createGroupUsers(currentUser, requestUserList, group);
 
         groupUserRepository.saveAll(groupUsers.getGroupUserList());
 
@@ -158,6 +159,12 @@ public class GroupService implements GroupUtils {
             group.getGroupBaseInfoVo() ,
             groupUsers.getUserInfoVoList()
             ,true);
+    }
+
+    private static void addHostUserIdIfNotExist(Long UserId, List<Long> memberIds) {
+        if(!memberIds.contains(UserId)){
+            memberIds.add(UserId);
+        }
     }
 
     /**
@@ -198,9 +205,9 @@ public class GroupService implements GroupUtils {
      * 그룹 도메인으로 옮길 예정입니다.
      * @return Group
      */
-    private Group makeFriendGroup() {
+    private Group makeFriendGroup(String reqUserName, Integer memberCount) {
         //defaultCategory
-        Category category = queryGroupCategoryById(1L);
+        Category category = queryGroupCategoryById(Category.defaultEmptyCategoryId);
 
         Group group = Group.builder()
             .publicAccess(false)
@@ -211,7 +218,7 @@ public class GroupService implements GroupUtils {
                 backgroundImageService.getRandomBackgroundImageUrl()
             )
             .category(category)
-            .title(Group.generateGroupTitle())
+            .title(Group.generateGroupTitle(reqUserName,memberCount))
             .groupType(GroupType.FRIEND).build();
 
         return group;
