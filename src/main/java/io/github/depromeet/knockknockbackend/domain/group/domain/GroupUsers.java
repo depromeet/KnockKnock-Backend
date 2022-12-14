@@ -30,7 +30,7 @@ public class GroupUsers {
         return new GroupUsers(groupUserList);
     }
 
-    public static GroupUsers createGroupUsers(List<User>  requestUserList , Group group){
+    public static GroupUsers createGroupUsers(List<User> requestUserList ,Group group){
         List<GroupUser> requestGroupUserList = requestUserList.stream()
             .map(user -> GroupUser.builder()
                 .user(user)
@@ -39,7 +39,7 @@ public class GroupUsers {
         return new GroupUsers(requestGroupUserList);
     }
 
-    public List<UserInfoVO> getUserInfoVoList(){
+    protected List<UserInfoVO> getUserInfoVOs(){
         return groupUserList.stream().map(GroupUser::getMemberUserInfo)
             .collect(Collectors.toList());
     }

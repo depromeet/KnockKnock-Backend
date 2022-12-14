@@ -8,6 +8,7 @@ import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.reque
 import io.github.depromeet.knockknockbackend.domain.group.service.dto.UpdateGroupDto;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.Notification;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
+import io.github.depromeet.knockknockbackend.domain.user.domain.vo.UserInfoVO;
 import io.github.depromeet.knockknockbackend.global.database.BaseTimeEntity;
 import java.util.ArrayList;
 import java.util.List;
@@ -135,4 +136,10 @@ public class Group extends BaseTimeEntity {
     public boolean checkUserIsAlreadyEnterGroup(Long userId) {
         return groupUsers.checkUserIsAlreadyEnterGroup(userId);
     }
+
+    public List<UserInfoVO> getMemberInfoVOs(){
+        return groupUsers.getUserInfoVOs();
+    }
+
+
 }

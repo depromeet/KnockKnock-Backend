@@ -51,7 +51,7 @@ public class AdmissionService implements AdmissionUsecase {
     public AdmissionInfoDto requestAdmission(Long groupId) {
         User reqUser = userUtils.getUserFromSecurityContext();
         Group group = groupUtils.queryGroup(groupId);
-        groupUtils.validUserIsAlreadyEnterGroup(group,reqUser.getId());
+        group.validUserIsAlreadyEnterGroup(reqUser.getId());
 
         //TODO : 요청시 알림 넣어주기?
         Admission admission = Admission.createAdmission(reqUser, group);
@@ -68,7 +68,7 @@ public class AdmissionService implements AdmissionUsecase {
     public AdmissionInfoListResponse getAdmissions(Long groupId) {
         Long userId = SecurityUtils.getCurrentUserId();
         Group group = groupUtils.queryGroup(groupId);
-        groupUtils.validReqUserIsGroupHost(group,userId);
+        group.validUserIsHost(userId);
 
         List<Admission> Admissions = admissionRepository.findByGroupAndAdmissionState(group ,
             AdmissionState.PENDING);
@@ -88,7 +88,7 @@ public class AdmissionService implements AdmissionUsecase {
     public AdmissionInfoDto acceptAdmission(Long groupId , Long admissionId) {
         Long userId = SecurityUtils.getCurrentUserId();
         Group group = groupUtils.queryGroup(groupId);
-        groupUtils.validReqUserIsGroupHost(group,userId);
+        group.validUserIsHost(userId);
 
         Admission admission = queryAdmission(admissionId);
         admission.acceptAdmission();
@@ -104,7 +104,7 @@ public class AdmissionService implements AdmissionUsecase {
     public AdmissionInfoDto refuseAdmission(Long groupId , Long admissionId) {
         Long userId = SecurityUtils.getCurrentUserId();
         Group group = groupUtils.queryGroup(groupId);
-        groupUtils.validReqUserIsGroupHost(group,userId);
+        group.validUserIsHost(userId);
 
         Admission admission = queryAdmission(admissionId);
         admission.refuseAdmission();

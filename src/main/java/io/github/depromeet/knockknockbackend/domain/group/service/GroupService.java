@@ -21,7 +21,6 @@ import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.reque
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateOpenGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.GroupInTypeRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.UpdateGroupRequest;
-import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.CreateGroupResponse;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupBriefInfoDto;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupInviteLinkResponse;
 import io.github.depromeet.knockknockbackend.global.utils.generate.TokenGenerator;
@@ -97,7 +96,7 @@ public class GroupService implements GroupUtils {
      * 오픈 그룹(홀로 외침방 )을 생성합니다.
      * @return CreateGroupResponse
      */
-    public CreateGroupResponse createOpenGroup(CreateOpenGroupRequest createOpenGroupRequest) {
+    public GroupResponse createOpenGroup(CreateOpenGroupRequest createOpenGroupRequest) {
         // 요청자 정보 시큐리티에서 가져옴
         User currentUser = userUtils.getUserFromSecurityContext();
 
@@ -114,18 +113,14 @@ public class GroupService implements GroupUtils {
         // 그룹 유저 리스트 추가
         GroupUsers groupUsers = GroupUsers.createGroupUsers(members, group);
 
-        return new CreateGroupResponse(
-            group.getGroupBaseInfoVo(),
-            groupUsers.getUserInfoVoList(),
-            group.checkUserIsHost(currentUser.getId())
-        );
+        return getGroupResponse(group, currentUser.getId());
     }
 
     /**
      * 친구그룹을 만듭니다
      * @return CreateGroupResponse
      */
-    public CreateGroupResponse createFriendGroup(CreateFriendGroupRequest createFriendGroupRequest) {
+    public GroupResponse createFriendGroup(CreateFriendGroupRequest createFriendGroupRequest) {
         User currentUser = userUtils.getUserFromSecurityContext();
 
         //TODO : 요청 받은 memeberId가 친구 목록에 속해있는지 검증.
@@ -139,11 +134,7 @@ public class GroupService implements GroupUtils {
         // 그룹 유저 리스트만들기
         GroupUsers groupUsers = GroupUsers.createGroupUsers(members, group);
 
-        return new CreateGroupResponse(
-            group.getGroupBaseInfoVo() ,
-            group.getMemberInfoVOs(),
-            group.checkUserIsHost(currentUser.getId())
-        );
+        return getGroupResponse(group, currentUser.getId());
     }
 
     private static void addHostUserIdIfNotExist(Long UserId, List<Long> memberIds) {
@@ -223,11 +214,7 @@ public class GroupService implements GroupUtils {
         Category category = queryGroupCategoryById(updateGroupRequest.getCategoryId());
         group.updateGroup(updateGroupRequest.toUpdateGroupDto(), category);
 
-        return new GroupResponse(
-            group.getGroupBaseInfoVo(),
-            group.getMemberInfoVOs(),
-            group.checkUserIsHost(currentUserId)
-        );
+        return getGroupResponse(group, currentUserId);
     }
 
 
@@ -252,11 +239,7 @@ public class GroupService implements GroupUtils {
         Long currentUserId = SecurityUtils.getCurrentUserId();
         Group group = queryGroup(groupId);
 
-        return new GroupResponse(
-            group.getGroupBaseInfoVo(),
-            group.getMemberInfoVOs(),
-            group.checkUserIsHost(currentUserId)
-        );
+        return getGroupResponse(group, currentUserId);
     }
 
 
@@ -354,11 +337,7 @@ public class GroupService implements GroupUtils {
 
         groupUsers.addMembers(findUserList ,group);
 
-        return new GroupResponse(
-            group.getGroupBaseInfoVo(),
-            group.getMemberInfoVOs(),
-            group.checkUserIsHost(currentUserId)
-        );
+        return getGroupResponse(group, currentUserId);
     }
 
     @Override
@@ -379,11 +358,8 @@ public class GroupService implements GroupUtils {
         }
 
         groupUsers.removeUserByUserId(currentUserId);
-        return new GroupResponse(
-            group.getGroupBaseInfoVo(),
-            group.getMemberInfoVOs(),
-            group.checkUserIsHost(currentUserId)
-        );
+
+        return getGroupResponse(group, currentUserId);
     }
 
     public GroupInviteLinkResponse createGroupInviteLink(Long groupId) {
@@ -426,11 +402,7 @@ public class GroupService implements GroupUtils {
 
         groupUsers.addMember(currentUser, group);
 
-        return new GroupResponse(
-            group.getGroupBaseInfoVo(),
-            group.getMemberInfoVOs(),
-            group.checkUserIsHost(currentUserId)
-        );
+        return getGroupResponse(group, currentUserId);
     }
 
     public GroupResponse deleteMemberFromGroup(Long groupId, Long userId) {
@@ -445,6 +417,10 @@ public class GroupService implements GroupUtils {
         // 방장의 권한으로 내쫓을때
         groupUsers.removeUserByUserId(userId);
 
+        return getGroupResponse(group, currentUserId);
+    }
+
+    private GroupResponse getGroupResponse(Group group, Long currentUserId) {
         return new GroupResponse(
             group.getGroupBaseInfoVo(),
             group.getMemberInfoVOs(),
