@@ -53,19 +53,23 @@ public class NotificationService {
 
     @Transactional(readOnly = true)
     public QueryNotificationListResponse queryListByGroupId(Pageable pageable, Long groupId) {
-        Slice<Notification> alarmHistory = notificationRepository.findAllByGroupId(groupId,
-            pageable);
+        Slice<Notification> alarmHistory = notificationRepository.findAllByGroupId(groupId, pageable);
+
+        Slice<NotificationReaction> notificationReactions = notificationReactionRepository.findByUserIdAndNotificationIn(
+            SecurityUtils.getCurrentUserId(), alarmHistory.getContent()
+        );
 
         Slice<QueryAlarmHistoryResponseElement> result = alarmHistory
             .map(notification -> {
                     List<NotificationReactionCountInfoVo> notificationReactionCountInfos
                         = notificationReactionRepository.findAllCountByNotification(notification);
-                    Optional<NotificationReaction> myNotificationReaction = notificationReactionRepository.findByUserIdAndNotification(
-                        SecurityUtils.getCurrentUserId(), notification);
+
+                    Optional<NotificationReaction> myNotificationReaction = notificationReactions.stream()
+                        .filter(notificationReaction -> notification.equals(notificationReaction.getNotification()))
+                        .findAny();
 
                     NotificationReactionInfoVo notificationReactionInfoVo = NotificationReactionInfoVo.builder()
-                        .myReactionId(myNotificationReaction.isPresent() ? myNotificationReaction.get()
-                            .getReaction().getId() : null)
+                        .myReactionId(myNotificationReaction.isPresent() ? myNotificationReaction.get().getReaction().getId() : null)
                         .reactionCountInfos(notificationReactionCountInfos)
                         .build();
 
