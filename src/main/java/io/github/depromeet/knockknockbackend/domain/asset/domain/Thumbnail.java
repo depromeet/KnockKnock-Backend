@@ -16,4 +16,6 @@ public class Thumbnail {
     private Long id;
 
     private String thumbnailImageUrl;
+
+    private Long rank;
 }
