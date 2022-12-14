@@ -99,12 +99,10 @@ public class GroupService {
      */
     public CreateGroupResponse createOpenGroup(CreateOpenGroupRequest createOpenGroupRequest) {
         // 요청자 정보 시큐리티에서 가져옴
-        User reqUser = userUtils.getUserFromSecurityContext();
+        User currentUser = userUtils.getUserFromSecurityContext();
 
         List<Long> memberIds = createOpenGroupRequest.getMemberIds();
-        if(!memberIds.contains(reqUser.getId())){
-            memberIds.add(reqUser.getId());
-        }
+        addHostUserIdIfNotExist(currentUser.getId(), memberIds);
         //요청받은 id 목록들로 디비에서 조회
         List<User> findUserList = userUtils.findByIdIn(memberIds);
 
@@ -114,7 +112,7 @@ public class GroupService {
         Group group = makeOpenGroup(createOpenGroupRequest);
         groupRepository.save(group);
         // 그룹 유저 리스트 추가
-        GroupUsers groupUsers = GroupUsers.createGroupUsers(reqUser, findUserList, group);
+        GroupUsers groupUsers = GroupUsers.createGroupUsers(currentUser, findUserList, group);
         groupUserRepository.saveAll(groupUsers.getGroupUserList());
 
         return new CreateGroupResponse(
@@ -128,20 +126,18 @@ public class GroupService {
      * @return CreateGroupResponse
      */
     public CreateGroupResponse createFriendGroup(CreateFriendGroupRequest createFriendGroupRequest) {
-        User reqUser = userUtils.getUserFromSecurityContext();
+        User currentUser = userUtils.getUserFromSecurityContext();
 
         //TODO : 요청 받은 memeberId가 친구 목록에 속해있는지 검증.
         List<Long> memberIds = createFriendGroupRequest.getMemberIds();
-        if(!memberIds.contains(reqUser.getId())){
-            memberIds.add(reqUser.getId());
-        }
+        addHostUserIdIfNotExist(currentUser.getId(), memberIds);
         //요청받은 id 목록들로 디비에서 조회
         List<User> requestUserList = userUtils.findByIdIn(memberIds);
         // 그룹 만들기
-        Group group = makeFriendGroup(reqUser.getNickname(), memberIds.size());
+        Group group = makeFriendGroup(currentUser.getNickname(), memberIds.size());
         groupRepository.save(group);
         // 그룹 유저 리스트만들기
-        GroupUsers groupUsers = GroupUsers.createGroupUsers(reqUser, requestUserList, group);
+        GroupUsers groupUsers = GroupUsers.createGroupUsers(currentUser, requestUserList, group);
 
         groupUserRepository.saveAll(groupUsers.getGroupUserList());
 
@@ -150,6 +146,12 @@ public class GroupService {
             group.getGroupBaseInfoVo() ,
             groupUsers.getUserInfoVoList()
             ,true);
+    }
+
+    private static void addHostUserIdIfNotExist(Long UserId, List<Long> memberIds) {
+        if(!memberIds.contains(UserId)){
+            memberIds.add(UserId);
+        }
     }
 
     /**
