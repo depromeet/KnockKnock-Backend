@@ -5,6 +5,7 @@ import io.github.depromeet.knockknockbackend.domain.group.domain.vo.GroupBaseInf
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.UpdateGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.service.dto.UpdateGroupDto;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.Notification;
+import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.global.database.BaseTimeEntity;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +20,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
@@ -57,9 +59,13 @@ public class Group extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "group")
     private List<Notification> notifications = new ArrayList<>();
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "host_id")
+    User host;
     @Builder
     public Group(Long id, String title, String description, String thumbnailPath, String backgroundImagePath,
-        Boolean publicAccess , Category category ,GroupType groupType) {
+        Boolean publicAccess , Category category ,GroupType groupType ,User host) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -68,6 +74,7 @@ public class Group extends BaseTimeEntity {
         this.publicAccess = publicAccess;
         this.category = category;
         this.groupType = groupType;
+        this.host = host;
     }
 
     public static String generateGroupTitle(String reqUserName, Integer memberCount){
