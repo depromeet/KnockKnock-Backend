@@ -2,6 +2,8 @@ package io.github.depromeet.knockknockbackend.domain.group.domain;
 
 
 import io.github.depromeet.knockknockbackend.domain.group.domain.vo.GroupBaseInfoVo;
+import io.github.depromeet.knockknockbackend.domain.group.exception.AlreadyGroupEnterException;
+import io.github.depromeet.knockknockbackend.domain.group.exception.NotHostException;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.UpdateGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.service.dto.UpdateGroupDto;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.Notification;
@@ -93,7 +95,9 @@ public class Group extends BaseTimeEntity {
             .publicAccess(publicAccess)
             .category(category)
             .groupType(groupType)
-            .groupId(id).build();
+            .groupId(id)
+            .hostInfoVO(host.getUserInfo())
+            .build();
     }
 
     public void updateGroup(UpdateGroupDto updateGroupDto,Category category) {
@@ -113,5 +117,22 @@ public class Group extends BaseTimeEntity {
         return Group.builder()
             .id(id)
             .build();
+    }
+
+    public void validUserIsHost(Long userId){
+        if(!checkUserIsHost(userId)){
+            throw NotHostException.EXCEPTION;
+        }
+    }
+    public Boolean checkUserIsHost(Long userId){
+        return host.getId().equals(userId);
+    }
+
+    public void validUserIsAlreadyEnterGroup(Long userId){
+        groupUsers.validUserIsAlreadyEnterGroup(userId);
+    }
+
+    public boolean checkUserIsAlreadyEnterGroup(Long userId) {
+        return groupUsers.checkUserIsAlreadyEnterGroup(userId);
     }
 }
