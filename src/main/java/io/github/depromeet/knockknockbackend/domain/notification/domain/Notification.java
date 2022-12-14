@@ -1,21 +1,12 @@
 package io.github.depromeet.knockknockbackend.domain.notification.domain;
 
-import static java.util.stream.Collectors.counting;
-import static java.util.stream.Collectors.groupingBy;
 import io.github.depromeet.knockknockbackend.domain.group.domain.Group;
-import io.github.depromeet.knockknockbackend.domain.notification.domain.vo.NotificationBaseInfoVo;
-import io.github.depromeet.knockknockbackend.domain.notification.domain.vo.NotificationReactionInfoVo;
-import io.github.depromeet.knockknockbackend.domain.notification.domain.vo.NotificationReactionCountInfoVo;
 import io.github.depromeet.knockknockbackend.domain.reaction.domain.NotificationReaction;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.global.database.BaseTimeEntity;
 import java.time.LocalDateTime;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -85,52 +76,6 @@ public class Notification extends BaseTimeEntity {
             .sendUser(sendUser)
             .sendAt(sendAt)
             .build();
-    }
-
-    public NotificationBaseInfoVo getNotificationBaseInfoVo(Long userId) {
-        return NotificationBaseInfoVo.builder()
-            .notificationId(id)
-            .title(title)
-            .content(content)
-            .imageUrl(imageUrl)
-            .sendAt(sendAt)
-            .sendUserId(sendUser.getId())
-            .notificationReactionInfoVo(getNotificationReactionCountInfoVo(userId))
-            .build();
-    }
-
-    private NotificationReactionInfoVo getNotificationReactionCountInfoVo(Long userId) {
-        return NotificationReactionInfoVo.builder()
-            .myReactionId(getMyReactionId(userId))
-            .reactionCountInfos(getNotificationReactionCountInfoVo())
-            .build();
-    }
-
-    private List<NotificationReactionCountInfoVo> getNotificationReactionCountInfoVo() {
-        Map<Long, Long> countPerReactions = notificationReactions.stream()
-            .collect(
-                groupingBy(notificationReaction ->
-                    notificationReaction.getReaction().getId(), counting())
-            );
-
-        return countPerReactions.entrySet().stream()
-            .map(countOfReactionId ->
-                NotificationReactionCountInfoVo.builder()
-                    .reactionId(countOfReactionId.getKey())
-                    .reactionCount(countOfReactionId.getValue().intValue())
-                    .build()
-            ).collect(Collectors.toList());
-    }
-
-    private Long getMyReactionId(Long userId) {
-        Optional<NotificationReaction> result = notificationReactions.stream()
-            .filter(notificationReaction -> userId.equals(notificationReaction.getUser().getId()))
-            .findAny();
-
-        if(result.isPresent()){
-            return result.get().getReaction().getId();
-        }
-        return null;
     }
 
 }
