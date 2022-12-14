@@ -1,10 +1,12 @@
 package io.github.depromeet.knockknockbackend.domain.user.presentation;
 
 import io.github.depromeet.knockknockbackend.domain.user.presentation.dto.request.ChangeNicknameRequest;
+import io.github.depromeet.knockknockbackend.domain.user.presentation.dto.request.ChangeProfileRequest;
 import io.github.depromeet.knockknockbackend.domain.user.presentation.dto.response.QueryUserByNicknameResponse;
+import io.github.depromeet.knockknockbackend.domain.user.presentation.dto.response.UserProfileResponse;
 import io.github.depromeet.knockknockbackend.domain.user.service.UserService;
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -22,6 +24,7 @@ import javax.validation.Valid;
 @SecurityRequirement(name = "access-token")
 @RequiredArgsConstructor
 @RequestMapping("/users")
+@SecurityRequirement(name = "access-token")
 @RestController
 public class UserController {
 
@@ -38,6 +41,16 @@ public class UserController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void changeNickname(@RequestBody @Valid ChangeNicknameRequest request) {
         userService.changeNickname(request.getNickname());
+    }
+
+    @PutMapping("/profile")
+    public UserProfileResponse changeProfile(@RequestBody @Valid ChangeProfileRequest changeProfileRequest) {
+       return userService.changeProfile(changeProfileRequest);
+    }
+
+    @GetMapping("/profile")
+    public UserProfileResponse getProfile() {
+        return userService.getProfile();
     }
 
 }
