@@ -33,15 +33,10 @@ public class GroupUsers {
     public static GroupUsers createGroupUsers(User host , List<User>  requestUserList , Group group){
         List<GroupUser> requestGroupUserList = requestUserList.stream()
             .map(user -> GroupUser.builder()
-                .isHost(false)
+                .isHost(user.getId().equals(host.getId()))
                 .user(user)
                 .group(group).build())
             .collect(Collectors.toList());
-        GroupUser hostMember = GroupUser.builder()
-            .isHost(true)
-            .user(host)
-            .group(group).build();
-        requestGroupUserList.add(hostMember);
         return new GroupUsers(requestGroupUserList);
     }
 
@@ -50,17 +45,17 @@ public class GroupUsers {
             .collect(Collectors.toList());
     }
 
-    public void validReqUserIsGroupHost(User reqUser) {
+    public void validUserIsGroupHost(Long userId) {
         groupUserList.stream()
-            .filter(groupUser -> groupUser.getUser().equals(reqUser) && groupUser.getIsHost())
+            .filter(groupUser -> groupUser.getUserId().equals(userId) && groupUser.getIsHost())
             .findFirst()
             .orElseThrow(() -> NotHostException.EXCEPTION);
     }
 
-    public Boolean checkReqUserGroupHost(User reqUser) {
+    public Boolean checkUserGroupHost(Long userId) {
         return groupUserList.stream()
             .anyMatch(groupUser ->
-                groupUser.getIsHost() && groupUser.getUser().getId().equals(reqUser.getId()));
+                groupUser.getIsHost() && groupUser.getUserId().equals(userId));
 
     }
 
@@ -74,15 +69,15 @@ public class GroupUsers {
     }
 
 
-    public void validUserIsAlreadyEnterGroup(User reqUser){
-        if(checkUserIsAlreadyEnterGroup(reqUser))
+    public void validUserIsAlreadyEnterGroup(Long userId){
+        if(checkUserIsAlreadyEnterGroup(userId))
             throw AlreadyGroupEnterException.EXCEPTION;
     }
 
-    public boolean checkUserIsAlreadyEnterGroup(User reqUser) {
+    public boolean checkUserIsAlreadyEnterGroup(Long userId) {
         return groupUserList.stream()
             .anyMatch(groupUser ->
-                groupUser.getUser().getId().equals(reqUser.getId()));
+                groupUser.getUser().getId().equals(userId));
     }
 
 

@@ -70,9 +70,11 @@ public class Group extends BaseTimeEntity {
         this.groupType = groupType;
     }
 
-    public static String generateGroupTitle(){
-        // TODO : 방이름 자동 설정 로직 정책에 따르기
-        return "방이름";
+    public static String generateGroupTitle(String reqUserName, Integer memberCount){
+        if(memberCount <= 1){
+            return reqUserName + "님의 방";
+        }
+        return reqUserName + "님 외 " + (memberCount - 1) + "명";
     }
 
     public GroupBaseInfoVo getGroupBaseInfoVo(){

@@ -1,6 +1,7 @@
-package io.github.depromeet.knockknockbackend.domain.group.domain;
+package io.github.depromeet.knockknockbackend.domain.admission.domain;
 
 
+import io.github.depromeet.knockknockbackend.domain.group.domain.Group;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.global.database.BaseTimeEntity;
 import javax.persistence.Entity;
