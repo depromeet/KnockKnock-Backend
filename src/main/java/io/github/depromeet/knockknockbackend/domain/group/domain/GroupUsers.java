@@ -50,17 +50,17 @@ public class GroupUsers {
             .collect(Collectors.toList());
     }
 
-    public void validReqUserIsGroupHost(Long reqUserId) {
+    public void validUserIsGroupHost(Long userId) {
         groupUserList.stream()
-            .filter(groupUser -> groupUser.getUserId().equals(reqUserId) && groupUser.getIsHost())
+            .filter(groupUser -> groupUser.getUserId().equals(userId) && groupUser.getIsHost())
             .findFirst()
             .orElseThrow(() -> NotHostException.EXCEPTION);
     }
 
-    public Boolean checkReqUserGroupHost(Long reqUserId) {
+    public Boolean checkUserGroupHost(Long userId) {
         return groupUserList.stream()
             .anyMatch(groupUser ->
-                groupUser.getIsHost() && groupUser.getUserId().equals(reqUserId));
+                groupUser.getIsHost() && groupUser.getUserId().equals(userId));
 
     }
 
@@ -74,15 +74,15 @@ public class GroupUsers {
     }
 
 
-    public void validUserIsAlreadyEnterGroup(Long reqUserId){
-        if(checkUserIsAlreadyEnterGroup(reqUserId))
+    public void validUserIsAlreadyEnterGroup(Long userId){
+        if(checkUserIsAlreadyEnterGroup(userId))
             throw AlreadyGroupEnterException.EXCEPTION;
     }
 
-    public boolean checkUserIsAlreadyEnterGroup(Long reqUserId) {
+    public boolean checkUserIsAlreadyEnterGroup(Long userId) {
         return groupUserList.stream()
             .anyMatch(groupUser ->
-                groupUser.getUser().getId().equals(reqUserId));
+                groupUser.getUser().getId().equals(userId));
     }
 
 
