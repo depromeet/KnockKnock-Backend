@@ -4,7 +4,6 @@ package io.github.depromeet.knockknockbackend.domain.group.domain;
 import io.github.depromeet.knockknockbackend.domain.group.domain.vo.GroupBaseInfoVo;
 import io.github.depromeet.knockknockbackend.domain.group.exception.AlreadyGroupEnterException;
 import io.github.depromeet.knockknockbackend.domain.group.exception.NotHostException;
-import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.UpdateGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.service.dto.UpdateGroupDto;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.Notification;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
@@ -14,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.persistence.CascadeType;
-import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -30,7 +28,6 @@ import javax.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.lang.Nullable;
 
 @Getter
 @Table(name = "tbl_group")
