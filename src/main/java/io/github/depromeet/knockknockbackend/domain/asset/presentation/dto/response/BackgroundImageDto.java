@@ -1,7 +1,7 @@
 package io.github.depromeet.knockknockbackend.domain.asset.presentation.dto.response;
 
 
-import io.github.depromeet.knockknockbackend.domain.group.domain.BackgroundImage;
+import io.github.depromeet.knockknockbackend.domain.asset.domain.BackgroundImage;
 import lombok.Getter;
 
 @Getter

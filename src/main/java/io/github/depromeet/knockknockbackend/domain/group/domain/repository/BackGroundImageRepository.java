@@ -1,7 +1,6 @@
 package io.github.depromeet.knockknockbackend.domain.group.domain.repository;
 
-import io.github.depromeet.knockknockbackend.domain.group.domain.BackgroundImage;
-import io.github.depromeet.knockknockbackend.domain.group.domain.Category;
+import io.github.depromeet.knockknockbackend.domain.asset.domain.BackgroundImage;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

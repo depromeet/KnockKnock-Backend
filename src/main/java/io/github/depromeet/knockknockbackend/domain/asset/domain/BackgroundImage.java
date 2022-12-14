@@ -1,4 +1,4 @@
-package io.github.depromeet.knockknockbackend.domain.group.domain;
+package io.github.depromeet.knockknockbackend.domain.asset.domain;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

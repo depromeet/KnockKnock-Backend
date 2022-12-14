@@ -1,11 +1,11 @@
 package io.github.depromeet.knockknockbackend.domain.asset.service;
 
-import io.github.depromeet.knockknockbackend.domain.group.domain.BackgroundImage;
-import io.github.depromeet.knockknockbackend.domain.group.domain.Thumbnail;
+import io.github.depromeet.knockknockbackend.domain.asset.domain.BackgroundImage;
+import io.github.depromeet.knockknockbackend.domain.asset.domain.Thumbnail;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.BackGroundImageRepository;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.ThumbnailRepository;
-import io.github.depromeet.knockknockbackend.domain.group.exception.BackgroundImageNotFoundException;
-import io.github.depromeet.knockknockbackend.domain.group.exception.ThumbNailImageNotFoundException;
+import io.github.depromeet.knockknockbackend.domain.asset.exception.BackgroundImageNotFoundException;
+import io.github.depromeet.knockknockbackend.domain.asset.exception.ThumbNailImageNotFoundException;
 import io.github.depromeet.knockknockbackend.domain.asset.presentation.dto.response.BackgroundImageDto;
 import io.github.depromeet.knockknockbackend.domain.asset.presentation.dto.response.BackgroundListResponse;
 import io.github.depromeet.knockknockbackend.domain.asset.presentation.dto.response.ThumbnailImageDto;
