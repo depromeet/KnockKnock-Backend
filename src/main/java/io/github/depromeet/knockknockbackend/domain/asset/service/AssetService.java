@@ -2,14 +2,15 @@ package io.github.depromeet.knockknockbackend.domain.asset.service;
 
 import io.github.depromeet.knockknockbackend.domain.asset.domain.BackgroundImage;
 import io.github.depromeet.knockknockbackend.domain.asset.domain.Thumbnail;
+import io.github.depromeet.knockknockbackend.domain.asset.presentation.dto.response.ProfileImagesResponse;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.BackGroundImageRepository;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.ThumbnailRepository;
 import io.github.depromeet.knockknockbackend.domain.asset.exception.BackgroundImageNotFoundException;
 import io.github.depromeet.knockknockbackend.domain.asset.exception.ThumbNailImageNotFoundException;
 import io.github.depromeet.knockknockbackend.domain.asset.presentation.dto.response.BackgroundImageDto;
-import io.github.depromeet.knockknockbackend.domain.asset.presentation.dto.response.BackgroundListResponse;
+import io.github.depromeet.knockknockbackend.domain.asset.presentation.dto.response.BackgroundsResponse;
 import io.github.depromeet.knockknockbackend.domain.asset.presentation.dto.response.ThumbnailImageDto;
-import io.github.depromeet.knockknockbackend.domain.asset.presentation.dto.response.ThumbnailListResponse;
+import io.github.depromeet.knockknockbackend.domain.asset.presentation.dto.response.ThumbnailsResponse;
 import io.github.depromeet.knockknockbackend.domain.group.service.AssetUtils;
 import java.util.List;
 import java.util.Optional;
@@ -31,12 +32,12 @@ public class AssetService implements AssetUtils {
         return backgroundImage.getBackgroundImageUrl();
     }
 
-    public BackgroundListResponse getAllBackgroundImage(){
+    public BackgroundsResponse getAllBackgroundImage(){
         List<BackgroundImageDto> backgroundImageDtos = backGroundImageRepository.findAll()
             .stream()
             .map(BackgroundImageDto::new)
             .collect(Collectors.toList());
-        return new BackgroundListResponse(backgroundImageDtos);
+        return new BackgroundsResponse(backgroundImageDtos);
     }
 
     public String getRandomThumbnailUrl() {
@@ -46,11 +47,14 @@ public class AssetService implements AssetUtils {
         return thumbnail.getThumbnailImageUrl();
     }
 
-    public ThumbnailListResponse getAllThumbnailImage(){
+    public ThumbnailsResponse getAllThumbnailImage(){
         List<ThumbnailImageDto> thumbnailImageDtos = thumbnailRepository.findAll()
             .stream()
             .map(ThumbnailImageDto::new)
             .collect(Collectors.toList());
-        return new ThumbnailListResponse(thumbnailImageDtos);
+        return new ThumbnailsResponse(thumbnailImageDtos);
+    }
+
+    public ProfileImagesResponse getAllProfileImages() {
     }
 }

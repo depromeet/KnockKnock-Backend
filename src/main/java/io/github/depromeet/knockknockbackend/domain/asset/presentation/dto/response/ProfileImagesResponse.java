@@ -7,7 +7,6 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class BackgroundListResponse {
-    List<BackgroundImageDto> backgrounds ;
-
+public class ProfileImagesResponse {
+    List<ProfileImageDto> profiles;
 }
