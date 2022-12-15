@@ -35,7 +35,7 @@ public class StorageService {
 
     @Transactional
     public void deleteNotificationFromStorage(Long storageId) {
-        Storage storage = validateStorageId(storageId);
+        Storage storage = queryStorageById(storageId);
         if (!SecurityUtils.getCurrentUserId().equals(storage.getUser().getId())) {
             throw StorageForbiddenException.EXCEPTION;
         }
@@ -53,7 +53,7 @@ public class StorageService {
         }
     }
 
-    private Storage validateStorageId(Long storageId) {
+    private Storage queryStorageById(Long storageId) {
         return storageRepository.findById(storageId)
             .orElseThrow(() -> StorageNotFoundException.EXCEPTION);
     }
