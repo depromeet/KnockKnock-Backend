@@ -46,7 +46,10 @@ public enum ErrorCode {
 
     NOTIFICATION_FORBIDDEN(HttpStatus.FORBIDDEN.value(), "NOTIFICATION-403-1", "The user has no access to the notification"),
     NOTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "NOTIFICATION-404-1", "Notification Not Found"),
-    NOTIFICATION_FCM_FAIL_SEND(HttpStatus.INTERNAL_SERVER_ERROR.value(), "NOTIFICATION-500-1", "FCM ERROR");
+    NOTIFICATION_FCM_FAIL_SEND(HttpStatus.INTERNAL_SERVER_ERROR.value(), "NOTIFICATION-500-1", "FCM ERROR"),
+
+    STORAGE_FORBIDDEN(HttpStatus.FORBIDDEN.value(), "STORAGE-403-1", "The user has no access to the storage"),
+    STORAGE_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "STORAGE-404-1", "Storage Not Found");
 
     private int status;
     private String code;
