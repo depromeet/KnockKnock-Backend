@@ -5,6 +5,7 @@ import io.github.depromeet.knockknockbackend.domain.group.domain.vo.GroupBaseInf
 import io.github.depromeet.knockknockbackend.domain.group.exception.AlreadyGroupEnterException;
 import io.github.depromeet.knockknockbackend.domain.group.exception.HostCanNotLeaveGroupException;
 import io.github.depromeet.knockknockbackend.domain.group.exception.NotHostException;
+import io.github.depromeet.knockknockbackend.domain.group.exception.NotMemberException;
 import io.github.depromeet.knockknockbackend.domain.group.service.dto.UpdateGroupDto;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.Notification;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
@@ -64,8 +65,9 @@ public class Group extends BaseTimeEntity {
     @OneToMany(mappedBy = "group")
     private List<Notification> notifications = new ArrayList<>();
 
-    @Embedded
-    private Host host;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "host_id")
+    private User host;
     @Builder
     public Group(Long id, String title, String description, String thumbnailPath, String backgroundImagePath,
         Boolean publicAccess , Category category ,GroupType groupType ,User host) {
@@ -77,7 +79,7 @@ public class Group extends BaseTimeEntity {
         this.publicAccess = publicAccess;
         this.category = category;
         this.groupType = groupType;
-        this.host = Host.from(host);
+        this.host = host;
         this.groupUsers.add(new GroupUser(this,host));
     }
 
@@ -131,11 +133,17 @@ public class Group extends BaseTimeEntity {
     }
 
     public void validUserIsAlreadyEnterGroup(Long userId){
-        if(checkUserIsAlreadyEnterGroup(userId))
+        if(checkUserIsMemberOfGroup(userId))
             throw AlreadyGroupEnterException.EXCEPTION;
     }
 
-    public boolean checkUserIsAlreadyEnterGroup(Long userId) {
+    public void validUserIsMemberOfGroup(Long userId){
+        if(!checkUserIsMemberOfGroup(userId)){
+            throw NotMemberException.EXCEPTION;
+        }
+    }
+
+    public boolean checkUserIsMemberOfGroup(Long userId) {
         return groupUsers.stream()
             .anyMatch(groupUser ->
                 groupUser.getUserId().equals(userId));
@@ -147,8 +155,8 @@ public class Group extends BaseTimeEntity {
             .collect(Collectors.toList());
     }
 
-    public void addMembers(List<User> newMembers){
-        newMembers.forEach(this::addMember);
+    public void addMembers(Long reqUserId, List<User> newMembers){
+        newMembers.forEach(user -> addMember(reqUserId,user));
     }
 
     public void removeMemberByUserId(Long userId){
@@ -158,10 +166,16 @@ public class Group extends BaseTimeEntity {
         groupUsers.removeIf(groupUser -> groupUser.getUserId().equals(userId));
     }
 
-    public void addMember(User reqUser) {
-        validUserIsAlreadyEnterGroup(reqUser.getId());
-        GroupUser groupUser = new GroupUser(this, reqUser);
+    public void addMember(Long reqUserId, User newUser) {
+        validUserIsAlreadyEnterGroup(newUser.getId());
+        validUserIsMemberOfGroup(reqUserId);
+        GroupUser groupUser = new GroupUser(this, newUser);
         groupUsers.add(groupUser);
+    }
+
+    public void acceptMember(Long reqUserId ,User newUser){
+        validUserIsHost(reqUserId);
+        addMember(reqUserId,newUser);
     }
 
 
