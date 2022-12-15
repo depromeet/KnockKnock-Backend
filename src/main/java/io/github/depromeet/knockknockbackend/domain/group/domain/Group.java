@@ -3,6 +3,7 @@ package io.github.depromeet.knockknockbackend.domain.group.domain;
 
 import io.github.depromeet.knockknockbackend.domain.group.domain.vo.GroupBaseInfoVo;
 import io.github.depromeet.knockknockbackend.domain.group.exception.AlreadyGroupEnterException;
+import io.github.depromeet.knockknockbackend.domain.group.exception.HostCanNotLeaveGroupException;
 import io.github.depromeet.knockknockbackend.domain.group.exception.NotHostException;
 import io.github.depromeet.knockknockbackend.domain.group.service.dto.UpdateGroupDto;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.Notification;
@@ -153,7 +154,10 @@ public class Group extends BaseTimeEntity {
         groupUsers.addAll(newGroupUsers);
     }
 
-    public void removeUserByUserId(Long userId){
+    public void removeMemberByUserId(Long userId){
+        if(checkUserIsHost(userId)) {
+            throw HostCanNotLeaveGroupException.EXCEPTION;
+        }
         groupUsers.removeIf(groupUser -> groupUser.getUserId().equals(userId));
     }
 

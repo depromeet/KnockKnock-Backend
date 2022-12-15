@@ -348,11 +348,8 @@ public class GroupService implements GroupUtils {
         Long currentUserId = SecurityUtils.getCurrentUserId();
 
         Group group = queryGroup(groupId);
-        if(group.checkUserIsHost(currentUserId)) {
-            throw HostCanNotLeaveGroupException.EXCEPTION;
-        }
 
-        group.removeUserByUserId(currentUserId);
+        group.removeMemberByUserId(currentUserId);
 
         return getGroupResponse(group, currentUserId);
     }
@@ -404,11 +401,8 @@ public class GroupService implements GroupUtils {
         Group group = queryGroup(groupId);
         group.validUserIsHost(currentUserId);
 
-        if(currentUserId.equals(userId))
-            throw HostCanNotLeaveGroupException.EXCEPTION;
-
         // 방장의 권한으로 내쫓을때
-        group.removeUserByUserId(userId);
+        group.removeMemberByUserId(userId);
 
         return getGroupResponse(group, currentUserId);
     }
