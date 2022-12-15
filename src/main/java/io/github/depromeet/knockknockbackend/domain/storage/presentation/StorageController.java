@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,6 +27,13 @@ public class StorageController {
     @PostMapping("/{notification_id}")
     public void saveNotificationToStorage(@PathVariable("notification_id") Long notificationId) {
         storageService.saveNotificationToStorage(notificationId);
+    }
+
+    @Operation(summary = "보관함에 저장한 푸쉬알림 삭제")
+    @ResponseStatus(HttpStatus.OK)
+    @DeleteMapping("/{storage_id}")
+    public void deleteNotificationFromStorage(@PathVariable("storage_id") Long storageId) {
+        storageService.deleteNotificationFromStorage(storageId);
     }
 
 }

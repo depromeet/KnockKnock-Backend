@@ -7,11 +7,14 @@ import io.github.depromeet.knockknockbackend.domain.notification.domain.reposito
 import io.github.depromeet.knockknockbackend.domain.notification.exception.NotificationForbiddenException;
 import io.github.depromeet.knockknockbackend.domain.notification.exception.NotificationNotFoundException;
 import io.github.depromeet.knockknockbackend.domain.storage.domain.Storage;
-import io.github.depromeet.knockknockbackend.domain.storage.repository.StorageRepository;
+import io.github.depromeet.knockknockbackend.domain.storage.exception.StorageForbiddenException;
+import io.github.depromeet.knockknockbackend.domain.storage.domain.repository.StorageRepository;
+import io.github.depromeet.knockknockbackend.domain.storage.exception.StorageNotFoundException;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.global.utils.security.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -30,6 +33,15 @@ public class StorageService {
         );
     }
 
+    @Transactional
+    public void deleteNotificationFromStorage(Long storageId) {
+        Storage storage = validateStorageId(storageId);
+        if (!SecurityUtils.getCurrentUserId().equals(storage.getUser().getId())) {
+            throw StorageForbiddenException.EXCEPTION;
+        }
+        storageRepository.delete(storage);
+    }
+
     private void validateAccessibleNotificationId(Long notificationId) {
         Notification notification = notificationRepository.findById(notificationId)
             .orElseThrow(() -> NotificationNotFoundException.EXCEPTION);
@@ -40,4 +52,10 @@ public class StorageService {
                 .orElseThrow(() -> NotificationForbiddenException.EXCEPTION);
         }
     }
+
+    private Storage validateStorageId(Long storageId) {
+        return storageRepository.findById(storageId)
+            .orElseThrow(() -> StorageNotFoundException.EXCEPTION);
+    }
+
 }
