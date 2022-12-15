@@ -420,4 +420,7 @@ public class GroupService implements GroupUtils {
             group.checkUserIsHost(currentUserId)
         );
     }
+
+    public GroupResponse getFamousGroup() {
+    }
 }

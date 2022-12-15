@@ -219,4 +219,10 @@ public class GroupController {
         return groupService.checkGroupInviteLink(groupId,code);
     }
 
+    @Operation(summary = "요즘 뜨고있는 알림방")
+    @PostMapping("/famous")
+    public GroupResponse getFamousGroup(){
+        return groupService.getFamousGroup();
+    }
+
 }
