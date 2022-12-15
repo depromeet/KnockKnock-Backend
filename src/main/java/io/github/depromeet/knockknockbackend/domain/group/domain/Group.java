@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.persistence.CascadeType;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -63,9 +64,8 @@ public class Group extends BaseTimeEntity {
     @OneToMany(mappedBy = "group")
     private List<Notification> notifications = new ArrayList<>();
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "host_id")
-    User host;
+    @Embedded
+    private Host host;
     @Builder
     public Group(Long id, String title, String description, String thumbnailPath, String backgroundImagePath,
         Boolean publicAccess , Category category ,GroupType groupType ,User host) {
@@ -77,7 +77,7 @@ public class Group extends BaseTimeEntity {
         this.publicAccess = publicAccess;
         this.category = category;
         this.groupType = groupType;
-        this.host = host;
+        this.host = Host.from(host);
         this.groupUsers.add(new GroupUser(this,host));
     }
 
