@@ -155,8 +155,8 @@ public class Group extends BaseTimeEntity {
             .collect(Collectors.toList());
     }
 
-    public void addMembers(Long reqUserId, List<User> newMembers){
-        newMembers.forEach(user -> addMember(reqUserId,user));
+    public void memberInviteNewUsers(Long reqUserId, List<User> newMembers){
+        newMembers.forEach(user -> memberInviteNewUser(reqUserId, user));
     }
 
     public void removeMemberByUserId(Long userId){
@@ -166,16 +166,24 @@ public class Group extends BaseTimeEntity {
         groupUsers.removeIf(groupUser -> groupUser.getUserId().equals(userId));
     }
 
-    public void addMember(Long reqUserId, User newUser) {
-        validUserIsAlreadyEnterGroup(newUser.getId());
+    public void memberInviteNewUser(Long reqUserId, User newUser) {
         validUserIsMemberOfGroup(reqUserId);
+        addMember(newUser);
+    }
+
+    private void addMember(User newUser) {
+        validUserIsAlreadyEnterGroup(newUser.getId());
         GroupUser groupUser = new GroupUser(this, newUser);
         groupUsers.add(groupUser);
     }
 
-    public void acceptMember(Long reqUserId ,User newUser){
+    public void hostAcceptMember(Long reqUserId ,User newUser){
         validUserIsHost(reqUserId);
-        addMember(reqUserId,newUser);
+        addMember(newUser);
+    }
+
+    public void enterGroup(User newUser){
+        addMember(newUser);
     }
 
 

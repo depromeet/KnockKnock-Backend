@@ -14,7 +14,6 @@ import io.github.depromeet.knockknockbackend.domain.group.domain.repository.Invi
 import io.github.depromeet.knockknockbackend.domain.group.exception.CategoryNotFoundException;
 import io.github.depromeet.knockknockbackend.domain.group.exception.GroupNotFoundException;
 import io.github.depromeet.knockknockbackend.domain.group.exception.InvalidInviteTokenException;
-import io.github.depromeet.knockknockbackend.domain.group.exception.NotMemberException;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateFriendGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateOpenGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.GroupInTypeRequest;
@@ -109,7 +108,7 @@ public class GroupService implements GroupUtils {
         Group group = makeOpenGroup(createOpenGroupRequest,currentUser);
         groupRepository.save(group);
         // 그룹 유저 리스트 추가
-        group.addMembers(members);
+        group.memberInviteNewUsers(currentUser.getId(), members);
 
         return getGroupResponse(group, currentUser.getId());
     }
@@ -128,7 +127,7 @@ public class GroupService implements GroupUtils {
         // 그룹 만들기
         Group group = makeFriendGroup(currentUser, memberIds.size());
         // 그룹 유저 리스트만들기
-        group.addMembers(members);
+        group.memberInviteNewUsers(currentUser.getId(), members);
         groupRepository.save(group);
 
 
@@ -329,14 +328,16 @@ public class GroupService implements GroupUtils {
         // 요청받은 유저 아이디 목록이 디비에 존재하는 지 확인
         validReqMemberNotExist(findUserList, requestMemberIds);
         // TODO : 친구 목록에 존재하는지 확인
-        group.addMembers(findUserList);
+        group.memberInviteNewUsers(currentUserId, findUserList);
 
         return getGroupResponse(group, currentUserId);
     }
 
     @Override
-    public void addMemberToGroup(Group group, User newUser) {
-        group.addMember(newUser);
+    public void acceptMemberToGroup(Group group, User newUser) {
+        Long currentUserId = SecurityUtils.getCurrentUserId();
+
+        group.hostAcceptMember(currentUserId,newUser);
     }
 
     public GroupResponse leaveFromGroup(Long groupId) {
@@ -354,9 +355,7 @@ public class GroupService implements GroupUtils {
         Long currentUserId = SecurityUtils.getCurrentUserId();
 
         // 요청한 유저가 멤버가 아니라면 링크 발급이 안되어야 한다.
-        if(!group.checkUserIsAlreadyEnterGroup(currentUserId)){
-            throw NotMemberException.EXCEPTION;
-        }
+        group.validUserIsMemberOfGroup(currentUserId);
 
         String token = tokenGenerator.nextString();
 
@@ -384,7 +383,7 @@ public class GroupService implements GroupUtils {
         User currentUser = userUtils.getUserFromSecurityContext();
         Long currentUserId = currentUser.getId();
 
-        group.addMember(currentUser);
+        group.enterGroup(currentUser);
 
         return getGroupResponse(group, currentUserId);
     }
