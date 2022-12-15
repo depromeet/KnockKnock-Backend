@@ -2,6 +2,7 @@ package io.github.depromeet.knockknockbackend.domain.group.domain;
 
 
 import io.github.depromeet.knockknockbackend.domain.group.domain.vo.GroupBaseInfoVo;
+import io.github.depromeet.knockknockbackend.domain.group.event.EnterGroupEvent;
 import io.github.depromeet.knockknockbackend.domain.group.exception.AlreadyGroupEnterException;
 import io.github.depromeet.knockknockbackend.domain.group.exception.HostCanNotLeaveGroupException;
 import io.github.depromeet.knockknockbackend.domain.group.exception.NotHostException;
@@ -11,12 +12,13 @@ import io.github.depromeet.knockknockbackend.domain.notification.domain.Notifica
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.domain.user.domain.vo.UserInfoVO;
 import io.github.depromeet.knockknockbackend.global.database.BaseTimeEntity;
+import io.github.depromeet.knockknockbackend.global.event.Events;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.persistence.CascadeType;
-import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
@@ -31,11 +33,13 @@ import javax.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Getter
 @Table(name = "tbl_group")
 @Entity
 @NoArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
 public class Group extends BaseTimeEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -166,9 +170,22 @@ public class Group extends BaseTimeEntity {
         groupUsers.removeIf(groupUser -> groupUser.getUserId().equals(userId));
     }
 
+    public void kickUserFromGroup(Long reqUserId, Long kickUserId){
+        validUserIsHost(reqUserId);
+        removeMemberByUserId(kickUserId);
+    }
+
     public void memberInviteNewUser(Long reqUserId, User newUser) {
         validUserIsMemberOfGroup(reqUserId);
         addMember(newUser);
+
+        EnterGroupEvent.MemberInvite memberInviteEvent = EnterGroupEvent.MemberInvite.builder()
+            .enterUserId(newUser.getId())
+            .inviterId(reqUserId)
+            .groupId(getId())
+            .build();
+
+        Events.raise(memberInviteEvent);
     }
 
     private void addMember(User newUser) {
@@ -180,10 +197,24 @@ public class Group extends BaseTimeEntity {
     public void hostAcceptMember(Long reqUserId ,User newUser){
         validUserIsHost(reqUserId);
         addMember(newUser);
+
+        EnterGroupEvent.HostAccept hostAcceptEvent = EnterGroupEvent.HostAccept.builder()
+            .groupId(getId())
+            .hostUserId(host.getId())
+            .enterUserId(newUser.getId())
+            .build();
+
+        Events.raise(hostAcceptEvent);
     }
 
     public void enterGroup(User newUser){
         addMember(newUser);
+        EnterGroupEvent.InviteLink inviteLinkEvent = EnterGroupEvent.InviteLink.builder()
+            .enterUserId(newUser.getId())
+            .groupId(getId())
+            .build();
+
+        Events.raise(inviteLinkEvent);
     }
 
 
