@@ -6,7 +6,6 @@ import io.github.depromeet.knockknockbackend.domain.group.domain.Group.GroupBuil
 import io.github.depromeet.knockknockbackend.domain.group.domain.Category;
 import io.github.depromeet.knockknockbackend.domain.group.domain.GroupType;
 import io.github.depromeet.knockknockbackend.domain.group.domain.GroupUser;
-import io.github.depromeet.knockknockbackend.domain.group.domain.GroupUsers;
 import io.github.depromeet.knockknockbackend.domain.group.domain.InviteTokenRedisEntity;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.CategoryRepository;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.GroupRepository;
@@ -17,12 +16,10 @@ import io.github.depromeet.knockknockbackend.domain.group.exception.GroupNotFoun
 import io.github.depromeet.knockknockbackend.domain.group.exception.HostCanNotLeaveGroupException;
 import io.github.depromeet.knockknockbackend.domain.group.exception.InvalidInviteTokenException;
 import io.github.depromeet.knockknockbackend.domain.group.exception.NotMemberException;
-import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.AddFriendToGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateFriendGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateOpenGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.GroupInTypeRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.UpdateGroupRequest;
-import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.CreateGroupResponse;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupBriefInfoDto;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupInviteLinkResponse;
 import io.github.depromeet.knockknockbackend.global.utils.generate.TokenGenerator;
@@ -41,7 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class GroupService {
+public class GroupService implements GroupUtils {
 
     private final GroupRepository groupRepository;
     private final GroupUserRepository groupUserRepository;
@@ -72,6 +69,7 @@ public class GroupService {
      * @param groupId 그룹 아이디
      * @return
      */
+    @Override
     public Group queryGroup(Long groupId) {
         return groupRepository.findById(groupId)
             .orElseThrow(() -> GroupNotFoundException.EXCEPTION);
@@ -97,54 +95,51 @@ public class GroupService {
      * 오픈 그룹(홀로 외침방 )을 생성합니다.
      * @return CreateGroupResponse
      */
-    public CreateGroupResponse createOpenGroup(CreateOpenGroupRequest createOpenGroupRequest) {
+    public GroupResponse createOpenGroup(CreateOpenGroupRequest createOpenGroupRequest) {
         // 요청자 정보 시큐리티에서 가져옴
-        User reqUser = userUtils.getUserFromSecurityContext();
-        // 혹시 본인 아이디 멤버로 넣었으면 지워버리기.
-        createOpenGroupRequest.getMemberIds().removeIf(id -> reqUser.getId().equals(id));
+        User currentUser = userUtils.getUserFromSecurityContext();
+
+        List<Long> memberIds = createOpenGroupRequest.getMemberIds();
+        addHostUserIdIfNotExist(currentUser.getId(), memberIds);
         //요청받은 id 목록들로 디비에서 조회
-        List<User> findUserList = userUtils.findByIdIn(createOpenGroupRequest.getMemberIds());
+        List<User> members = userUtils.findByIdIn(memberIds);
 
         // 요청받은 유저 아이디 목록이 디비에 존재하는 지 확인
-        validReqMemberNotExist(findUserList, createOpenGroupRequest.getMemberIds());
+        validReqMemberNotExist(members, createOpenGroupRequest.getMemberIds());
         // 오픈 그룹 만들기
-        Group group = makeOpenGroup(createOpenGroupRequest);
+        Group group = makeOpenGroup(createOpenGroupRequest,currentUser);
         groupRepository.save(group);
         // 그룹 유저 리스트 추가
-        GroupUsers groupUsers = GroupUsers.createGroupUsers(reqUser, findUserList, group);
-        groupUserRepository.saveAll(groupUsers.getGroupUserList());
+        group.addMembers(members);
 
-        return new CreateGroupResponse(
-            group.getGroupBaseInfoVo() ,
-            groupUsers.getUserInfoVoList()
-            ,true);
+        return getGroupResponse(group, currentUser.getId());
     }
 
     /**
      * 친구그룹을 만듭니다
      * @return CreateGroupResponse
      */
-    public CreateGroupResponse createFriendGroup(CreateFriendGroupRequest createFriendGroupRequest) {
-        User reqUser = userUtils.getUserFromSecurityContext();
+    public GroupResponse createFriendGroup(CreateFriendGroupRequest createFriendGroupRequest) {
+        User currentUser = userUtils.getUserFromSecurityContext();
 
         //TODO : 요청 받은 memeberId가 친구 목록에 속해있는지 검증.
         List<Long> memberIds = createFriendGroupRequest.getMemberIds();
-        memberIds.removeIf(id -> reqUser.getId().equals(id));
+        addHostUserIdIfNotExist(currentUser.getId(), memberIds);
         //요청받은 id 목록들로 디비에서 조회
-        List<User> requestUserList = userUtils.findByIdIn(memberIds);
+        List<User> members = userUtils.findByIdIn(memberIds);
         // 그룹 만들기
-        Group group = makeFriendGroup();
+        Group group = makeFriendGroup(currentUser, memberIds.size());
         groupRepository.save(group);
         // 그룹 유저 리스트만들기
-        GroupUsers groupUsers = GroupUsers.createGroupUsers(reqUser, requestUserList, group);
+        group.addMembers(members);
 
-        groupUserRepository.saveAll(groupUsers.getGroupUserList());
+        return getGroupResponse(group, currentUser.getId());
+    }
 
-
-        return new CreateGroupResponse(
-            group.getGroupBaseInfoVo() ,
-            groupUsers.getUserInfoVoList()
-            ,true);
+    private static void addHostUserIdIfNotExist(Long UserId, List<Long> memberIds) {
+        if(!memberIds.contains(UserId)){
+            memberIds.add(UserId);
+        }
     }
 
     /**
@@ -153,7 +148,7 @@ public class GroupService {
      * 그룹 도메인으로 옮길 예정입니다.
      * @return Group
      */
-    private Group makeOpenGroup(CreateOpenGroupRequest createOpenGroupRequest) {
+    private Group makeOpenGroup(CreateOpenGroupRequest createOpenGroupRequest, User host) {
         GroupBuilder groupBuilder = Group.builder()
             .publicAccess(createOpenGroupRequest.getPublicAccess())
             .thumbnailPath(
@@ -168,7 +163,8 @@ public class GroupService {
             )
             .description(createOpenGroupRequest.getDescription())
             .title(createOpenGroupRequest.getTitle())
-            .groupType(GroupType.OPEN);
+            .groupType(GroupType.OPEN)
+            .host(host);
 
         Category category = queryGroupCategoryById(
             createOpenGroupRequest.getCategoryId());
@@ -185,11 +181,11 @@ public class GroupService {
      * 그룹 도메인으로 옮길 예정입니다.
      * @return Group
      */
-    private Group makeFriendGroup() {
+    private Group makeFriendGroup(User host, Integer memberCount) {
         //defaultCategory
-        Category category = queryGroupCategoryById(1L);
+        Category category = queryGroupCategoryById(Category.defaultEmptyCategoryId);
 
-        Group group = Group.builder()
+        return Group.builder()
             .publicAccess(false)
             .thumbnailPath(
                 thumbnailImageService.getRandomThumbnailUrl()
@@ -198,10 +194,10 @@ public class GroupService {
                 backgroundImageService.getRandomBackgroundImageUrl()
             )
             .category(category)
-            .title(Group.generateGroupTitle())
-            .groupType(GroupType.FRIEND).build();
-
-        return group;
+            .title(Group.generateGroupTitle(host.getNickname(),memberCount))
+            .groupType(GroupType.FRIEND)
+            .host(host)
+            .build();
     }
 
 
@@ -210,20 +206,14 @@ public class GroupService {
      * @return GroupResponse
      */
     public GroupResponse updateGroup(Long groupId , UpdateGroupRequest updateGroupRequest) {
+        Long currentUserId = SecurityUtils.getCurrentUserId();
         Group group = queryGroup(groupId);
-        User reqUser = userUtils.getUserFromSecurityContext();
+        group.validUserIsHost(currentUserId);
 
-        // 그룹 유저 일급 컬랙션
-        GroupUsers groupUsers = group.getGroupUsers();
-        // reqUser 가 호스트인지 확인하는 메서드
-        groupUsers.validReqUserIsGroupHost(reqUser);
         Category category = queryGroupCategoryById(updateGroupRequest.getCategoryId());
         group.updateGroup(updateGroupRequest.toUpdateGroupDto(), category);
 
-        return new GroupResponse(
-            group.getGroupBaseInfoVo(),
-            groupUsers.getUserInfoVoList()
-            , true);
+        return getGroupResponse(group, currentUserId);
     }
 
 
@@ -232,16 +222,12 @@ public class GroupService {
      * @param groupId
      */
     public void deleteGroup(Long groupId) {
+        Long currentUserId = SecurityUtils.getCurrentUserId();
+
         Group group = queryGroup(groupId);
-        User reqUser = userUtils.getUserFromSecurityContext();
-        GroupUsers groupUsers = group.getGroupUsers();
+        group.validUserIsHost(currentUserId);
 
-        groupUsers.validReqUserIsGroupHost(reqUser);
-
-        // 캐스케이드 타입 all로 줬습니다.!
-        // 그룹지우면 그룹유저 미들 테이블 삭제됩니다.
         groupRepository.delete(group);
-
     }
 
     /**
@@ -249,16 +235,10 @@ public class GroupService {
      * @return GroupResponse
      */
     public GroupResponse getGroupDetailById(Long groupId) {
+        Long currentUserId = SecurityUtils.getCurrentUserId();
         Group group = queryGroup(groupId);
-        User reqUser = userUtils.getUserFromSecurityContext();
-        GroupUsers groupUsers = group.getGroupUsers();
 
-        Boolean iHost = groupUsers.checkReqUserGroupHost(reqUser);
-
-        return new GroupResponse(
-            group.getGroupBaseInfoVo(),
-            groupUsers.getUserInfoVoList(),
-            iHost);
+        return getGroupResponse(group, currentUserId);
     }
 
 
@@ -277,10 +257,10 @@ public class GroupService {
      * @return GroupBriefInfoListResponse
      */
     public Slice<GroupBriefInfoDto> findAllJoinedGroups(PageRequest pageRequest) {
-        Long reqUserId = SecurityUtils.getCurrentUserId();
+        Long currentUserId = SecurityUtils.getCurrentUserId();
 
         Slice<GroupUser> sliceGroupUsers = groupUserRepository.findJoinedGroupUser(
-            reqUserId, pageRequest);
+            currentUserId, pageRequest);
 
         return sliceGroupUsers.map(groupUser -> {
             Group group = groupUser.getGroup();
@@ -299,11 +279,11 @@ public class GroupService {
             return findAllJoinedGroups(pageRequest);
         }
 
-        Long reqUserId = SecurityUtils.getCurrentUserId();
+        Long currentUserId = SecurityUtils.getCurrentUserId();
         GroupType groupType = GroupType.valueOf(groupInTypeRequest.getValue());
 
         Slice<GroupUser> sliceGroupUsers = groupUserRepository.findJoinedGroupUserByGroupType(
-            reqUserId, groupType, pageRequest);
+            currentUserId, groupType, pageRequest);
 
         return sliceGroupUsers.map(groupUser -> {
             Group group = groupUser.getGroup();
@@ -341,54 +321,48 @@ public class GroupService {
             group -> new GroupBriefInfoDto(group.getGroupBaseInfoVo(), group.getMemberCount()));
     }
 
-    public GroupResponse addMembersToGroup(Long groupId, AddFriendToGroupRequest addFriendToGroupRequest) {
-        User reqUser = userUtils.getUserFromSecurityContext();
+
+    public GroupResponse addMembersToGroup(Long groupId, List<Long> requestMemberIds) {
+        Long currentUserId = SecurityUtils.getCurrentUserId();
         Group group = queryGroup(groupId);
-
-        List<Long> requestMemberIds = addFriendToGroupRequest.getMemberIds();
-        GroupUsers groupUsers = group.getGroupUsers();
-        List<Long> groupUserIds = groupUsers.getUserIds();
-
-        requestMemberIds.removeIf(groupUserIds::contains);
-
-        groupUsers.validReqUserIsGroupHost(reqUser);
 
         List<User> findUserList = userUtils.findByIdIn(requestMemberIds);
         // 요청받은 유저 아이디 목록이 디비에 존재하는 지 확인
-        validReqMemberNotExist(findUserList, addFriendToGroupRequest.getMemberIds());
+        validReqMemberNotExist(findUserList, requestMemberIds);
+        // TODO : 친구 목록에 존재하는지 확인
 
-        groupUsers.addMembers(findUserList ,group);
+        requestMemberIds.forEach(group::validUserIsAlreadyEnterGroup);
 
-        return new GroupResponse(group.getGroupBaseInfoVo(),groupUsers.getUserInfoVoList(),true);
+        group.addMembers(findUserList);
+
+        return getGroupResponse(group, currentUserId);
     }
 
-    public GroupResponse deleteMemberFromGroup(Long groupId, Long userId) {
-        User reqUser = userUtils.getUserFromSecurityContext();
-        Group group = queryGroup(groupId);
-        GroupUsers groupUsers = group.getGroupUsers();
+    @Override
+    public void addMemberToGroup(Group group, User newUser) {
+        group.validUserIsAlreadyEnterGroup(newUser.getId());
+        group.addMember(newUser);
+    }
 
-        // 일반 유저가 본인 스스로 방에서 나갈때
-        if(reqUser.getId().equals(userId)){
-            if(groupUsers.checkReqUserGroupHost(reqUser))
-                throw HostCanNotLeaveGroupException.EXCEPTION;
-            groupUsers.removeUserByUserId(userId);
-            return new GroupResponse(group.getGroupBaseInfoVo(),groupUsers.getUserInfoVoList(),false);
+    public GroupResponse leaveFromGroup(Long groupId) {
+        Long currentUserId = SecurityUtils.getCurrentUserId();
+
+        Group group = queryGroup(groupId);
+        if(group.checkUserIsHost(currentUserId)) {
+            throw HostCanNotLeaveGroupException.EXCEPTION;
         }
 
-        // 방장의 권한으로 내쫓을때
-        groupUsers.validReqUserIsGroupHost(reqUser);
-        groupUsers.removeUserByUserId(userId);
-        return new GroupResponse(group.getGroupBaseInfoVo(),groupUsers.getUserInfoVoList(),true);
+        group.removeUserByUserId(currentUserId);
 
+        return getGroupResponse(group, currentUserId);
     }
 
     public GroupInviteLinkResponse createGroupInviteLink(Long groupId) {
         Group group = queryGroup(groupId);
-        GroupUsers groupUsers = group.getGroupUsers();
-        User reqUser = userUtils.getUserFromSecurityContext();
+        Long currentUserId = SecurityUtils.getCurrentUserId();
 
         // 요청한 유저가 멤버가 아니라면 링크 발급이 안되어야 한다.
-        if(!groupUsers.checkUserIsAlreadyEnterGroup(reqUser)){
+        if(!group.checkUserIsAlreadyEnterGroup(currentUserId)){
             throw NotMemberException.EXCEPTION;
         }
 
@@ -397,7 +371,7 @@ public class GroupService {
         InviteTokenRedisEntity tokenRedisEntity = InviteTokenRedisEntity.builder()
             .token(token)
             .groupId(groupId)
-            .issuerId(reqUser.getId())
+            .issuerId(currentUserId)
             .ttl(24L)
             .build();
 
@@ -415,17 +389,35 @@ public class GroupService {
         }
 
         Group group = queryGroup(groupId);
-        GroupUsers groupUsers = group.getGroupUsers();
-        User reqUser = userUtils.getUserFromSecurityContext();
-
+        User currentUser = userUtils.getUserFromSecurityContext();
+        Long currentUserId = currentUser.getId();
         // 유저가 이미 방안에 들어가있는지 검증
-        groupUsers.validUserIsAlreadyEnterGroup(reqUser);
+        group.validUserIsAlreadyEnterGroup(currentUserId);
 
-        groupUsers.addMember(reqUser,group);
+        group.addMember(currentUser);
 
+        return getGroupResponse(group, currentUserId);
+    }
+
+    public GroupResponse deleteMemberFromGroup(Long groupId, Long userId) {
+        Long currentUserId = SecurityUtils.getCurrentUserId();
+        Group group = queryGroup(groupId);
+        group.validUserIsHost(currentUserId);
+
+        if(currentUserId.equals(userId))
+            throw HostCanNotLeaveGroupException.EXCEPTION;
+
+        // 방장의 권한으로 내쫓을때
+        group.removeUserByUserId(userId);
+
+        return getGroupResponse(group, currentUserId);
+    }
+
+    private GroupResponse getGroupResponse(Group group, Long currentUserId) {
         return new GroupResponse(
-                group.getGroupBaseInfoVo(),
-                groupUsers.getUserInfoVoList(),
-                false);
+            group.getGroupBaseInfoVo(),
+            group.getMemberInfoVOs(),
+            group.checkUserIsHost(currentUserId)
+        );
     }
 }

@@ -47,9 +47,9 @@ public class CustomGroupUserRepositoryImpl implements CustomGroupUserRepository{
     }
 
     @Override
-    public Slice<GroupUser> findJoinedGroupUser(Long reqUserId, Pageable pageable) {
+    public Slice<GroupUser> findJoinedGroupUser(Long userId, Pageable pageable) {
         List<GroupUser> groupUsers = getGroupUserWithGroupAndRecentNotification()
-            .where(groupUser.user.id.eq(reqUserId))
+            .where(groupUser.user.id.eq(userId))
             .orderBy(notification.sendAt.coalesce(group.createdDate).desc())
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize() + 1)
@@ -59,9 +59,9 @@ public class CustomGroupUserRepositoryImpl implements CustomGroupUserRepository{
     }
 
     @Override
-    public Slice<GroupUser> findJoinedGroupUserByGroupType(Long reqUserId, GroupType groupType, Pageable pageable) {
+    public Slice<GroupUser> findJoinedGroupUserByGroupType(Long userId, GroupType groupType, Pageable pageable) {
         List<GroupUser> groupUsers = getGroupUserWithGroupAndRecentNotification()
-            .where(groupUser.user.id.eq(reqUserId)
+            .where(groupUser.user.id.eq(userId)
                 .and(group.groupType.eq(groupType)))
             .orderBy(notification.sendAt.coalesce(group.createdDate).desc())
             .offset(pageable.getOffset())

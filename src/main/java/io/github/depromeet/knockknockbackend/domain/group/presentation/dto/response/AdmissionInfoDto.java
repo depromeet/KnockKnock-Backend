@@ -1,7 +1,7 @@
 package io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response;
 
 
-import io.github.depromeet.knockknockbackend.domain.group.domain.AdmissionState;
+import io.github.depromeet.knockknockbackend.domain.admission.domain.AdmissionState;
 import io.github.depromeet.knockknockbackend.domain.user.domain.vo.UserInfoVO;
 import java.time.LocalDateTime;
 import lombok.Builder;
