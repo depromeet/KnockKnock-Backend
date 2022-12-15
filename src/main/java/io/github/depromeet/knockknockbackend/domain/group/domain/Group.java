@@ -78,6 +78,7 @@ public class Group extends BaseTimeEntity {
         this.category = category;
         this.groupType = groupType;
         this.host = host;
+        this.groupUsers.add(new GroupUser(this,host));
     }
 
     public static String generateGroupTitle(String reqUserName, Integer memberCount){
@@ -147,21 +148,18 @@ public class Group extends BaseTimeEntity {
     }
 
     public void addMembers(List<User> newMembers){
-        List<GroupUser> newGroupUsers = newMembers.stream()
-            .map(user -> new GroupUser(this, user))
-            .collect(Collectors.toList());
-
-        groupUsers.addAll(newGroupUsers);
+        newMembers.forEach(this::addMember);
     }
 
     public void removeMemberByUserId(Long userId){
-        if(checkUserIsHost(userId)) {
+        if(checkUserIsHost(userId)){
             throw HostCanNotLeaveGroupException.EXCEPTION;
         }
         groupUsers.removeIf(groupUser -> groupUser.getUserId().equals(userId));
     }
 
     public void addMember(User reqUser) {
+        validUserIsAlreadyEnterGroup(reqUser.getId());
         GroupUser groupUser = new GroupUser(this, reqUser);
         groupUsers.add(groupUser);
     }

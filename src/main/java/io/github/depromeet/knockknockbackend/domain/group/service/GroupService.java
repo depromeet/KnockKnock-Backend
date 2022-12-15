@@ -13,7 +13,6 @@ import io.github.depromeet.knockknockbackend.domain.group.domain.repository.Grou
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.InviteTokenRedisEntityRepository;
 import io.github.depromeet.knockknockbackend.domain.group.exception.CategoryNotFoundException;
 import io.github.depromeet.knockknockbackend.domain.group.exception.GroupNotFoundException;
-import io.github.depromeet.knockknockbackend.domain.group.exception.HostCanNotLeaveGroupException;
 import io.github.depromeet.knockknockbackend.domain.group.exception.InvalidInviteTokenException;
 import io.github.depromeet.knockknockbackend.domain.group.exception.NotMemberException;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateFriendGroupRequest;
@@ -124,14 +123,14 @@ public class GroupService implements GroupUtils {
 
         //TODO : 요청 받은 memeberId가 친구 목록에 속해있는지 검증.
         List<Long> memberIds = createFriendGroupRequest.getMemberIds();
-        addHostUserIdIfNotExist(currentUser.getId(), memberIds);
         //요청받은 id 목록들로 디비에서 조회
         List<User> members = userUtils.findByIdIn(memberIds);
         // 그룹 만들기
         Group group = makeFriendGroup(currentUser, memberIds.size());
-        groupRepository.save(group);
         // 그룹 유저 리스트만들기
         group.addMembers(members);
+        groupRepository.save(group);
+
 
         return getGroupResponse(group, currentUser.getId());
     }
@@ -330,9 +329,6 @@ public class GroupService implements GroupUtils {
         // 요청받은 유저 아이디 목록이 디비에 존재하는 지 확인
         validReqMemberNotExist(findUserList, requestMemberIds);
         // TODO : 친구 목록에 존재하는지 확인
-
-        requestMemberIds.forEach(group::validUserIsAlreadyEnterGroup);
-
         group.addMembers(findUserList);
 
         return getGroupResponse(group, currentUserId);
@@ -340,7 +336,6 @@ public class GroupService implements GroupUtils {
 
     @Override
     public void addMemberToGroup(Group group, User newUser) {
-        group.validUserIsAlreadyEnterGroup(newUser.getId());
         group.addMember(newUser);
     }
 
@@ -388,8 +383,6 @@ public class GroupService implements GroupUtils {
         Group group = queryGroup(groupId);
         User currentUser = userUtils.getUserFromSecurityContext();
         Long currentUserId = currentUser.getId();
-        // 유저가 이미 방안에 들어가있는지 검증
-        group.validUserIsAlreadyEnterGroup(currentUserId);
 
         group.addMember(currentUser);
 
