@@ -1,4 +1,4 @@
-package io.github.depromeet.knockknockbackend.domain.storage.repository;
+package io.github.depromeet.knockknockbackend.domain.storage.domain.repository;
 
 import io.github.depromeet.knockknockbackend.domain.storage.domain.Storage;
 import org.springframework.data.repository.CrudRepository;
