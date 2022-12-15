@@ -44,6 +44,8 @@ public enum ErrorCode {
     INVALID_INVITE_TOKEN(400 , "GROUP-400-4","invalid invite token"),
     REACTION_FORBIDDEN(HttpStatus.FORBIDDEN.value(), "REACTION-403-1", "the user cannot change the reaction"),
 
+    NOTIFICATION_FORBIDDEN(HttpStatus.FORBIDDEN.value(), "NOTIFICATION-403-1", "The user has no access to the notification"),
+    NOTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "NOTIFICATION-404-1", "Notification Not Found"),
     NOTIFICATION_FCM_FAIL_SEND(HttpStatus.INTERNAL_SERVER_ERROR.value(), "NOTIFICATION-500-1", "FCM ERROR");
 
     private int status;
