@@ -11,6 +11,7 @@ import io.github.depromeet.knockknockbackend.domain.group.domain.repository.Cate
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.GroupRepository;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.GroupUserRepository;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.InviteTokenRedisEntityRepository;
+import io.github.depromeet.knockknockbackend.domain.group.domain.vo.GroupBaseInfoVo;
 import io.github.depromeet.knockknockbackend.domain.group.exception.CategoryNotFoundException;
 import io.github.depromeet.knockknockbackend.domain.group.exception.GroupNotFoundException;
 import io.github.depromeet.knockknockbackend.domain.group.exception.HostCanNotLeaveGroupException;
@@ -21,6 +22,7 @@ import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.reque
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.GroupInTypeRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.UpdateGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupBriefInfoDto;
+import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupBriefInfos;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupInviteLinkResponse;
 import io.github.depromeet.knockknockbackend.global.utils.generate.TokenGenerator;
 import io.github.depromeet.knockknockbackend.global.utils.security.SecurityUtils;
@@ -29,6 +31,7 @@ import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.respo
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.global.exception.UserNotFoundException;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
@@ -421,6 +424,11 @@ public class GroupService implements GroupUtils {
         );
     }
 
-    public GroupResponse getFamousGroup() {
+    public GroupBriefInfos getFamousGroup() {
+        List<GroupBriefInfoDto> collect = groupRepository.findFamousGroup().stream()
+            .map(group -> new GroupBriefInfoDto(group.getGroupBaseInfoVo() ,group.getMemberCount()))
+            .collect(Collectors.toList());
+
+        return new GroupBriefInfos(collect);
     }
 }
