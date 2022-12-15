@@ -87,11 +87,7 @@ public class NotificationService {
 
         Optional<GroupBaseInfoVo> groupBaseInfoVo = alarmHistory.stream()
             .findFirst()
-            .map(notification -> GroupBaseInfoVo.builder()
-                .groupId(notification.getGroup().getId())
-                .title(notification.getGroup().getTitle())
-                .backgroundImagePath(notification.getGroup().getBackgroundImagePath())
-                .build());
+            .map(notification -> notification.getGroup().getGroupBaseInfoVo());
 
         return new QueryNotificationListResponse(groupBaseInfoVo.orElse(null), result);
     }
