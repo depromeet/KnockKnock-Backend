@@ -122,6 +122,11 @@ public class GroupController {
         return categoryService.findAllCategory();
     }
 
+    @GetMapping("/categories/famous")
+    public CategoryListResponse getFamousCategory(){
+        return categoryService.findFamousCategory();
+    }
+
     //TODO : 관리자권한 필요
     @PostMapping("/categories")
     public CategoryDto createCategory(@RequestBody @Valid CreateCategoryRequest createCategoryRequest){
