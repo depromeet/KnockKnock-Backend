@@ -142,6 +142,18 @@ public class NotificationService {
         );
     }
 
+    public Slice<QueryNotificationListResponseElement> getNotificationListResponseElements(
+        Slice<Notification> notifications) {
+        Slice<NotificationReaction> notificationReactions = retrieveNotificationReactions(
+            notifications);
+
+        List<NotificationReactionCountInfoVo> notificationReactionCountInfos
+            = retrieveNotificationReactionCountInfoVos(notifications);
+
+        return generateQueryNotificationListResponseElements(
+            notifications, notificationReactions, notificationReactionCountInfos);
+    }
+
     private void handleFcmMessagingException(BatchResponse batchResponse) {
         log.error(
             "[**FCM notification sending Error] successCount : {}, failureCount : {} ",
@@ -189,6 +201,53 @@ public class NotificationService {
         }
 
         return deviceTokenRepository.findUserByGroupIdAndNewOption(groupId, true, nightOption);
+    }
+
+    private static Slice<QueryNotificationListResponseElement> generateQueryNotificationListResponseElements(
+        Slice<Notification> notifications,
+        Slice<NotificationReaction> notificationReactions,
+        List<NotificationReactionCountInfoVo> notificationReactionCountInfos) {
+
+        return notifications
+            .map(notification -> {
+                    Optional<NotificationReaction> myNotificationReaction =
+                        notificationReactions.stream()
+                            .filter(notificationReaction -> notification.equals(
+                                    notificationReaction.getNotification()
+                                )
+                            ).findAny();
+
+                    NotificationReactionInfoVo notificationReactionInfoVo = NotificationReactionInfoVo.builder()
+                        .myReactionId(myNotificationReaction.isPresent() ?
+                            myNotificationReaction.get().getReaction().getId() : null
+                        )
+                        .reactionCountInfos(notificationReactionCountInfos)
+                        .build();
+
+                    return QueryNotificationListResponseElement.builder()
+                        .notificationId(notification.getId())
+                        .title(notification.getTitle())
+                        .content(notification.getContent())
+                        .imageUrl(notification.getImageUrl())
+                        .sendAt(notification.getSendAt())
+                        .sendUserId(notification.getSendUser().getId())
+                        .reactions(notificationReactionInfoVo)
+                        .build();
+                }
+            );
+    }
+
+    private List<NotificationReactionCountInfoVo> retrieveNotificationReactionCountInfoVos(
+        Slice<Notification> notifications) {
+        return notificationReactionRepository.findAllCountByNotificationIn(
+            notifications.getContent());
+    }
+
+    private Slice<NotificationReaction> retrieveNotificationReactions(
+        Slice<Notification> notifications) {
+        return notificationReactionRepository.findByUserIdAndNotificationIn(
+            SecurityUtils.getCurrentUserId(), notifications.getContent()
+        );
     }
 
 }
