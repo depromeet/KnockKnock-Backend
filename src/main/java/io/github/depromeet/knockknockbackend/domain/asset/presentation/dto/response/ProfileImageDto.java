@@ -12,6 +12,6 @@ public class ProfileImageDto {
 
     public ProfileImageDto(ProfileImage profileImage) {
         this.id = profileImage.getId();
-        this.url = profileImage.getProfileImageUrl();
+        this.url = profileImage.getImageUrl();
     }
 }

@@ -34,7 +34,7 @@ public class AssetService implements AssetUtils {
     public String getRandomBackgroundImageUrl() {
         BackgroundImage randomBackground = backGroundImageRepository.findRandomBackgroundImage()
             .orElseThrow(()-> BackgroundImageNotFoundException.EXCEPTION);
-        return randomBackground.getBackgroundImageUrl();
+        return randomBackground.getImageUrl();
     }
 
     public BackgroundsResponse getAllBackgroundImage(){
@@ -48,7 +48,7 @@ public class AssetService implements AssetUtils {
     public String getRandomThumbnailUrl() {
         Thumbnail randomThumbnail = thumbnailRepository.findRandomThumbnail()
             .orElseThrow(()-> ThumbNailImageNotFoundException.EXCEPTION);
-        return randomThumbnail.getThumbnailImageUrl();
+        return randomThumbnail.getImageUrl();
     }
 
     public ThumbnailsResponse getAllThumbnailImage(){

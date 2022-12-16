@@ -12,6 +12,6 @@ public class BackgroundImageDto {
 
     public BackgroundImageDto(BackgroundImage backgroundImage) {
         this.id = backgroundImage.getId();
-        this.url = backgroundImage.getBackgroundImageUrl();
+        this.url = backgroundImage.getImageUrl();
     }
 }

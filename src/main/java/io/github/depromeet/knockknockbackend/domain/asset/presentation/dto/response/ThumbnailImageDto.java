@@ -12,6 +12,6 @@ public class ThumbnailImageDto {
 
     public ThumbnailImageDto(Thumbnail thumbnail) {
         this.id = thumbnail.getId();
-        this.url = thumbnail.getThumbnailImageUrl();
+        this.url = thumbnail.getImageUrl();
     }
 }

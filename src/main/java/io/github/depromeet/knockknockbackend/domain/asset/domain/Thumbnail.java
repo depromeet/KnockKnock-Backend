@@ -15,7 +15,7 @@ public class Thumbnail {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String thumbnailImageUrl;
+    private String imageUrl;
 
     private Long listOrder;
 }

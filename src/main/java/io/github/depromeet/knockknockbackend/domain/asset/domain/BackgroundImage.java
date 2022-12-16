@@ -16,7 +16,7 @@ public class BackgroundImage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String backgroundImageUrl;
+    private String imageUrl;
 
     private Long listOrder;
 }

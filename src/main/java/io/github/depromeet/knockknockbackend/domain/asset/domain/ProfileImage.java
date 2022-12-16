@@ -15,7 +15,9 @@ public class ProfileImage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String profileImageUrl;
+    private String title;
+
+    private String imageUrl;
 
     private Long listOrder;
 }
