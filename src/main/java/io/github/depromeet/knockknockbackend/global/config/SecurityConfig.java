@@ -32,6 +32,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests()
                 .antMatchers("/").permitAll()
                 .antMatchers(SwaggerPatterns).permitAll()
+                .antMatchers("/actuator/**").permitAll()
                 .antMatchers("/credentials/**").permitAll()
                 .anyRequest().authenticated();
         http

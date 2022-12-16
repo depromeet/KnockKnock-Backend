@@ -34,29 +34,31 @@ public class CredentialService {
         OauthStrategy oauthStrategy = oauthFactory.getOauthstrategy(oauthProvider);
         String oauthAccessToken = oauthStrategy.getAccessToken(code);
        // 어세스토큰 처음부터 회원가입 테스트 할려면 여기서 얻어야함!
-        //        System.out.println(accessToken);
         OauthCommonUserInfoDto oauthUserInfo = oauthStrategy.getUserInfo(oauthAccessToken);
 
         String oauthId = oauthUserInfo.getOauthId();
         String email = oauthUserInfo.getEmail();
 
-        Optional<User> checkUser = userRepository.findByOauthIdAndOauthProvider(oauthId, oauthProvider.getValue());
-        Boolean isRegistered = checkUser.isPresent();
-        Long userId ;
-        if(!isRegistered){
-            //널값있을수 있음 email
-            User user = User.builder().oauthProvider(oauthProvider.getValue()).oauthId(oauthId).email(email).build();
-            userRepository.save(user);
-            userId = user.getId();
-        }else {
-            userId = checkUser.get().getId();
-        }
+        User user = userRepository.findByOauthIdAndOauthProvider(oauthId, oauthProvider.getValue())
+            .orElseGet(()->{
+                User newUser = User.builder()
+                    .oauthProvider(oauthProvider.getValue())
+                    .oauthId(oauthId)
+                    .email(email)
+                    .build();
+                userRepository.save(newUser);
+                return newUser;
+            });
+
+        Long userId = user.getId();
+
+        Optional<String> nickname = Optional.ofNullable(user.getNickname());
 
         String accessToken = jwtTokenProvider.generateAccessToken(userId);
         String refreshToken = generateRefreshToken(userId);
 
         return AfterOauthResponse.builder()
-            .isRegistered(isRegistered)
+            .isRegistered(nickname.isPresent())
             .accessToken(accessToken)
             .refreshToken(refreshToken)
             .build();
