@@ -9,17 +9,13 @@ import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.reque
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.UpdateGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.AdmissionInfoDto;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.AdmissionInfoListResponse;
-import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.BackgroundListResponse;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.CategoryDto;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.CategoryListResponse;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupInviteLinkResponse;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupBriefInfoDto;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupResponse;
-import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.ThumbnailListResponse;
-import io.github.depromeet.knockknockbackend.domain.group.service.BackgroundImageService;
 import io.github.depromeet.knockknockbackend.domain.group.service.CategoryService;
 import io.github.depromeet.knockknockbackend.domain.group.service.GroupService;
-import io.github.depromeet.knockknockbackend.domain.group.service.ThumbnailImageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -53,9 +49,6 @@ public class GroupController {
     private final CategoryService categoryService;
 
     private final AdmissionUsecase admissionUsecase;
-
-    private final ThumbnailImageService thumbnailImageService;
-    private final BackgroundImageService backgroundImageService;
 
     @Operation(summary = "공개 그룹을 만듭니다")
     @PostMapping("/open")
@@ -188,19 +181,6 @@ public class GroupController {
     public GroupResponse deleteMemberFromGroup(@PathVariable(value = "id") Long groupId, @PathVariable(value = "user_id") Long userId){
         return groupService.deleteMemberFromGroup(groupId , userId);
     }
-
-    @Operation(summary = "백그라운드 이미지")
-    @GetMapping("/asset/backgrounds")
-    public BackgroundListResponse getBackgroundImageUrls(){
-        return backgroundImageService.getAllBackgroundImage();
-    }
-
-    @Operation(summary = "썸네일 이미지")
-    @GetMapping("/asset/thumbnails")
-    public ThumbnailListResponse getThumbnailImageUrls(){
-        return thumbnailImageService.getAllBackgroundImage();
-    }
-
 
     @Operation(summary = "그룹 초대 토큰 발급")
     @GetMapping("/{id}/members/invite")

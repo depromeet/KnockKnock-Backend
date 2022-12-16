@@ -29,9 +29,7 @@ public enum ErrorCode {
     OTHER_SERVER_FORBIDDEN(403, "FEIGN-403-1", "Other server forbidden"),
     OTHER_SERVER_EXPIRED_TOKEN(419, "FEIGN-419-1", "Other server expired token"),
     CATEGORY_NOT_FOUND(404,"GROUP-404-1", "Category Not Found" ),
-    BACKGROUND_NOT_FOUND(404,"GROUP-404-2", "BACKGROUND Not Found"),
 
-    THUMBNAIL_NOT_FOUND(404,"GROUP-404-3", "THUMBNAIL Not Found"),
     GROUP_NOT_FOUND(404,"GROUP-404-1", "Group Not Found" ),
 
     GROUP_NOT_HOST(400 , "GROUP-400-1","User Not Host" ),
@@ -44,7 +42,10 @@ public enum ErrorCode {
     INVALID_INVITE_TOKEN(400 , "GROUP-400-4","invalid invite token"),
     REACTION_FORBIDDEN(HttpStatus.FORBIDDEN.value(), "REACTION-403-1", "the user cannot change the reaction"),
 
-    NOTIFICATION_FCM_FAIL_SEND(HttpStatus.INTERNAL_SERVER_ERROR.value(), "NOTIFICATION-500-1", "FCM ERROR");
+    NOTIFICATION_FCM_FAIL_SEND(HttpStatus.INTERNAL_SERVER_ERROR.value(), "NOTIFICATION-500-1", "FCM ERROR"),
+    PROFILE_IMAGE_NOT_FOUND(404,"ASSET-404-1", "PROFILE Not Found"),
+    BACKGROUND_NOT_FOUND(404,"ASSET-404-2", "BACKGROUND Not Found"),
+    THUMBNAIL_NOT_FOUND(404,"ASSET-404-3", "THUMBNAIL Not Found");
 
     private int status;
     private String code;
