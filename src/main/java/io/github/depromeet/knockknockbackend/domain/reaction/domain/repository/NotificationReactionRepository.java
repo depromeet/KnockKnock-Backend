@@ -17,6 +17,12 @@ public interface NotificationReactionRepository extends CrudRepository<Notificat
         + "group by NR.reaction.id")
     List<NotificationReactionCountInfoVo> findAllCountByNotification(Notification notification);
 
+    @Query("select new io.github.depromeet.knockknockbackend.domain.notification.domain.vo.NotificationReactionCountInfoVo(NR.reaction.id , count(NR.reaction.id) ) "
+        + "from NotificationReaction  NR "
+        + "where NR.notification in :notifications "
+        + "group by NR.reaction.id")
+    List<NotificationReactionCountInfoVo> findAllCountByNotificationIn(List<Notification> notifications);
+
     Slice<NotificationReaction> findByUserIdAndNotificationIn(Long userId, List<Notification> notifications);
 
 }
