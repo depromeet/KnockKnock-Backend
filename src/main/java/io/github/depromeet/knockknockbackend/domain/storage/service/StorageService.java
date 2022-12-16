@@ -48,9 +48,9 @@ public class StorageService {
     }
 
     @Transactional(readOnly = true)
-    public QueryNotificationListInStorageResponse queryNotificationsInStorage(Long groupId, Pageable pageable) {
+    public QueryNotificationListInStorageResponse queryNotificationsInStorage(Long groupId, Integer periodOfMonth, Pageable pageable) {
         Slice<Notification> notifications = notificationRepository.findSliceFromStorage(
-            SecurityUtils.getCurrentUserId(), groupId, pageable
+            SecurityUtils.getCurrentUserId(), groupId, periodOfMonth, pageable
         );
 
         return new QueryNotificationListInStorageResponse(

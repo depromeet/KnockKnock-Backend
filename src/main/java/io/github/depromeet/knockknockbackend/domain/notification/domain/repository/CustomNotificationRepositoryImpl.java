@@ -7,6 +7,7 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.Notification;
+import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -33,13 +34,14 @@ public class CustomNotificationRepositoryImpl implements CustomNotificationRepos
     }
 
     @Override
-    public Slice<Notification> findSliceFromStorage(Long userId, Long groupId, Pageable pageable) {
+    public Slice<Notification> findSliceFromStorage(Long userId, Long groupId, Integer periodOfMonth, Pageable pageable) {
         List<Notification> notifications = queryFactory
             .select(notification)
             .from(storage)
             .innerJoin(storage.notification, notification)
             .where(storage.user.id.eq(userId),
-                eqGroupId(groupId)
+                eqGroupId(groupId),
+                greaterEqualPeriodOfMonth(periodOfMonth)
             )
             .orderBy(sort(pageable))
             .offset(pageable.getOffset())
@@ -54,6 +56,14 @@ public class CustomNotificationRepositoryImpl implements CustomNotificationRepos
             return null;
         }
         return notification.group.id.eq(groupId);
+    }
+
+    private BooleanExpression greaterEqualPeriodOfMonth(Integer periodOfMonth) {
+        if (periodOfMonth == null) {
+            return null;
+        }
+        LocalDate dateCondition = LocalDate.now().minusMonths(periodOfMonth);
+        return storage.createdDate.goe(dateCondition.atStartOfDay());
     }
 
     private OrderSpecifier<?> sort(Pageable pageable) {
