@@ -14,4 +14,5 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
 
     @EntityGraph(attributePaths = {"group"})
     Optional<Notification> findById(Long notificationId);
+
 }

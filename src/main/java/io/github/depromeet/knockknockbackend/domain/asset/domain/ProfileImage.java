@@ -1,4 +1,4 @@
-package io.github.depromeet.knockknockbackend.domain.group.domain;
+package io.github.depromeet.knockknockbackend.domain.asset.domain;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -7,14 +7,17 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import lombok.Getter;
 
-
 @Getter
-@Table(name = "tbl_group_background_image")
+@Table(name = "tbl_profile_image")
 @Entity
-public class BackgroundImage {
+public class ProfileImage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String backgroundImageUrl;
+    private String title;
+
+    private String imageUrl;
+
+    private Long listOrder;
 }

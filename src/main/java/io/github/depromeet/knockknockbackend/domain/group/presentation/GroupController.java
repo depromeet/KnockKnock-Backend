@@ -1,6 +1,7 @@
 package io.github.depromeet.knockknockbackend.domain.group.presentation;
 
 import io.github.depromeet.knockknockbackend.domain.group.domain.usecase.AdmissionUsecase;
+import io.github.depromeet.knockknockbackend.domain.group.domain.vo.GroupBaseInfoVo;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.AddFriendToGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateCategoryRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.CreateFriendGroupRequest;
@@ -9,23 +10,21 @@ import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.reque
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.request.UpdateGroupRequest;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.AdmissionInfoDto;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.AdmissionInfoListResponse;
-import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.BackgroundListResponse;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.CategoryDto;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.CategoryListResponse;
+import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupBriefInfos;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupInviteLinkResponse;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupBriefInfoDto;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupResponse;
-import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.ThumbnailListResponse;
-import io.github.depromeet.knockknockbackend.domain.group.service.BackgroundImageService;
 import io.github.depromeet.knockknockbackend.domain.group.service.CategoryService;
 import io.github.depromeet.knockknockbackend.domain.group.service.GroupService;
-import io.github.depromeet.knockknockbackend.domain.group.service.ThumbnailImageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -53,9 +52,6 @@ public class GroupController {
     private final CategoryService categoryService;
 
     private final AdmissionUsecase admissionUsecase;
-
-    private final ThumbnailImageService thumbnailImageService;
-    private final BackgroundImageService backgroundImageService;
 
     @Operation(summary = "공개 그룹을 만듭니다")
     @PostMapping("/open")
@@ -120,6 +116,11 @@ public class GroupController {
     @GetMapping("/categories")
     public CategoryListResponse getCategory(){
         return categoryService.findAllCategory();
+    }
+
+    @GetMapping("/categories/famous")
+    public CategoryListResponse getFamousCategory(){
+        return categoryService.findFamousCategory();
     }
 
     //TODO : 관리자권한 필요
@@ -189,19 +190,6 @@ public class GroupController {
         return groupService.deleteMemberFromGroup(groupId , userId);
     }
 
-    @Operation(summary = "백그라운드 이미지")
-    @GetMapping("/asset/backgrounds")
-    public BackgroundListResponse getBackgroundImageUrls(){
-        return backgroundImageService.getAllBackgroundImage();
-    }
-
-    @Operation(summary = "썸네일 이미지")
-    @GetMapping("/asset/thumbnails")
-    public ThumbnailListResponse getThumbnailImageUrls(){
-        return thumbnailImageService.getAllBackgroundImage();
-    }
-
-
     @Operation(summary = "그룹 초대 토큰 발급")
     @GetMapping("/{id}/members/invite")
     public GroupInviteLinkResponse createGroupInviteLink(
@@ -217,6 +205,12 @@ public class GroupController {
         @PathVariable(value = "code") String code
     ){
         return groupService.checkGroupInviteLink(groupId,code);
+    }
+
+    @Operation(summary = "요즘 뜨고있는 알림방")
+    @GetMapping("/famous")
+    public GroupBriefInfos getFamousGroup(){
+        return groupService.getFamousGroup();
     }
 
 }

@@ -57,3 +57,11 @@ logging:
   level:
     io.github.depromeet.knockknockbackend.global.utils.api.client.* : debug
 
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, prometheus

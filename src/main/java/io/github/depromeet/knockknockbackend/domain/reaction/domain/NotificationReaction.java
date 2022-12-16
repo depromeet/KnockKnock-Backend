@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.domain.reaction.domain;
 
+import io.github.depromeet.knockknockbackend.domain.asset.domain.Reaction;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.Notification;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.global.database.BaseTimeEntity;

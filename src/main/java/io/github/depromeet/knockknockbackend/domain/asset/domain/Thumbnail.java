@@ -1,4 +1,4 @@
-package io.github.depromeet.knockknockbackend.domain.group.domain;
+package io.github.depromeet.knockknockbackend.domain.asset.domain;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -15,5 +15,7 @@ public class Thumbnail {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String thumbnailImageUrl;
+    private String imageUrl;
+
+    private Long listOrder;
 }
