@@ -10,13 +10,6 @@ import org.springframework.data.repository.CrudRepository;
 
 public interface NotificationReactionRepository extends CrudRepository<NotificationReaction, Long> {
 
-
-    @Query("select new io.github.depromeet.knockknockbackend.domain.notification.domain.vo.NotificationReactionCountInfoVo(NR.reaction.id , count(NR.reaction.id) ) "
-        + "from NotificationReaction  NR "
-        + "where NR.notification = :notification "
-        + "group by NR.reaction.id")
-    List<NotificationReactionCountInfoVo> findAllCountByNotification(Notification notification);
-
     @Query("select new io.github.depromeet.knockknockbackend.domain.notification.domain.vo.NotificationReactionCountInfoVo(NR.reaction.id , count(NR.reaction.id) ) "
         + "from NotificationReaction  NR "
         + "where NR.notification in :notifications "
