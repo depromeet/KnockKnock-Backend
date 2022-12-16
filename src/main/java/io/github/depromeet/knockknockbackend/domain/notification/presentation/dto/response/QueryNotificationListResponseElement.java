@@ -8,7 +8,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class QueryAlarmHistoryResponseElement {
+public class QueryNotificationListResponseElement {
     private Long notificationId;
     private String title;
     private String content;

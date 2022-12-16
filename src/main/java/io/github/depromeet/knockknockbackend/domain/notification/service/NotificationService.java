@@ -17,7 +17,7 @@ import io.github.depromeet.knockknockbackend.domain.notification.exception.FcmRe
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.request.RegisterFcmTokenRequest;
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.request.SendInstanceRequest;
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.response.QueryNotificationListResponse;
-import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.response.QueryAlarmHistoryResponseElement;
+import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.response.QueryNotificationListResponseElement;
 import io.github.depromeet.knockknockbackend.domain.reaction.domain.NotificationReaction;
 import io.github.depromeet.knockknockbackend.domain.reaction.domain.repository.NotificationReactionRepository;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
@@ -59,7 +59,7 @@ public class NotificationService {
             SecurityUtils.getCurrentUserId(), alarmHistory.getContent()
         );
 
-        Slice<QueryAlarmHistoryResponseElement> result = alarmHistory
+        Slice<QueryNotificationListResponseElement> result = alarmHistory
             .map(notification -> {
                     List<NotificationReactionCountInfoVo> notificationReactionCountInfos
                         = notificationReactionRepository.findAllCountByNotification(notification);
@@ -73,7 +73,7 @@ public class NotificationService {
                         .reactionCountInfos(notificationReactionCountInfos)
                         .build();
 
-                    return QueryAlarmHistoryResponseElement.builder()
+                    return QueryNotificationListResponseElement.builder()
                         .notificationId(notification.getId())
                         .title(notification.getTitle())
                         .content(notification.getContent())

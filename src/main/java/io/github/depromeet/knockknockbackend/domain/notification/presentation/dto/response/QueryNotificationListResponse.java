@@ -11,6 +11,6 @@ import org.springframework.data.domain.Slice;
 public class QueryNotificationListResponse {
 
     private final GroupBaseInfoVo groups;
-    private final Slice<QueryAlarmHistoryResponseElement> notifications;
+    private final Slice<QueryNotificationListResponseElement> notifications;
 
 }
