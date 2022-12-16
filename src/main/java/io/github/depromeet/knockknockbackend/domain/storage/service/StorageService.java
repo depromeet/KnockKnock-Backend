@@ -6,6 +6,8 @@ import io.github.depromeet.knockknockbackend.domain.notification.domain.Notifica
 import io.github.depromeet.knockknockbackend.domain.notification.domain.repository.NotificationRepository;
 import io.github.depromeet.knockknockbackend.domain.notification.exception.NotificationForbiddenException;
 import io.github.depromeet.knockknockbackend.domain.notification.exception.NotificationNotFoundException;
+import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.response.QueryNotificationListInStorageResponse;
+import io.github.depromeet.knockknockbackend.domain.notification.service.NotificationService;
 import io.github.depromeet.knockknockbackend.domain.storage.domain.Storage;
 import io.github.depromeet.knockknockbackend.domain.storage.exception.StorageForbiddenException;
 import io.github.depromeet.knockknockbackend.domain.storage.domain.repository.StorageRepository;
@@ -13,6 +15,8 @@ import io.github.depromeet.knockknockbackend.domain.storage.exception.StorageNot
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.global.utils.security.SecurityUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class StorageService {
 
+    private final NotificationService notificationService;
     private final StorageRepository storageRepository;
     private final NotificationRepository notificationRepository;
     private final GroupUserRepository groupUserRepository;
@@ -40,6 +45,17 @@ public class StorageService {
             throw StorageForbiddenException.EXCEPTION;
         }
         storageRepository.delete(storage);
+    }
+
+    @Transactional(readOnly = true)
+    public QueryNotificationListInStorageResponse queryNotificationsInStorage(Long groupId, Pageable pageable) {
+        Slice<Notification> notifications = notificationRepository.findSliceFromStorage(
+            SecurityUtils.getCurrentUserId(), groupId, pageable
+        );
+
+        return new QueryNotificationListInStorageResponse(
+            notificationService.getNotificationListResponseElements(notifications)
+        );
     }
 
     private void validateAccessibleNotificationId(Long notificationId) {
