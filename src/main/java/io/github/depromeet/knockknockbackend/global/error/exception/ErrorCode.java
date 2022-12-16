@@ -42,10 +42,17 @@ public enum ErrorCode {
     INVALID_INVITE_TOKEN(400 , "GROUP-400-4","invalid invite token"),
     REACTION_FORBIDDEN(HttpStatus.FORBIDDEN.value(), "REACTION-403-1", "the user cannot change the reaction"),
 
+    NOTIFICATION_FORBIDDEN(HttpStatus.FORBIDDEN.value(), "NOTIFICATION-403-1", "The user has no access to the notification"),
+    NOTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "NOTIFICATION-404-1", "Notification Not Found"),
     NOTIFICATION_FCM_FAIL_SEND(HttpStatus.INTERNAL_SERVER_ERROR.value(), "NOTIFICATION-500-1", "FCM ERROR"),
+
+    STORAGE_FORBIDDEN(HttpStatus.FORBIDDEN.value(), "STORAGE-403-1", "The user has no access to the storage"),
+    STORAGE_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "STORAGE-404-1", "Storage Not Found");
+
     PROFILE_IMAGE_NOT_FOUND(404,"ASSET-404-1", "PROFILE Not Found"),
     BACKGROUND_NOT_FOUND(404,"ASSET-404-2", "BACKGROUND Not Found"),
     THUMBNAIL_NOT_FOUND(404,"ASSET-404-3", "THUMBNAIL Not Found");
+
 
     private int status;
     private String code;

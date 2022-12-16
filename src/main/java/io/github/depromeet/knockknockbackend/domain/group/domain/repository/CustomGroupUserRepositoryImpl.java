@@ -9,7 +9,9 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import io.github.depromeet.knockknockbackend.domain.group.domain.GroupType;
 import io.github.depromeet.knockknockbackend.domain.group.domain.GroupUser;
+import io.github.depromeet.knockknockbackend.domain.group.domain.QGroupUser;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -68,4 +70,15 @@ public class CustomGroupUserRepositoryImpl implements CustomGroupUserRepository{
 
         return new SliceImpl<>(groupUsers, pageable, hasNext(groupUsers, pageable));
     }
+
+    @Override
+    public Optional<GroupUser> findByGroupIdAndUserId(Long groupId, Long userId) {
+        GroupUser groupUser = queryFactory.selectFrom(QGroupUser.groupUser)
+            .where(QGroupUser.groupUser.group.id.eq(groupId)
+                .and(QGroupUser.groupUser.user.id.eq(userId)))
+            .fetchOne();
+
+        return Optional.ofNullable(groupUser);
+    }
+
 }

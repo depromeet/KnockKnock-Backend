@@ -12,4 +12,7 @@ public interface NotificationRepository extends CrudRepository<Notification, Lon
     Slice<Notification> findAllByGroupId(Long groupId, Pageable pageable);
 
 
+    @EntityGraph(attributePaths = {"group"})
+    Optional<Notification> findById(Long notificationId);
+
 }
