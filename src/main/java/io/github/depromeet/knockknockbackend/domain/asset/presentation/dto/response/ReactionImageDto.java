@@ -1,17 +1,20 @@
 package io.github.depromeet.knockknockbackend.domain.asset.presentation.dto.response;
 
 import io.github.depromeet.knockknockbackend.domain.asset.domain.ProfileImage;
-import io.github.depromeet.knockknockbackend.domain.asset.domain.Thumbnail;
+import io.github.depromeet.knockknockbackend.domain.asset.domain.Reaction;
 import lombok.Getter;
 
 @Getter
-public class ProfileImageDto {
+public class ReactionImageDto {
 
     private Long id;
     private String url;
 
-    public ProfileImageDto(ProfileImage profileImage) {
-        this.id = profileImage.getId();
-        this.url = profileImage.getImageUrl();
+    private String title;
+
+    public ReactionImageDto(Reaction reaction) {
+        this.id = reaction.getId();
+        this.url = reaction.getImageUrl();
+        this.title = reaction.getTitle();
     }
 }

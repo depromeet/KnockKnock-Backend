@@ -9,9 +9,10 @@ public class ProfileImageDto {
 
     private Long id;
     private String url;
-
+    private String title;
     public ProfileImageDto(ProfileImage profileImage) {
         this.id = profileImage.getId();
         this.url = profileImage.getImageUrl();
+        this.title = profileImage.getTitle();
     }
 }

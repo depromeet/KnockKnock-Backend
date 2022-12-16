@@ -2,6 +2,7 @@ package io.github.depromeet.knockknockbackend.domain.asset.presentation;
 
 import io.github.depromeet.knockknockbackend.domain.asset.presentation.dto.response.ProfileImageDto;
 import io.github.depromeet.knockknockbackend.domain.asset.presentation.dto.response.ProfileImagesResponse;
+import io.github.depromeet.knockknockbackend.domain.asset.presentation.dto.response.ReactionsResponse;
 import io.github.depromeet.knockknockbackend.domain.asset.service.AssetService;
 import io.github.depromeet.knockknockbackend.domain.asset.presentation.dto.response.BackgroundsResponse;
 import io.github.depromeet.knockknockbackend.domain.asset.presentation.dto.response.ThumbnailsResponse;
@@ -43,5 +44,10 @@ public class AssetController {
         return assetService.getRandomProfileImageUrl();
     }
 
+    @Operation(summary = "리액션 이미지 받기")
+    @GetMapping("/reactions")
+    public ReactionsResponse getAllReactionImages(){
+        return assetService.getAllReactionImages();
+    }
 
 }

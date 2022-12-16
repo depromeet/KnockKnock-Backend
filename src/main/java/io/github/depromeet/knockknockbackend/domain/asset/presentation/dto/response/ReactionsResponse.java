@@ -7,6 +7,6 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class ThumbnailsResponse {
-    List<ThumbnailImageDto> thumbnails;
+public class ReactionsResponse {
+    List<ReactionImageDto> reactions;
 }

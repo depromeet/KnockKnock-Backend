@@ -4,6 +4,7 @@ import io.github.depromeet.knockknockbackend.domain.asset.domain.BackgroundImage
 import io.github.depromeet.knockknockbackend.domain.asset.domain.ProfileImage;
 import io.github.depromeet.knockknockbackend.domain.asset.domain.Thumbnail;
 import io.github.depromeet.knockknockbackend.domain.asset.domain.repository.ProfileImageRepository;
+import io.github.depromeet.knockknockbackend.domain.asset.domain.repository.ReactionRepository;
 import io.github.depromeet.knockknockbackend.domain.asset.exception.ProfileImageNotFoundException;
 import io.github.depromeet.knockknockbackend.domain.asset.presentation.dto.response.ProfileImageDto;
 import io.github.depromeet.knockknockbackend.domain.asset.presentation.dto.response.ProfileImagesResponse;
@@ -13,6 +14,8 @@ import io.github.depromeet.knockknockbackend.domain.asset.exception.BackgroundIm
 import io.github.depromeet.knockknockbackend.domain.asset.exception.ThumbNailImageNotFoundException;
 import io.github.depromeet.knockknockbackend.domain.asset.presentation.dto.response.BackgroundImageDto;
 import io.github.depromeet.knockknockbackend.domain.asset.presentation.dto.response.BackgroundsResponse;
+import io.github.depromeet.knockknockbackend.domain.asset.presentation.dto.response.ReactionImageDto;
+import io.github.depromeet.knockknockbackend.domain.asset.presentation.dto.response.ReactionsResponse;
 import io.github.depromeet.knockknockbackend.domain.asset.presentation.dto.response.ThumbnailImageDto;
 import io.github.depromeet.knockknockbackend.domain.asset.presentation.dto.response.ThumbnailsResponse;
 import io.github.depromeet.knockknockbackend.domain.group.service.AssetUtils;
@@ -28,8 +31,9 @@ public class AssetService implements AssetUtils {
 
     private final BackGroundImageRepository backGroundImageRepository;
     private final ThumbnailRepository thumbnailRepository;
-
     private final ProfileImageRepository profileImageRepository;
+
+    private final ReactionRepository reactionRepository;
 
     public String getRandomBackgroundImageUrl() {
         BackgroundImage randomBackground = backGroundImageRepository.findRandomBackgroundImage()
@@ -71,5 +75,13 @@ public class AssetService implements AssetUtils {
             .map(ProfileImageDto::new)
             .collect(Collectors.toList());
         return new ProfileImagesResponse(profileImageDtos);
+    }
+
+    public ReactionsResponse getAllReactionImages(){
+        List<ReactionImageDto> reactionImageDtos = reactionRepository.findAllByOrderByListOrderAsc()
+            .stream()
+            .map(ReactionImageDto::new)
+            .collect(Collectors.toList());
+        return new ReactionsResponse(reactionImageDtos);
     }
 }
