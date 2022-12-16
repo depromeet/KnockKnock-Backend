@@ -16,11 +16,9 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 
 @Getter
-@Setter
 @Table(name = "tbl_group_user",
     uniqueConstraints = {
         @UniqueConstraint(columnNames = {"group_id", "user_id"})
@@ -28,7 +26,6 @@ import lombok.Setter;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class GroupUser extends BaseTimeEntity {
-
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

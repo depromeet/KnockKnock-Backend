@@ -19,7 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Transactional
+@Transactional(readOnly = true)
 @Service
 @RequiredArgsConstructor
 public class AdmissionService implements AdmissionUsecase {
@@ -48,6 +48,7 @@ public class AdmissionService implements AdmissionUsecase {
      * 그룹 입장요청을 합니다.
      */
     @Override
+    @Transactional
     public AdmissionInfoDto requestAdmission(Long groupId) {
         User reqUser = userUtils.getUserFromSecurityContext();
         Group group = groupUtils.queryGroup(groupId);
@@ -85,6 +86,7 @@ public class AdmissionService implements AdmissionUsecase {
      * 방장이 그룹 가입 요청을 승인합니다.
      */
     @Override
+    @Transactional
     public AdmissionInfoDto acceptAdmission(Long groupId , Long admissionId) {
         Long userId = SecurityUtils.getCurrentUserId();
         Group group = groupUtils.queryGroup(groupId);
@@ -93,7 +95,7 @@ public class AdmissionService implements AdmissionUsecase {
         Admission admission = queryAdmission(admissionId);
         admission.acceptAdmission();
 
-        groupUtils.addMemberToGroup(group,admission.getRequester());
+        groupUtils.acceptMemberToGroup(group,admission.getRequester());
 
         return getAdmissionInfoDto(admission);
     }
@@ -101,6 +103,7 @@ public class AdmissionService implements AdmissionUsecase {
      * 방장이 그룹 가입 요청을 거절합니다.
      */
     @Override
+    @Transactional
     public AdmissionInfoDto refuseAdmission(Long groupId , Long admissionId) {
         Long userId = SecurityUtils.getCurrentUserId();
         Group group = groupUtils.queryGroup(groupId);

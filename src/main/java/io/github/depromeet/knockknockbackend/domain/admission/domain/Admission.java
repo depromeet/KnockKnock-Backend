@@ -1,9 +1,11 @@
 package io.github.depromeet.knockknockbackend.domain.admission.domain;
 
 
+import io.github.depromeet.knockknockbackend.domain.admission.event.NewAdmissionEvent;
 import io.github.depromeet.knockknockbackend.domain.group.domain.Group;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.global.database.BaseTimeEntity;
+import io.github.depromeet.knockknockbackend.global.event.Events;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -14,6 +16,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
+import javax.persistence.PostPersist;
 import javax.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -55,6 +58,20 @@ public class Admission extends BaseTimeEntity {
             .requester(requester)
             .group(group)
             .build();
+    }
+
+    @PostPersist
+    private void requestAdmission(){
+        Group group = getGroup();
+
+        NewAdmissionEvent newAdmissionEvent = NewAdmissionEvent.builder()
+            .requesterId(requester.getId())
+            .groupId(group.getId())
+            .admissionId(getId())
+            .hostId(group.getHost().getId())
+            .build();
+
+        Events.raise(newAdmissionEvent);
     }
 
     public void refuseAdmission(){
