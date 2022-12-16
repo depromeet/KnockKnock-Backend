@@ -5,15 +5,21 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.MulticastMessage;
 import io.github.depromeet.knockknockbackend.domain.group.domain.Group;
+import io.github.depromeet.knockknockbackend.domain.group.domain.vo.GroupBaseInfoVo;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.DeviceToken;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.NightCondition;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.Notification;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.repository.DeviceTokenRepository;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.repository.NotificationRepository;
+import io.github.depromeet.knockknockbackend.domain.notification.domain.vo.NotificationReactionCountInfoVo;
+import io.github.depromeet.knockknockbackend.domain.notification.domain.vo.NotificationReactionInfoVo;
 import io.github.depromeet.knockknockbackend.domain.notification.exception.FcmResponseException;
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.request.RegisterFcmTokenRequest;
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.request.SendInstanceRequest;
-import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.response.QueryAlarmHistoryResponse;
+import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.response.QueryNotificationListResponse;
+import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.response.QueryAlarmHistoryResponseElement;
+import io.github.depromeet.knockknockbackend.domain.reaction.domain.NotificationReaction;
+import io.github.depromeet.knockknockbackend.domain.reaction.domain.repository.NotificationReactionRepository;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.global.utils.security.SecurityUtils;
 import java.time.LocalDateTime;
@@ -23,8 +29,8 @@ import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,12 +42,54 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final DeviceTokenRepository deviceTokenRepository;
+    private final NotificationReactionRepository notificationReactionRepository;
     private final EntityManager entityManager;
 
 
-    @Transactional
-    public QueryAlarmHistoryResponse queryAlarmHistoryByUserId(Pageable pageable) {
+    @Transactional(readOnly = true)
+    public QueryNotificationListResponse queryAlarmHistoryByUserId(Pageable pageable) {
         return null;
+    }
+
+    @Transactional(readOnly = true)
+    public QueryNotificationListResponse queryListByGroupId(Pageable pageable, Long groupId) {
+        Slice<Notification> alarmHistory = notificationRepository.findAllByGroupId(groupId, pageable);
+
+        Slice<NotificationReaction> notificationReactions = notificationReactionRepository.findByUserIdAndNotificationIn(
+            SecurityUtils.getCurrentUserId(), alarmHistory.getContent()
+        );
+
+        Slice<QueryAlarmHistoryResponseElement> result = alarmHistory
+            .map(notification -> {
+                    List<NotificationReactionCountInfoVo> notificationReactionCountInfos
+                        = notificationReactionRepository.findAllCountByNotification(notification);
+
+                    Optional<NotificationReaction> myNotificationReaction = notificationReactions.stream()
+                        .filter(notificationReaction -> notification.equals(notificationReaction.getNotification()))
+                        .findAny();
+
+                    NotificationReactionInfoVo notificationReactionInfoVo = NotificationReactionInfoVo.builder()
+                        .myReactionId(myNotificationReaction.isPresent() ? myNotificationReaction.get().getReaction().getId() : null)
+                        .reactionCountInfos(notificationReactionCountInfos)
+                        .build();
+
+                    return QueryAlarmHistoryResponseElement.builder()
+                        .notificationId(notification.getId())
+                        .title(notification.getTitle())
+                        .content(notification.getContent())
+                        .imageUrl(notification.getImageUrl())
+                        .sendAt(notification.getSendAt())
+                        .sendUserId(notification.getSendUser().getId())
+                        .reactions(notificationReactionInfoVo)
+                        .build();
+                }
+            );
+
+        Optional<GroupBaseInfoVo> groupBaseInfoVo = alarmHistory.stream()
+            .findFirst()
+            .map(notification -> notification.getGroup().getGroupBaseInfoVo());
+
+        return new QueryNotificationListResponse(groupBaseInfoVo.orElse(null), result);
     }
 
     @Transactional
