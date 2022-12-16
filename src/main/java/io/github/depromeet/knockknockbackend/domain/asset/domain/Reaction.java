@@ -1,4 +1,4 @@
-package io.github.depromeet.knockknockbackend.domain.reaction.domain;
+package io.github.depromeet.knockknockbackend.domain.asset.domain;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -27,6 +27,8 @@ public class Reaction {
     private String title;
 
     private String imageUrl;
+
+    private Long listOrder;
 
     public static Reaction of(Long reactionId) {
         return Reaction.builder()

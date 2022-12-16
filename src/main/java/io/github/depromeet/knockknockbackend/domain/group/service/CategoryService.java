@@ -37,4 +37,11 @@ public class CategoryService {
 
         return new CategoryDto(category);
     }
+
+    public CategoryListResponse findFamousCategory(){
+        List<CategoryDto> categoryDtos = categoryRepository.findFamousCategory().stream()
+            .map(CategoryDto::new)
+            .collect(Collectors.toList());
+        return new CategoryListResponse(categoryDtos);
+    }
 }
