@@ -2,18 +2,23 @@ package io.github.depromeet.knockknockbackend.domain.group.domain;
 
 
 import io.github.depromeet.knockknockbackend.domain.group.domain.vo.GroupBaseInfoVo;
+import io.github.depromeet.knockknockbackend.domain.group.event.EnterGroupEvent;
 import io.github.depromeet.knockknockbackend.domain.group.exception.AlreadyGroupEnterException;
+import io.github.depromeet.knockknockbackend.domain.group.exception.HostCanNotLeaveGroupException;
 import io.github.depromeet.knockknockbackend.domain.group.exception.NotHostException;
+import io.github.depromeet.knockknockbackend.domain.group.exception.NotMemberException;
 import io.github.depromeet.knockknockbackend.domain.group.service.dto.UpdateGroupDto;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.Notification;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.domain.user.domain.vo.UserInfoVO;
 import io.github.depromeet.knockknockbackend.global.database.BaseTimeEntity;
+import io.github.depromeet.knockknockbackend.global.event.Events;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
@@ -28,11 +33,13 @@ import javax.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Getter
 @Table(name = "tbl_group")
 @Entity
 @NoArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
 public class Group extends BaseTimeEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -64,7 +71,7 @@ public class Group extends BaseTimeEntity {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "host_id")
-    User host;
+    private User host;
     @Builder
     public Group(Long id, String title, String description, String thumbnailPath, String backgroundImagePath,
         Boolean publicAccess , Category category ,GroupType groupType ,User host) {
@@ -77,6 +84,7 @@ public class Group extends BaseTimeEntity {
         this.category = category;
         this.groupType = groupType;
         this.host = host;
+        this.groupUsers.add(new GroupUser(this,host));
     }
 
     public static String generateGroupTitle(String reqUserName, Integer memberCount){
@@ -129,11 +137,17 @@ public class Group extends BaseTimeEntity {
     }
 
     public void validUserIsAlreadyEnterGroup(Long userId){
-        if(checkUserIsAlreadyEnterGroup(userId))
+        if(checkUserIsMemberOfGroup(userId))
             throw AlreadyGroupEnterException.EXCEPTION;
     }
 
-    public boolean checkUserIsAlreadyEnterGroup(Long userId) {
+    public void validUserIsMemberOfGroup(Long userId){
+        if(!checkUserIsMemberOfGroup(userId)){
+            throw NotMemberException.EXCEPTION;
+        }
+    }
+
+    public boolean checkUserIsMemberOfGroup(Long userId) {
         return groupUsers.stream()
             .anyMatch(groupUser ->
                 groupUser.getUserId().equals(userId));
@@ -145,21 +159,62 @@ public class Group extends BaseTimeEntity {
             .collect(Collectors.toList());
     }
 
-    public void addMembers(List<User> newMembers){
-        List<GroupUser> newGroupUsers = newMembers.stream()
-            .map(user -> new GroupUser(this, user))
-            .collect(Collectors.toList());
-
-        groupUsers.addAll(newGroupUsers);
+    public void memberInviteNewUsers(Long reqUserId, List<User> newMembers){
+        newMembers.forEach(user -> memberInviteNewUser(reqUserId, user));
     }
 
-    public void removeUserByUserId(Long userId){
+    public void removeMemberByUserId(Long userId){
+        if(checkUserIsHost(userId)){
+            throw HostCanNotLeaveGroupException.EXCEPTION;
+        }
         groupUsers.removeIf(groupUser -> groupUser.getUserId().equals(userId));
     }
 
-    public void addMember(User reqUser) {
-        GroupUser groupUser = new GroupUser(this, reqUser);
+    public void kickUserFromGroup(Long reqUserId, Long kickUserId){
+        validUserIsHost(reqUserId);
+        removeMemberByUserId(kickUserId);
+    }
+
+    public void memberInviteNewUser(Long reqUserId, User newUser) {
+        validUserIsMemberOfGroup(reqUserId);
+        addMember(newUser);
+
+        EnterGroupEvent.MemberInvite memberInviteEvent = EnterGroupEvent.MemberInvite.builder()
+            .enterUserId(newUser.getId())
+            .inviterId(reqUserId)
+            .groupId(getId())
+            .build();
+
+        Events.raise(memberInviteEvent);
+    }
+
+    private void addMember(User newUser) {
+        validUserIsAlreadyEnterGroup(newUser.getId());
+        GroupUser groupUser = new GroupUser(this, newUser);
         groupUsers.add(groupUser);
+    }
+
+    public void hostAcceptMember(Long reqUserId ,User newUser){
+        validUserIsHost(reqUserId);
+        addMember(newUser);
+
+        EnterGroupEvent.HostAccept hostAcceptEvent = EnterGroupEvent.HostAccept.builder()
+            .groupId(getId())
+            .hostUserId(host.getId())
+            .enterUserId(newUser.getId())
+            .build();
+
+        Events.raise(hostAcceptEvent);
+    }
+
+    public void enterGroup(User newUser){
+        addMember(newUser);
+        EnterGroupEvent.InviteLink inviteLinkEvent = EnterGroupEvent.InviteLink.builder()
+            .enterUserId(newUser.getId())
+            .groupId(getId())
+            .build();
+
+        Events.raise(inviteLinkEvent);
     }
 
 

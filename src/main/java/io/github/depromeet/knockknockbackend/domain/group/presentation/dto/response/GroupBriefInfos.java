@@ -4,10 +4,9 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-
 @Getter
 @AllArgsConstructor
-public class BackgroundListResponse {
-    List<BackgroundImageDto> backgroundList ;
+public class GroupBriefInfos {
 
+    List<GroupBriefInfoDto> groupBriefInfos;
 }

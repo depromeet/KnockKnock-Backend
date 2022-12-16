@@ -2,7 +2,7 @@ package io.github.depromeet.knockknockbackend.domain.reaction.service;
 
 import io.github.depromeet.knockknockbackend.domain.notification.domain.Notification;
 import io.github.depromeet.knockknockbackend.domain.reaction.domain.NotificationReaction;
-import io.github.depromeet.knockknockbackend.domain.reaction.domain.Reaction;
+import io.github.depromeet.knockknockbackend.domain.asset.domain.Reaction;
 import io.github.depromeet.knockknockbackend.domain.reaction.exception.ReactionForbiddenException;
 import io.github.depromeet.knockknockbackend.domain.reaction.presentation.dto.request.RegisterReactionRequest;
 import io.github.depromeet.knockknockbackend.domain.reaction.domain.repository.NotificationReactionRepository;
