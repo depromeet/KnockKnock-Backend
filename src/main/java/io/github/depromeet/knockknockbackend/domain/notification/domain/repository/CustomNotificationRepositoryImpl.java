@@ -3,6 +3,7 @@ package io.github.depromeet.knockknockbackend.domain.notification.domain.reposit
 import static io.github.depromeet.knockknockbackend.domain.notification.domain.QNotification.notification;
 import static io.github.depromeet.knockknockbackend.domain.storage.domain.QStorage.storage;
 
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.Notification;
@@ -11,12 +12,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Repository;
 
 @RequiredArgsConstructor
 @Repository
 public class CustomNotificationRepositoryImpl implements CustomNotificationRepository {
 
+    private static final long NEXT_SLICE_CHECK = 1;
     private final JPAQueryFactory queryFactory;
 
     private boolean hasNext(List<Notification> notifications, Pageable pageable) {
@@ -36,16 +40,44 @@ public class CustomNotificationRepositoryImpl implements CustomNotificationRepos
             .innerJoin(storage.notification, notification)
             .where(storage.user.id.eq(userId),
                 eqGroupId(groupId)
-            ).fetch();
+            )
+            .orderBy(sort(pageable))
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize() + NEXT_SLICE_CHECK)
+            .fetch();
 
         return new SliceImpl<>(notifications, pageable, hasNext(notifications, pageable));
     }
 
     private BooleanExpression eqGroupId(Long groupId) {
-        if(groupId == null) {
+        if (groupId == null) {
             return null;
         }
         return notification.group.id.eq(groupId);
+    }
+
+    private OrderSpecifier<?> sort(Pageable pageable) {
+        OrderSpecifier<?> orderSpecifier = null;
+
+        Sort sort = pageable.getSort();
+        if (sort.isEmpty()) {
+            return null;
+        }
+
+        for (Order order : sort) {
+            com.querydsl.core.types.Order direction =
+                order.getDirection().isAscending() ?
+                    com.querydsl.core.types.Order.ASC : com.querydsl.core.types.Order.DESC;
+            switch (order.getProperty()) {
+                case "createdDate":
+                    orderSpecifier = new OrderSpecifier<>(direction, storage.createdDate);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        return orderSpecifier;
     }
 
 }
