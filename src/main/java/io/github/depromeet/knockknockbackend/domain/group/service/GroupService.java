@@ -34,6 +34,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -144,14 +145,14 @@ public class GroupService implements GroupUtils {
         GroupBuilder groupBuilder = Group.builder()
             .publicAccess(createOpenGroupRequest.getPublicAccess())
             .thumbnailPath(
-                createOpenGroupRequest.getThumbnailPath() == null ?
-                    assetUtils.getRandomThumbnailUrl() :
-                    createOpenGroupRequest.getThumbnailPath()
+                StringUtils.hasText(createOpenGroupRequest.getThumbnailPath()) ?
+                    createOpenGroupRequest.getThumbnailPath() :
+                    assetUtils.getRandomThumbnailUrl()
             )
             .backgroundImagePath(
-                createOpenGroupRequest.getBackgroundImagePath() == null ?
-                    assetUtils.getRandomBackgroundImageUrl() :
-                    createOpenGroupRequest.getBackgroundImagePath()
+                StringUtils.hasText(createOpenGroupRequest.getBackgroundImagePath()) ?
+                    createOpenGroupRequest.getBackgroundImagePath() :
+                    assetUtils.getRandomBackgroundImageUrl()
             )
             .description(createOpenGroupRequest.getDescription())
             .title(createOpenGroupRequest.getTitle())
@@ -162,8 +163,7 @@ public class GroupService implements GroupUtils {
             createOpenGroupRequest.getCategoryId());
         groupBuilder.category(category);
 
-        Group group = groupBuilder.build();
-        return group;
+        return groupBuilder.build();
     }
 
 
