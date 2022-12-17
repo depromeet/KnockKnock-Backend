@@ -9,6 +9,7 @@ import lombok.Getter;
 @Builder
 public class NotificationReactionCountInfoVo {
 
+    private final Long notificationId;
     private final Long reactionId;
     private final Long reactionCount;
 
