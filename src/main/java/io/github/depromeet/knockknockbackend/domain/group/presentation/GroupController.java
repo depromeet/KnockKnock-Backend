@@ -18,6 +18,7 @@ import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.respo
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupResponse;
 import io.github.depromeet.knockknockbackend.domain.group.service.CategoryService;
 import io.github.depromeet.knockknockbackend.domain.group.service.GroupService;
+import io.github.depromeet.knockknockbackend.global.annotation.DisableSecurity;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -38,11 +39,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/groups")
-@RequiredArgsConstructor
-@Tag(name = "그룹 관련 컨트롤러", description = "")
+@Tag(name = "그룹 관련 컨트롤러",description = "")
 @SecurityRequirement(name = "access-token")
 public class GroupController {
 
@@ -54,18 +54,21 @@ public class GroupController {
     private final AdmissionUsecase admissionUsecase;
 
     @Operation(summary = "공개 그룹을 만듭니다")
+    @Tag(name = "그룹 생성")
     @PostMapping("/open")
     public GroupResponse createOpenGroup(@Valid @RequestBody CreateOpenGroupRequest createOpenGroupRequest){
         return groupService.createOpenGroup(createOpenGroupRequest);
     }
 
     @Operation(summary = "친구 그룹을 만듭니다")
+    @Tag(name = "그룹 생성")
     @PostMapping("/friend")
     public GroupResponse createFriendGroup(@Valid @RequestBody CreateFriendGroupRequest createFriendGroupRequest){
         return groupService.createFriendGroup(createFriendGroupRequest);
     }
 
     @Operation(summary = "방장 권한 그룹 설정")
+    @Tag(name = "방장 권한 그룹 관리")
     @PutMapping("/{id}")
     public GroupResponse putGroup(@PathVariable("id") Long groupId ,@Valid @RequestBody UpdateGroupRequest updateGroupRequest){
 
@@ -73,6 +76,7 @@ public class GroupController {
     }
 
     @Operation(summary = "방장 권한 그룹 제거")
+    @Tag(name = "방장 권한 그룹 관리")
     @DeleteMapping("/{id}")
     public void deleteGroup(@PathVariable("id") Long groupId){
         groupService.deleteGroup(groupId);
@@ -80,6 +84,7 @@ public class GroupController {
 
 
     @GetMapping("/{id}")
+    @Tag(name = "그룹 조회")
     public GroupResponse getGroupDetail(@PathVariable("id") Long groupId){
         return groupService.getGroupDetailById(groupId);
     }
@@ -88,6 +93,7 @@ public class GroupController {
     @Parameter(name = "type", description = "type", schema = @Schema(implementation = GroupInTypeRequest.class)
         , in = ParameterIn.QUERY)
     @Operation(summary = "참여중인 그룹 목록 전체 홀로외침 친구들 방 필터링")
+    @Tag(name = "그룹 조회")
     @GetMapping("/joined")
     public Slice<GroupBriefInfoDto> getParticipatingGroups(
         @RequestParam("type") GroupInTypeRequest groupInTypeRequest,
@@ -104,6 +110,7 @@ public class GroupController {
     @Parameter(name = "category", description = "category", schema = @Schema(implementation = Long.class)
         , in = ParameterIn.QUERY)
     @Operation(summary = "방 찾기")
+    @Tag(name = "그룹 조회")
     @GetMapping("/open")
     public Slice<GroupBriefInfoDto> getAllOpenGroups(
         @RequestParam(value = "category" ) Long categoryId,
@@ -112,38 +119,42 @@ public class GroupController {
         PageRequest pageRequest = PageRequest.of(page, size);
         return groupService.findOpenGroupByCategory(categoryId ,pageRequest);
     }
-
+    @Tag(name = "그룹 카테고리")
     @GetMapping("/categories")
     public CategoryListResponse getCategory(){
         return categoryService.findAllCategory();
     }
 
+    @Tag(name = "그룹 카테고리")
     @GetMapping("/categories/famous")
     public CategoryListResponse getFamousCategory(){
         return categoryService.findFamousCategory();
     }
 
     //TODO : 관리자권한 필요
-    @PostMapping("/categories")
-    public CategoryDto createCategory(@RequestBody @Valid CreateCategoryRequest createCategoryRequest){
-        return categoryService.saveCategory(createCategoryRequest);
-    }
+//    @PostMapping("/categories")
+//    public CategoryDto createCategory(@RequestBody @Valid CreateCategoryRequest createCategoryRequest){
+//        return categoryService.saveCategory(createCategoryRequest);
+//    }
 
 
 
     @Operation(summary = "그룹에 가입요청을 합니다.")
+    @Tag(name = "그룹 가입요청")
     @PostMapping("/{id}/admissions")
     public AdmissionInfoDto admissionToGroup(@PathVariable(value = "id") Long groupId){
         return admissionUsecase.requestAdmission(groupId);
     }
 
-    @Operation(summary = "그룹 가입 요청을 살펴봅니다.")
+    @Operation(summary = "그룹 가입 요청을 살펴봅니다. (방장 권한)")
+    @Tag(name = "그룹 가입요청")
     @GetMapping("/{id}/admissions")
     public AdmissionInfoListResponse getAdmissionRequest(@PathVariable(value = "id") Long groupId){
         return admissionUsecase.getAdmissions(groupId);
     }
 
-    @Operation(summary = "그룹 가입요청을 허락합니다.")
+    @Operation(summary = "그룹 가입요청을 허락합니다. (방장 권한)")
+    @Tag(name = "그룹 가입요청")
     @PostMapping("/{id}/admissions/{admission_id}/allow")
     public AdmissionInfoDto acceptAdmissionRequest(
         @PathVariable(value = "id") Long groupId,
@@ -151,7 +162,8 @@ public class GroupController {
         return admissionUsecase.acceptAdmission(groupId,admissionId);
     }
 
-    @Operation(summary = "그룹 가입요청을 거절합니다.")
+    @Operation(summary = "그룹 가입요청을 거절합니다. (방장 권한)")
+    @Tag(name = "그룹 가입요청")
     @PostMapping("/{id}/admissions/{admission_id}/refuse")
     public AdmissionInfoDto refuseAdmissionRequest(
         @PathVariable(value = "id") Long groupId,
@@ -160,6 +172,7 @@ public class GroupController {
         return admissionUsecase.refuseAdmission(groupId, admissionId);
     }
     @Operation(summary = "방 검색하기")
+    @Tag(name = "그룹 조회")
     @GetMapping("/search/{searchString}")
     public Slice<GroupBriefInfoDto> searchOpenGroups(
         @PathVariable(value = "searchString") String searchString,
@@ -170,7 +183,8 @@ public class GroupController {
         return groupService.searchOpenGroups(searchString,pageRequest);
     }
 
-    @Operation(summary = "방장 권한 멤버 추가")
+    @Operation(summary = "멤버 추가 내 친구 목록 초대가능!")
+    @Tag(name = "그룹 멤버")
     @PostMapping("/{id}/members")
     public GroupResponse addMembers(
         @PathVariable(value = "id") Long groupId,
@@ -179,18 +193,21 @@ public class GroupController {
     }
 
     @Operation(summary = "그룹에서 나가기 ( 방장은 못나갑니다 )")
+    @Tag(name = "그룹 멤버")
     @DeleteMapping("/{id}/members/leave")
     public GroupResponse leaveFromGroup(@PathVariable(value = "id") Long groupId){
         return groupService.leaveFromGroup(groupId);
     }
 
     @Operation(summary = "멤버 내쫓기 (방장권한)")
+    @Tag(name = "방장 권한 그룹 관리")
     @DeleteMapping("/{id}/members/{user_id}")
     public GroupResponse deleteMemberFromGroup(@PathVariable(value = "id") Long groupId, @PathVariable(value = "user_id") Long userId){
         return groupService.deleteMemberFromGroup(groupId , userId);
     }
 
     @Operation(summary = "그룹 초대 토큰 발급")
+    @Tag(name = "그룹 멤버")
     @GetMapping("/{id}/members/invite")
     public GroupInviteLinkResponse createGroupInviteLink(
         @PathVariable(value = "id") Long groupId
@@ -199,6 +216,7 @@ public class GroupController {
     }
 
     @Operation(summary = "그룹 초대 토큰 검증 & 그룹 가입")
+    @Tag(name = "그룹 멤버")
     @PostMapping("/{id}/members/invite/{code}")
     public GroupResponse checkGroupInviteLink(
         @PathVariable(value = "id") Long groupId,
@@ -208,6 +226,7 @@ public class GroupController {
     }
 
     @Operation(summary = "요즘 뜨고있는 알림방")
+    @Tag(name = "그룹 조회")
     @GetMapping("/famous")
     public GroupBriefInfos getFamousGroup(){
         return groupService.getFamousGroup();
