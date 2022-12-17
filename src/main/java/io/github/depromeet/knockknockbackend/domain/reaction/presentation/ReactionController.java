@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @SecurityRequirement(name = "access-token")
 @Tag(name = "리액션 관련 컨트롤러", description = "")
 @RequiredArgsConstructor
-@RequestMapping("/reactions")
+@RequestMapping("/api/v1/reactions")
 @RestController
 public class ReactionController {
 

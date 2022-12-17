@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 @SecurityRequirement(name = "access-token")
 @Tag(name = "푸쉬알림 관련 컨트롤러", description = "")
 @RequiredArgsConstructor
-@RequestMapping("/notifications")
+@RequestMapping("/api/v1/notifications")
 @RestController
 public class NotificationController {
 

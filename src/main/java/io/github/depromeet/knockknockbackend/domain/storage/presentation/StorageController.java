@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 @SecurityRequirement(name = "access-token")
 @Tag(name = "보관함 관련 컨트롤러", description = "")
 @RequiredArgsConstructor
-@RequestMapping("/storages")
+@RequestMapping("/api/v1/storages")
 @RestController
 public class StorageController {
 

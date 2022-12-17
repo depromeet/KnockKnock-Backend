@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/credentials")
+@RequestMapping("/api/v1/credentials")
 @RequiredArgsConstructor
 @Tag(name = "인증 관련 컨트롤러", description = "oauth, token refresh 기능을 담당합니다")
 public class CredentialController {

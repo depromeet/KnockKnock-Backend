@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
-@RequestMapping("/asset")
+@RequestMapping("/api/v1/asset")
 @RestController
 @Tag(name = "이미지 관련 컨트롤러", description = "")
 @SecurityRequirement(name = "access-token")

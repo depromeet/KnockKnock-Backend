@@ -38,7 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/groups")
+@RequestMapping("/api/v1/groups")
 @Tag(name = "그룹 관련 컨트롤러", description = "")
 @SecurityRequirement(name = "access-token")
 public class GroupController {

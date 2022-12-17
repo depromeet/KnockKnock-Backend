@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "유저 관련 컨트롤러", description = "")
 @SecurityRequirement(name = "access-token")
 @RequiredArgsConstructor
-@RequestMapping("/relations")
+@RequestMapping("/api/v1/relations")
 @RestController
 public class RelationController {
 
