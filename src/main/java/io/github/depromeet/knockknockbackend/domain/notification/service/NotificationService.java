@@ -55,14 +55,16 @@ public class NotificationService {
     public QueryNotificationListResponse queryListByGroupId(Pageable pageable, Long groupId) {
         Slice<Notification> notifications = notificationRepository.findAllByGroupId(groupId, pageable);
 
-        Slice<QueryNotificationListResponseElement> notificationListResponseElements = getNotificationListResponseElements(
-            notifications);
+        Slice<QueryNotificationListResponseElement> notificationListResponseElements =
+            getNotificationListResponseElements(notifications);
 
         Optional<GroupBaseInfoVo> groupBaseInfoVo = notifications.stream()
             .findFirst()
             .map(notification -> notification.getGroup().getGroupBaseInfoVo());
 
-        return new QueryNotificationListResponse(groupBaseInfoVo.orElse(null), notificationListResponseElements);
+        return new QueryNotificationListResponse(
+            groupBaseInfoVo.orElse(null), notificationListResponseElements
+        );
     }
 
     @Transactional
@@ -121,11 +123,14 @@ public class NotificationService {
         Slice<NotificationReaction> notificationReactions = retrieveNotificationReactions(
             notifications);
 
-        List<NotificationReactionCountInfoVo> notificationReactionCountInfos
-            = retrieveNotificationReactionCountInfoVos(notifications);
+        List<List<NotificationReactionCountInfoVo>> notificationReactionCountInfoVos =
+            notifications.stream()
+                .map(notificationReactionRepository::findAllCountByNotification
+                ).collect(Collectors.toList());
 
         return generateQueryNotificationListResponseElements(
-            notifications, notificationReactions, notificationReactionCountInfos);
+            notifications, notificationReactions, notificationReactionCountInfoVos
+        );
     }
 
     private void handleFcmMessagingException(BatchResponse batchResponse) {
@@ -180,7 +185,7 @@ public class NotificationService {
     private static Slice<QueryNotificationListResponseElement> generateQueryNotificationListResponseElements(
         Slice<Notification> notifications,
         Slice<NotificationReaction> notificationReactions,
-        List<NotificationReactionCountInfoVo> notificationReactionCountInfos) {
+        List<List<NotificationReactionCountInfoVo>> notificationReactionCountInfoVos) {
 
         return notifications
             .map(notification -> {
@@ -195,7 +200,17 @@ public class NotificationService {
                         .myReactionId(myNotificationReaction.isPresent() ?
                             myNotificationReaction.get().getReaction().getId() : null
                         )
-                        .reactionCountInfos(notificationReactionCountInfos)
+                        .reactionCountInfos(
+                            notificationReactionCountInfoVos.stream()
+                                .filter(notificationReactionCountInfoVo -> {
+                                        if (!notificationReactionCountInfoVo.isEmpty()) {
+                                            return notification.getId().equals(
+                                                notificationReactionCountInfoVo.get(0).getNotificationId());
+                                        }
+                                        return false;
+                                    }
+                                ).findAny().orElse(null)
+                        )
                         .build();
 
                     return QueryNotificationListResponseElement.builder()
@@ -209,12 +224,6 @@ public class NotificationService {
                         .build();
                 }
             );
-    }
-
-    private List<NotificationReactionCountInfoVo> retrieveNotificationReactionCountInfoVos(
-        Slice<Notification> notifications) {
-        return notificationReactionRepository.findAllCountByNotificationIn(
-            notifications.getContent());
     }
 
     private Slice<NotificationReaction> retrieveNotificationReactions(
