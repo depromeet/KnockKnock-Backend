@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.domain.user.presentation.dto.request;
 
+
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import lombok.Getter;
@@ -13,6 +14,5 @@ public class ChangeProfileRequest {
     @NotEmpty
     private String nickname;
 
-    @NotEmpty
-    private String profilePath;
+    @NotEmpty private String profilePath;
 }

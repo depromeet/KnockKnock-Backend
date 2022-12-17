@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.domain.recommendmessage.domain;
 
+
 import io.github.depromeet.knockknockbackend.global.database.BaseTimeEntity;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -14,7 +15,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
 
 @Getter
 @Builder
@@ -33,5 +33,4 @@ public class RecommendMessageContent extends BaseTimeEntity {
     @JoinColumn(name = "recommned_message_id")
     @ManyToOne(fetch = FetchType.LAZY)
     private RecommendMessage recommendMessage;
-
 }

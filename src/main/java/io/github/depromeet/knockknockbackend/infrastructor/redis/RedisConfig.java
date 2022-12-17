@@ -1,5 +1,7 @@
 package io.github.depromeet.knockknockbackend.infrastructor.redis;
 
+
+import java.time.Duration;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,9 +12,8 @@ import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactor
 import org.springframework.data.redis.core.RedisKeyValueAdapter;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 
-import java.time.Duration;
-
-@EnableRedisRepositories(enableKeyspaceEvents = RedisKeyValueAdapter.EnableKeyspaceEvents.ON_STARTUP)
+@EnableRedisRepositories(
+        enableKeyspaceEvents = RedisKeyValueAdapter.EnableKeyspaceEvents.ON_STARTUP)
 @Configuration
 public class RedisConfig {
 
@@ -30,14 +31,14 @@ public class RedisConfig {
         RedisStandaloneConfiguration redisConfig =
                 new RedisStandaloneConfiguration(redisHost, redisPort);
 
-        if(redisPassword != null && !redisPassword.isBlank())
+        if (redisPassword != null && !redisPassword.isBlank())
             redisConfig.setPassword(redisPassword);
 
-        LettuceClientConfiguration clientConfig = LettuceClientConfiguration.builder()
-                .commandTimeout(Duration.ofSeconds(1))
-                .shutdownTimeout(Duration.ZERO)
-                .build();
+        LettuceClientConfiguration clientConfig =
+                LettuceClientConfiguration.builder()
+                        .commandTimeout(Duration.ofSeconds(1))
+                        .shutdownTimeout(Duration.ZERO)
+                        .build();
         return new LettuceConnectionFactory(redisConfig, clientConfig);
     }
-
 }

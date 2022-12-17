@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.global.successResponse;
 
+
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpStatus;
@@ -19,10 +20,15 @@ public class SuccessResponseAdvice implements ResponseBodyAdvice {
     }
 
     @Override
-    public Object beforeBodyWrite(Object body, MethodParameter returnType,
-        MediaType selectedContentType, Class selectedConverterType, ServerHttpRequest request,
-        ServerHttpResponse response) {
-        HttpServletResponse servletResponse = ((ServletServerHttpResponse) response).getServletResponse();
+    public Object beforeBodyWrite(
+            Object body,
+            MethodParameter returnType,
+            MediaType selectedContentType,
+            Class selectedConverterType,
+            ServerHttpRequest request,
+            ServerHttpResponse response) {
+        HttpServletResponse servletResponse =
+                ((ServletServerHttpResponse) response).getServletResponse();
 
         int status = servletResponse.getStatus();
         HttpStatus resolve = HttpStatus.resolve(status);
@@ -31,8 +37,8 @@ public class SuccessResponseAdvice implements ResponseBodyAdvice {
             return body;
         }
 
-        if(resolve.is2xxSuccessful()){
-            return new SuccessResponse(status,body);
+        if (resolve.is2xxSuccessful()) {
+            return new SuccessResponse(status, body);
         }
 
         return body;

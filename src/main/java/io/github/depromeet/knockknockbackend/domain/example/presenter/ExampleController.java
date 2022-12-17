@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.domain.example.presenter;
 
+
 import io.github.depromeet.knockknockbackend.domain.example.presenter.dto.request.ExampleRequest;
 import io.github.depromeet.knockknockbackend.domain.example.presenter.dto.response.ExampleResponse;
 import io.github.depromeet.knockknockbackend.domain.example.service.ExampleService;
@@ -18,5 +19,4 @@ public class ExampleController {
     public ExampleResponse getExampleValue(@RequestBody ExampleRequest request) {
         return new ExampleResponse(exampleService.getExample(request));
     }
-
 }

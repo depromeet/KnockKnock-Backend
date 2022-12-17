@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.domain.user.presentation.dto.response;
 
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -11,5 +12,4 @@ public class QueryUserByNicknameResponseElement {
     private final String nickname;
     private final String profilePath;
     private final boolean isFriend;
-
 }

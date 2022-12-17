@@ -1,7 +1,6 @@
 package io.github.depromeet.knockknockbackend.global.utils.api.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -24,18 +23,18 @@ public class KakaoInformationResponse {
     @NoArgsConstructor
     public static class KakaoAccount {
 
-//        private Profile profile;
+        //        private Profile profile;
         private String email;
-//        @Getter
-//        @NoArgsConstructor
-//        public static class Profile {
-//            @JsonProperty("profile_image_url")
-//            private String profileImageUrl;
-//        }
+        //        @Getter
+        //        @NoArgsConstructor
+        //        public static class Profile {
+        //            @JsonProperty("profile_image_url")
+        //            private String profileImageUrl;
+        //        }
 
-//        public String getProfileImageUrl() {
-//            return profile.getProfileImageUrl();
-//        }
+        //        public String getProfileImageUrl() {
+        //            return profile.getProfileImageUrl();
+        //        }
 
     }
 
@@ -47,14 +46,12 @@ public class KakaoInformationResponse {
         return kakaoAccount.getEmail();
     }
 
-
-
-//    public String getName() {
-//        return properties.getNickname();
-//    }
-//
-//    public String getProfileImage() {
-//        return kakaoAccount.getProfileImageUrl();
-//    }
+    //    public String getName() {
+    //        return properties.getNickname();
+    //    }
+    //
+    //    public String getProfileImage() {
+    //        return kakaoAccount.getProfileImageUrl();
+    //    }
 
 }

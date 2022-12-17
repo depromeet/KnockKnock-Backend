@@ -1,22 +1,21 @@
 package io.github.depromeet.knockknockbackend.domain.option.domain;
 
-import io.github.depromeet.knockknockbackend.domain.user.domain.User;
-import lombok.Getter;
 
+import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.MapsId;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import lombok.Getter;
 
 @Getter
 @Table(name = "tbl_option")
 @Entity
 public class Option {
 
-    @Id
-    private Long userId;
+    @Id private Long userId;
 
     @MapsId
     @OneToOne
@@ -40,5 +39,4 @@ public class Option {
     public void setNightOption(boolean nightOption) {
         this.nightOption = nightOption;
     }
-
 }

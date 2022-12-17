@@ -20,7 +20,7 @@ import org.springframework.stereotype.Repository;
 
 @RequiredArgsConstructor
 @Repository
-public class CustomGroupUserRepositoryImpl implements CustomGroupUserRepository{
+public class CustomGroupUserRepositoryImpl implements CustomGroupUserRepository {
 
     private final JPAQueryFactory queryFactory;
 
@@ -34,51 +34,59 @@ public class CustomGroupUserRepositoryImpl implements CustomGroupUserRepository{
     }
 
     private JPAQuery<GroupUser> getGroupUserWithGroupAndRecentNotification() {
-        return queryFactory.selectFrom(groupUser)
-            .join(groupUser.group, group)
-            .fetchJoin()
-            .leftJoin(notification)
-            .on(notification.id.eq(
-                JPAExpressions.select(notification.id.max())
-                    .from(notification)
-                    .where(notification.group.id.eq(group.id))
-                    .orderBy(notification.id.desc())
-            ));
+        return queryFactory
+                .selectFrom(groupUser)
+                .join(groupUser.group, group)
+                .fetchJoin()
+                .leftJoin(notification)
+                .on(
+                        notification.id.eq(
+                                JPAExpressions.select(notification.id.max())
+                                        .from(notification)
+                                        .where(notification.group.id.eq(group.id))
+                                        .orderBy(notification.id.desc())));
     }
 
     @Override
     public Slice<GroupUser> findJoinedGroupUser(Long userId, Pageable pageable) {
-        List<GroupUser> groupUsers = getGroupUserWithGroupAndRecentNotification()
-            .where(groupUser.user.id.eq(userId))
-            .orderBy(notification.sendAt.coalesce(group.createdDate).desc())
-            .offset(pageable.getOffset())
-            .limit(pageable.getPageSize() + 1)
-            .fetch();
+        List<GroupUser> groupUsers =
+                getGroupUserWithGroupAndRecentNotification()
+                        .where(groupUser.user.id.eq(userId))
+                        .orderBy(notification.sendAt.coalesce(group.createdDate).desc())
+                        .offset(pageable.getOffset())
+                        .limit(pageable.getPageSize() + 1)
+                        .fetch();
 
         return new SliceImpl<>(groupUsers, pageable, hasNext(groupUsers, pageable));
     }
 
     @Override
-    public Slice<GroupUser> findJoinedGroupUserByGroupType(Long userId, GroupType groupType, Pageable pageable) {
-        List<GroupUser> groupUsers = getGroupUserWithGroupAndRecentNotification()
-            .where(groupUser.user.id.eq(userId)
-                .and(group.groupType.eq(groupType)))
-            .orderBy(notification.sendAt.coalesce(group.createdDate).desc())
-            .offset(pageable.getOffset())
-            .limit(pageable.getPageSize() + 1)
-            .fetch();
+    public Slice<GroupUser> findJoinedGroupUserByGroupType(
+            Long userId, GroupType groupType, Pageable pageable) {
+        List<GroupUser> groupUsers =
+                getGroupUserWithGroupAndRecentNotification()
+                        .where(groupUser.user.id.eq(userId).and(group.groupType.eq(groupType)))
+                        .orderBy(notification.sendAt.coalesce(group.createdDate).desc())
+                        .offset(pageable.getOffset())
+                        .limit(pageable.getPageSize() + 1)
+                        .fetch();
 
         return new SliceImpl<>(groupUsers, pageable, hasNext(groupUsers, pageable));
     }
 
     @Override
     public Optional<GroupUser> findByGroupIdAndUserId(Long groupId, Long userId) {
-        GroupUser groupUser = queryFactory.selectFrom(QGroupUser.groupUser)
-            .where(QGroupUser.groupUser.group.id.eq(groupId)
-                .and(QGroupUser.groupUser.user.id.eq(userId)))
-            .fetchOne();
+        GroupUser groupUser =
+                queryFactory
+                        .selectFrom(QGroupUser.groupUser)
+                        .where(
+                                QGroupUser.groupUser
+                                        .group
+                                        .id
+                                        .eq(groupId)
+                                        .and(QGroupUser.groupUser.user.id.eq(userId)))
+                        .fetchOne();
 
         return Optional.ofNullable(groupUser);
     }
-
 }

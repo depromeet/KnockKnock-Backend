@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.domain.recommendmessage.presentation;
 
+
 import io.github.depromeet.knockknockbackend.domain.recommendmessage.presentation.dto.response.QueryRecommendMessageResponse;
 import io.github.depromeet.knockknockbackend.domain.recommendmessage.service.RecommendMessageService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,7 +22,7 @@ public class RecommendMessageController {
 
     @Operation(summary = "추천메세지 조회")
     @GetMapping
-    public QueryRecommendMessageResponse queryRecommendMessageContentByUseY(){
+    public QueryRecommendMessageResponse queryRecommendMessageContentByUseY() {
         return recommendMessageService.queryRecommendMessageContentByUseY();
     }
 }

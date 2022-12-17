@@ -34,19 +34,21 @@ public class CustomNotificationRepositoryImpl implements CustomNotificationRepos
     }
 
     @Override
-    public Slice<Notification> findSliceFromStorage(Long userId, Long groupId, Integer periodOfMonth, Pageable pageable) {
-        List<Notification> notifications = queryFactory
-            .select(notification)
-            .from(storage)
-            .innerJoin(storage.notification, notification)
-            .where(storage.user.id.eq(userId),
-                eqGroupId(groupId),
-                greaterEqualPeriodOfMonth(periodOfMonth)
-            )
-            .orderBy(sort(pageable))
-            .offset(pageable.getOffset())
-            .limit(pageable.getPageSize() + NEXT_SLICE_CHECK)
-            .fetch();
+    public Slice<Notification> findSliceFromStorage(
+            Long userId, Long groupId, Integer periodOfMonth, Pageable pageable) {
+        List<Notification> notifications =
+                queryFactory
+                        .select(notification)
+                        .from(storage)
+                        .innerJoin(storage.notification, notification)
+                        .where(
+                                storage.user.id.eq(userId),
+                                eqGroupId(groupId),
+                                greaterEqualPeriodOfMonth(periodOfMonth))
+                        .orderBy(sort(pageable))
+                        .offset(pageable.getOffset())
+                        .limit(pageable.getPageSize() + NEXT_SLICE_CHECK)
+                        .fetch();
 
         return new SliceImpl<>(notifications, pageable, hasNext(notifications, pageable));
     }
@@ -76,8 +78,9 @@ public class CustomNotificationRepositoryImpl implements CustomNotificationRepos
 
         for (Order order : sort) {
             com.querydsl.core.types.Order direction =
-                order.getDirection().isAscending() ?
-                    com.querydsl.core.types.Order.ASC : com.querydsl.core.types.Order.DESC;
+                    order.getDirection().isAscending()
+                            ? com.querydsl.core.types.Order.ASC
+                            : com.querydsl.core.types.Order.DESC;
             switch (order.getProperty()) {
                 case "createdDate":
                     orderSpecifier = new OrderSpecifier<>(direction, storage.createdDate);
@@ -89,5 +92,4 @@ public class CustomNotificationRepositoryImpl implements CustomNotificationRepos
 
         return orderSpecifier;
     }
-
 }

@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.domain.group.domain;
 
+
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Entity;
@@ -13,13 +14,11 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-
 @Getter
 @Table(name = "tbl_group_category")
 @Entity
-@NoArgsConstructor(access=AccessLevel.PROTECTED )
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Category {
-
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,7 +35,6 @@ public class Category {
 
     public static final Long defaultEmptyCategoryId = 1L;
 
-
     @Builder
     public Category(Long id, String emoji, String content) {
         this.id = id;
@@ -44,5 +42,3 @@ public class Category {
         this.content = content;
     }
 }
-
-

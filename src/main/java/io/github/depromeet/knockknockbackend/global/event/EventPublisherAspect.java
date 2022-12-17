@@ -1,13 +1,12 @@
 package io.github.depromeet.knockknockbackend.global.event;
 
+
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.stereotype.Component;
-
-
 
 @Aspect
 @Component
@@ -29,8 +28,7 @@ public class EventPublisherAspect implements ApplicationEventPublisherAware {
             appliedLocal.set(Boolean.TRUE);
         }
 
-        if (!nested)
-            Events.setPublisher(publisher);
+        if (!nested) Events.setPublisher(publisher);
 
         try {
             return joinPoint.proceed();

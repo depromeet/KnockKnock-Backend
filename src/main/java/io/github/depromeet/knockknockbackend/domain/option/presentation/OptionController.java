@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.domain.option.presentation;
 
+
 import io.github.depromeet.knockknockbackend.domain.option.service.OptionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -62,5 +63,4 @@ public class OptionController {
     public void nightOptionOff() {
         optionService.changeNightOption(false);
     }
-
 }

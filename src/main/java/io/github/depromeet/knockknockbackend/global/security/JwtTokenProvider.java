@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.global.security;
 
+
 import io.github.depromeet.knockknockbackend.global.exception.ExpiredTokenException;
 import io.github.depromeet.knockknockbackend.global.exception.InvalidTokenException;
 import io.github.depromeet.knockknockbackend.global.property.JwtProperties;
@@ -9,16 +10,15 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import java.nio.charset.StandardCharsets;
+import java.security.Key;
 import java.util.Date;
+import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-
-import javax.servlet.http.HttpServletRequest;
-import java.nio.charset.StandardCharsets;
-import java.security.Key;
 
 @RequiredArgsConstructor
 @Component
@@ -30,8 +30,9 @@ public class JwtTokenProvider {
     public String resolveToken(HttpServletRequest request) {
         String rawHeader = request.getHeader(jwtProperties.getHeader());
 
-        if(rawHeader != null && rawHeader.length() > jwtProperties.getPrefix().length() &&
-                rawHeader.startsWith(jwtProperties.getPrefix())) {
+        if (rawHeader != null
+                && rawHeader.length() > jwtProperties.getPrefix().length()
+                && rawHeader.startsWith(jwtProperties.getPrefix())) {
             return rawHeader.substring(jwtProperties.getPrefix().length() + 1);
         }
         return null;
@@ -40,13 +41,13 @@ public class JwtTokenProvider {
     public Authentication getAuthentication(String token) {
         String id = getJws(token).getBody().getSubject();
         UserDetails userDetails = authDetailsService.loadUserByUsername(id);
-        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+        return new UsernamePasswordAuthenticationToken(
+                userDetails, "", userDetails.getAuthorities());
     }
 
     private Jws<Claims> getJws(String token) {
         try {
-            return Jwts.parserBuilder().setSigningKey(getSecretKey())
-                    .build().parseClaimsJws(token);
+            return Jwts.parserBuilder().setSigningKey(getSecretKey()).build().parseClaimsJws(token);
         } catch (ExpiredJwtException e) {
             throw ExpiredTokenException.EXCEPTION;
         } catch (Exception e) {
@@ -58,30 +59,32 @@ public class JwtTokenProvider {
         return Keys.hmacShaKeyFor(jwtProperties.getSecretKey().getBytes(StandardCharsets.UTF_8));
     }
 
-    private String buildToken(Long id, Date issuedAt, Date accessTokenExpiresIn,String claimValue) {
+    private String buildToken(
+            Long id, Date issuedAt, Date accessTokenExpiresIn, String claimValue) {
         final Key encodedKey = getSecretKey();
         return Jwts.builder()
-            .setIssuer("knockknock")
-            .setIssuedAt(issuedAt)
-            .setSubject(id.toString())
-            .claim("type", claimValue)
-            .setExpiration(accessTokenExpiresIn)
-            .signWith(encodedKey)
-            .compact();
+                .setIssuer("knockknock")
+                .setIssuedAt(issuedAt)
+                .setSubject(id.toString())
+                .claim("type", claimValue)
+                .setExpiration(accessTokenExpiresIn)
+                .signWith(encodedKey)
+                .compact();
     }
 
     public String generateAccessToken(Long id) {
         final Date issuedAt = new Date();
-        final Date accessTokenExpiresIn = new Date(issuedAt.getTime() + jwtProperties.getAccessExp() * 1000);
+        final Date accessTokenExpiresIn =
+                new Date(issuedAt.getTime() + jwtProperties.getAccessExp() * 1000);
 
-        return buildToken(id, issuedAt, accessTokenExpiresIn,"access_token");
+        return buildToken(id, issuedAt, accessTokenExpiresIn, "access_token");
     }
-
 
     public String generateRefreshToken(Long id) {
         final Date issuedAt = new Date();
-        final Date refreshTokenExpiresIn = new Date(issuedAt.getTime() + jwtProperties.getAccessExp() * 1000);
-        return buildToken(id, issuedAt, refreshTokenExpiresIn,"refresh_token");
+        final Date refreshTokenExpiresIn =
+                new Date(issuedAt.getTime() + jwtProperties.getAccessExp() * 1000);
+        return buildToken(id, issuedAt, refreshTokenExpiresIn, "refresh_token");
     }
 
     public boolean isAccessToken(String token) {
@@ -108,8 +111,7 @@ public class JwtTokenProvider {
         throw InvalidTokenException.EXCEPTION;
     }
 
-    public Date getTokenExpiredAt(String token){
+    public Date getTokenExpiredAt(String token) {
         return getJws(token).getBody().getExpiration();
     }
-
 }

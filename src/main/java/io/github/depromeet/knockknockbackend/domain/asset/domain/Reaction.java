@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.domain.asset.domain;
 
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -10,7 +11,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
 
 @Getter
 @Builder(access = AccessLevel.PRIVATE)
@@ -31,9 +31,6 @@ public class Reaction {
     private Long listOrder;
 
     public static Reaction of(Long reactionId) {
-        return Reaction.builder()
-            .id(reactionId)
-            .build();
+        return Reaction.builder().id(reactionId).build();
     }
-
 }

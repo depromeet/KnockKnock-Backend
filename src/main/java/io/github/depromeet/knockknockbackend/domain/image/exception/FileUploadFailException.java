@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.domain.image.exception;
 
+
 import io.github.depromeet.knockknockbackend.global.error.exception.ErrorCode;
 import io.github.depromeet.knockknockbackend.global.error.exception.KnockException;
 
@@ -10,5 +11,4 @@ public class FileUploadFailException extends KnockException {
     private FileUploadFailException() {
         super(ErrorCode.FILE_UPLOAD_FAIL);
     }
-
 }

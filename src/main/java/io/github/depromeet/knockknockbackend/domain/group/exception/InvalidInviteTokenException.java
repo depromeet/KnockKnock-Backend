@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.domain.group.exception;
 
+
 import io.github.depromeet.knockknockbackend.global.error.exception.ErrorCode;
 import io.github.depromeet.knockknockbackend.global.error.exception.KnockException;
 
