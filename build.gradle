@@ -2,6 +2,7 @@ plugins {
     id 'org.springframework.boot' version '2.7.4'
     id 'io.spring.dependency-management' version '1.0.14.RELEASE'
     id 'java'
+    id 'com.diffplug.spotless' version '6.11.0'
 }
 
 group = 'io.github.depromeet'
@@ -14,11 +15,6 @@ configurations {
     }
 }
 
-compileJava {
-    options.compilerArgs << '-Amapstruct.defaultComponentModel=spring'
-}
-
-
 repositories {
     mavenCentral()
 }
@@ -28,6 +24,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web-services'
 
     implementation 'com.google.firebase:firebase-admin:9.1.0'
+    implementation 'com.amazonaws:aws-java-sdk-s3control:1.12.364'
 
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
@@ -57,15 +54,11 @@ dependencies {
     implementation 'org.springdoc:springdoc-openapi-ui:1.6.12'
     implementation 'io.github.openfeign:feign-httpclient:12.0'
 
-    implementation 'org.mapstruct:mapstruct:1.4.2.Final'
-    implementation 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
 
-    //순서 중요
-    annotationProcessor "org.mapstruct:mapstruct-processor:1.4.1.Final"
-    annotationProcessor "org.projectlombok:lombok-mapstruct-binding:0.2.0"
     annotationProcessor 'org.projectlombok:lombok'
 
-
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation "io.micrometer:micrometer-registry-prometheus"
 }
 
 tasks.named('test') {
@@ -74,4 +67,15 @@ tasks.named('test') {
 
 jar {
     enabled = false
+}
+
+spotless {
+    java {
+        target("**/*.java")
+        googleJavaFormat().aosp()
+        importOrder()
+        removeUnusedImports()
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
 }

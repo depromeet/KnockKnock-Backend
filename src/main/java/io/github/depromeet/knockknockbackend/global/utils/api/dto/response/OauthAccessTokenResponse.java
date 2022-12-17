@@ -1,6 +1,6 @@
 package io.github.depromeet.knockknockbackend.global.utils.api.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -8,6 +8,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class OauthAccessTokenResponse {
 
-	private String accessToken;
-
+    private String accessToken;
 }

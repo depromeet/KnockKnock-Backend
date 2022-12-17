@@ -9,5 +9,4 @@ import lombok.Getter;
 public class OauthLoginLinkResponse {
 
     private String link;
-
 }

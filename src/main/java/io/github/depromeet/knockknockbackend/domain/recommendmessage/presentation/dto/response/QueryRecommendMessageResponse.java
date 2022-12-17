@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.domain.recommendmessage.presentation.dto.response;
 
+
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,5 +10,4 @@ import lombok.Getter;
 public class QueryRecommendMessageResponse {
 
     private final List<QueryRecommendMessageResponseElement> recommendMessage;
-
 }

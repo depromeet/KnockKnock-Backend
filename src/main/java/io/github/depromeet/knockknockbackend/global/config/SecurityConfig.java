@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.global.config;
 
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.depromeet.knockknockbackend.global.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -16,28 +17,28 @@ public class SecurityConfig {
     private final ObjectMapper objectMapper;
 
     private static final String[] SwaggerPatterns = {
-        "/swagger-resources/**",
-        "/swagger-ui/**",
-        "/v3/api-docs/**",
+        "/swagger-resources/**", "/swagger-ui/**", "/v3/api-docs/**",
     };
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-                .formLogin().disable()
-                .cors().and()
-                .csrf().disable();
+        http.formLogin().disable().cors().and().csrf().disable();
 
-        http
-                .authorizeHttpRequests()
-                .antMatchers("/").permitAll()
-                .antMatchers(SwaggerPatterns).permitAll()
-                .antMatchers("/credentials/**").permitAll()
-                .anyRequest().authenticated();
-        http
-            .apply(new FilterConfig(jwtTokenProvider, objectMapper));
+        http.authorizeHttpRequests()
+                .antMatchers("/")
+                .permitAll()
+                .antMatchers(SwaggerPatterns)
+                .permitAll()
+                .antMatchers("/actuator/**")
+                .permitAll()
+                .antMatchers("/credentials/**")
+                .permitAll()
+                .antMatchers("/asset/version")
+                .permitAll()
+                .anyRequest()
+                .authenticated();
+        http.apply(new FilterConfig(jwtTokenProvider, objectMapper));
 
         return http.build();
     }
-
 }

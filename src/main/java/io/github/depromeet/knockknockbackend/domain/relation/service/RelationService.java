@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.domain.relation.service;
 
+
 import io.github.depromeet.knockknockbackend.domain.relation.domain.Relation;
 import io.github.depromeet.knockknockbackend.domain.relation.domain.repository.RelationRepository;
 import io.github.depromeet.knockknockbackend.domain.relation.exception.AlreadySendRequestException;
@@ -9,12 +10,11 @@ import io.github.depromeet.knockknockbackend.domain.relation.presentation.dto.re
 import io.github.depromeet.knockknockbackend.domain.user.UserRelationService;
 import io.github.depromeet.knockknockbackend.global.utils.security.SecurityUtils;
 import io.github.depromeet.knockknockbackend.global.utils.user.UserUtils;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -24,30 +24,43 @@ public class RelationService implements UserRelationService {
     private final UserUtils userUtils;
 
     public QueryFriendListResponse queryFriendList() {
-        List<Relation> relationList = relationRepository.findFriendList(SecurityUtils.getCurrentUserId());
+        List<Relation> relationList =
+                relationRepository.findFriendList(SecurityUtils.getCurrentUserId());
 
-        List<QueryFriendListResponseElement> result = relationList.stream().map(
-                relation -> {
-                    if(relation.getReceiveUser().getId().equals(SecurityUtils.getCurrentUserId())) {
-                        return new QueryFriendListResponseElement(relation.getSendUserInfo());
-                    } else {
-                        return new QueryFriendListResponseElement(relation.getReceiveUserInfo());
-                    }
-                }
-        ).collect(Collectors.toList());
+        List<QueryFriendListResponseElement> result =
+                relationList.stream()
+                        .map(
+                                relation -> {
+                                    if (relation.getReceiveUser()
+                                            .getId()
+                                            .equals(SecurityUtils.getCurrentUserId())) {
+                                        return new QueryFriendListResponseElement(
+                                                relation.getSendUserInfo());
+                                    } else {
+                                        return new QueryFriendListResponseElement(
+                                                relation.getReceiveUserInfo());
+                                    }
+                                })
+                        .collect(Collectors.toList());
 
         return new QueryFriendListResponse(result);
     }
 
     public HttpStatus sendFriendRequest(SendFriendRequest request) {
-        if(relationRepository.findRelationBySendUserIdAndReceiveUserId(SecurityUtils.getCurrentUserId(), request.getUserId()).isPresent()) {
+        if (relationRepository
+                .findRelationBySendUserIdAndReceiveUserId(
+                        SecurityUtils.getCurrentUserId(), request.getUserId())
+                .isPresent()) {
             throw AlreadySendRequestException.EXCEPTION;
         }
 
-        Relation relation = relationRepository.findRelationBySendUserIdAndReceiveUserId(request.getUserId(), SecurityUtils.getCurrentUserId())
-                .orElse(null);
+        Relation relation =
+                relationRepository
+                        .findRelationBySendUserIdAndReceiveUserId(
+                                request.getUserId(), SecurityUtils.getCurrentUserId())
+                        .orElse(null);
 
-        if(relation != null) {
+        if (relation != null) {
             relation.updateFriend(true);
             relationRepository.save(relation);
             return HttpStatus.NO_CONTENT;
@@ -57,15 +70,12 @@ public class RelationService implements UserRelationService {
                 Relation.builder()
                         .sendUser(userUtils.getUserById(SecurityUtils.getCurrentUserId()))
                         .receiveUser(userUtils.getUserById(request.getUserId()))
-                        .build()
-        );
+                        .build());
 
         return HttpStatus.CREATED;
-
     }
 
     public boolean getIsFriend(Long userId) {
         return relationRepository.isFriend(SecurityUtils.getCurrentUserId(), userId);
     }
-
 }

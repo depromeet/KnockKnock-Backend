@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.domain.reaction.presentation;
 
+
 import io.github.depromeet.knockknockbackend.domain.reaction.presentation.dto.request.RegisterReactionRequest;
 import io.github.depromeet.knockknockbackend.domain.reaction.service.ReactionService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,14 +35,17 @@ public class ReactionController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "알림에 리액션 수정")
-    @PatchMapping
-    public void changeReaction(@RequestBody RegisterReactionRequest request) {
-        reactionService.changeReaction(request);
+    @PatchMapping("{notification_reaction_id}")
+    public void changeReaction(
+            @PathVariable("notification_reaction_id") Long notificationReactionId,
+            @RequestBody RegisterReactionRequest request) {
+        reactionService.changeReaction(notificationReactionId, request);
     }
 
     @ResponseStatus(HttpStatus.OK)
     @DeleteMapping("{notification_reaction_id}")
-    public void deleteReaction(@PathVariable("notification_reaction_id") Long notificationReactionId) {
+    public void deleteReaction(
+            @PathVariable("notification_reaction_id") Long notificationReactionId) {
         reactionService.deleteReaction(notificationReactionId);
     }
 }

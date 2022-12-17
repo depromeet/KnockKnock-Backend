@@ -17,6 +17,7 @@ spring:
     properties:
       hibernate:
         format_sql: ${FORMAT_SQL:true}
+        default_batch_fetch_size: ${JPA_BATCH_FETCH_SIZE}
     open-in-view: false
     hibernate:
       ddl-auto: update
@@ -24,6 +25,13 @@ spring:
   sql:
     init:
       mode: always
+
+aws:
+  access-key: ${AWS_ACCESS_KEY}
+  secret-key: ${AWS_SECRET_KEY}
+  s3:
+    bucket: ${AWS_S3_BUCKET}
+    base-url: ${AWS_S3_BASE_URL}
 
 auth:
   jwt:
@@ -56,3 +64,11 @@ logging:
   level:
     io.github.depromeet.knockknockbackend.global.utils.api.client.* : debug
 
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, prometheus

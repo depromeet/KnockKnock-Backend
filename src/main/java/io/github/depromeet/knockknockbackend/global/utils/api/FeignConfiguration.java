@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.global.utils.api;
 
+
 import feign.Logger.Level;
 import feign.codec.ErrorDecoder;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -13,15 +14,14 @@ import org.springframework.context.annotation.Import;
 @Configuration
 public class FeignConfiguration {
 
-	@Bean
-	Level feginLoggerLevel() {
-		return Level.FULL;
-	}
+    @Bean
+    Level feginLoggerLevel() {
+        return Level.FULL;
+    }
 
-	@Bean
-	@ConditionalOnMissingBean(value = ErrorDecoder.class)
-	public FeignClientErrorDecoder commonFeignErrorDecoder() {
-		return new FeignClientErrorDecoder();
-	}
-
+    @Bean
+    @ConditionalOnMissingBean(value = ErrorDecoder.class)
+    public FeignClientErrorDecoder commonFeignErrorDecoder() {
+        return new FeignClientErrorDecoder();
+    }
 }

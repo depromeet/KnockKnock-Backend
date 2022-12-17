@@ -13,11 +13,9 @@ public class UpdateGroupDto {
     private String description;
     private Boolean publicAccess;
 
-
     private String thumbnailPath;
 
     private String backgroundImagePath;
 
     private Long categoryId;
-
 }

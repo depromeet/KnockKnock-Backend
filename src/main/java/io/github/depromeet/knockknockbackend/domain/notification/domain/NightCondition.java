@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.domain.notification.domain;
 
+
 import java.time.LocalDateTime;
 
 public enum NightCondition {
@@ -16,5 +17,4 @@ public enum NightCondition {
         int nowHour = LocalDateTime.now().getHour();
         return nowHour >= NightCondition.START_TIME.hour || nowHour < NightCondition.END_TIME.hour;
     }
-
 }

@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.global.property;
 
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -16,5 +17,4 @@ public class JwtProperties {
     private final Long refreshExp;
     private final String header;
     private final String prefix;
-
 }
