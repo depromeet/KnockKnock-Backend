@@ -7,6 +7,6 @@ import lombok.Getter;
 @Getter
 @Builder
 public class NotificationReactionInfoVo {
-    private Long myReactionId;
+    private final Long myReactionId;
     private final List<NotificationReactionCountInfoVo> reactionCountInfos;
 }
