@@ -1,11 +1,15 @@
 package io.github.depromeet.knockknockbackend.domain.asset.service;
 
+import io.github.depromeet.knockknockbackend.domain.asset.domain.AppVersion;
 import io.github.depromeet.knockknockbackend.domain.asset.domain.BackgroundImage;
 import io.github.depromeet.knockknockbackend.domain.asset.domain.ProfileImage;
 import io.github.depromeet.knockknockbackend.domain.asset.domain.Thumbnail;
+import io.github.depromeet.knockknockbackend.domain.asset.domain.repository.AppVersionRepository;
 import io.github.depromeet.knockknockbackend.domain.asset.domain.repository.ProfileImageRepository;
 import io.github.depromeet.knockknockbackend.domain.asset.domain.repository.ReactionRepository;
+import io.github.depromeet.knockknockbackend.domain.asset.exception.AppVersionNotFoundException;
 import io.github.depromeet.knockknockbackend.domain.asset.exception.ProfileImageNotFoundException;
+import io.github.depromeet.knockknockbackend.domain.asset.presentation.dto.response.AppVersionResponse;
 import io.github.depromeet.knockknockbackend.domain.asset.presentation.dto.response.ProfileImageDto;
 import io.github.depromeet.knockknockbackend.domain.asset.presentation.dto.response.ProfileImagesResponse;
 import io.github.depromeet.knockknockbackend.domain.asset.domain.repository.BackGroundImageRepository;
@@ -34,6 +38,8 @@ public class AssetService implements AssetUtils {
     private final ProfileImageRepository profileImageRepository;
 
     private final ReactionRepository reactionRepository;
+
+    private final AppVersionRepository appVersionRepository;
 
     public String getRandomBackgroundImageUrl() {
         BackgroundImage randomBackground = backGroundImageRepository.findRandomBackgroundImage()
@@ -83,5 +89,11 @@ public class AssetService implements AssetUtils {
             .map(ReactionImageDto::new)
             .collect(Collectors.toList());
         return new ReactionsResponse(reactionImageDtos);
+    }
+
+    public AppVersionResponse getAppVersion(){
+        AppVersion appVersion = appVersionRepository.findAll().stream().findFirst()
+            .orElseThrow(() -> AppVersionNotFoundException.EXCEPTION);
+        return new AppVersionResponse(appVersion.getVersion());
     }
 }

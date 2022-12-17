@@ -53,8 +53,8 @@ public enum ErrorCode {
 
     PROFILE_IMAGE_NOT_FOUND(404,"ASSET-404-1", "PROFILE Not Found"),
     BACKGROUND_NOT_FOUND(404,"ASSET-404-2", "BACKGROUND Not Found"),
-    THUMBNAIL_NOT_FOUND(404,"ASSET-404-3", "THUMBNAIL Not Found");
-
+    THUMBNAIL_NOT_FOUND(404,"ASSET-404-3", "THUMBNAIL Not Found"),
+    APP_VERSION_NOT_FOUND(404,"ASSET-404-4", "APP_VERSION Not Found");
 
     private int status;
     private String code;

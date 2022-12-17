@@ -34,6 +34,7 @@ public class SecurityConfig {
                 .antMatchers(SwaggerPatterns).permitAll()
                 .antMatchers("/actuator/**").permitAll()
                 .antMatchers("/credentials/**").permitAll()
+                .antMatchers("/asset/version").permitAll()
                 .anyRequest().authenticated();
         http
             .apply(new FilterConfig(jwtTokenProvider, objectMapper));

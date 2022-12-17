@@ -2,7 +2,9 @@ package io.github.depromeet.knockknockbackend.global.config;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.depromeet.knockknockbackend.global.annotation.DisableSecurity;
 import io.swagger.v3.core.jackson.ModelResolver;
+import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.Components;
@@ -10,9 +12,11 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityScheme.In;
 import io.swagger.v3.oas.models.security.SecurityScheme.Type;
+import org.springdoc.core.customizers.OperationCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 
@@ -56,8 +60,23 @@ public class SwaggerConfig {
         return new ModelResolver(objectMapper);
     }
 
-    //    static {
-    //        SpringDocUtils.getConfig().addAnnotationsToIgnore(MemberId.class);
-    //    }
+
+    @Bean
+    public OperationCustomizer customize() {
+        return (Operation operation, HandlerMethod handlerMethod) -> {
+            DisableSecurity methodAnnotation = handlerMethod.getMethodAnnotation(
+                DisableSecurity.class);
+            // DisableSecurity 어노테이션있을시 스웨거 시큐리티 설정 삭제
+            if(methodAnnotation != null){
+                operation.setSecurity(Collections.emptyList());
+            }
+            //태그 중복 설정시 제일 구체적인 값만 태그로 설정
+            List<String> tags = operation.getTags();
+            if(tags != null && !tags.isEmpty() ){
+                operation.setTags(Collections.singletonList(tags.get(0)));
+            }
+            return operation;
+        };
+    }
 
 }
