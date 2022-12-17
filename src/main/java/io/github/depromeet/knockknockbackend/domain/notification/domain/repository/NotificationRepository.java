@@ -1,6 +1,7 @@
 package io.github.depromeet.knockknockbackend.domain.notification.domain.repository;
 
 import io.github.depromeet.knockknockbackend.domain.notification.domain.Notification;
+import java.util.Optional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.EntityGraph;

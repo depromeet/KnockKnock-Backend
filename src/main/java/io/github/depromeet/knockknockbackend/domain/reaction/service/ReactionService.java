@@ -3,6 +3,7 @@ package io.github.depromeet.knockknockbackend.domain.reaction.service;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.Notification;
 import io.github.depromeet.knockknockbackend.domain.reaction.domain.NotificationReaction;
 import io.github.depromeet.knockknockbackend.domain.asset.domain.Reaction;
+import io.github.depromeet.knockknockbackend.domain.reaction.exception.ReactionAlreadyExistException;
 import io.github.depromeet.knockknockbackend.domain.reaction.exception.ReactionForbiddenException;
 import io.github.depromeet.knockknockbackend.domain.reaction.presentation.dto.request.RegisterReactionRequest;
 import io.github.depromeet.knockknockbackend.domain.reaction.domain.repository.NotificationReactionRepository;
@@ -21,22 +22,24 @@ public class ReactionService {
 
     @Transactional
     public void registerReaction(RegisterReactionRequest request) {
-        notificationReactionRepository.save(
-            NotificationReaction.of(
-                Notification.of(request.getNotificationId()),
-                Reaction.of(request.getReactionId()),
-                userUtils.getUserFromSecurityContext()
-            ));
+        try {
+            notificationReactionRepository.save(
+                NotificationReaction.of(
+                    Notification.of(request.getNotificationId()),
+                    Reaction.of(request.getReactionId()),
+                    userUtils.getUserFromSecurityContext()
+                ));
+        } catch(Exception e) {
+            throw ReactionAlreadyExistException.EXCEPTION;
+        }
     }
 
-    public void changeReaction(RegisterReactionRequest request) {
-        if (request.getNotificationReactionId() != null) {
-            validateMyReactionTheNotification(request.getNotificationReactionId());
-        }
+    public void changeReaction(Long notificationReactionId, RegisterReactionRequest request) {
+        validateMyReactionTheNotification(notificationReactionId);
 
         notificationReactionRepository.save(
             NotificationReaction.of(
-                request.getNotificationReactionId(),
+                notificationReactionId,
                 Reaction.of(request.getReactionId())
             ));
     }

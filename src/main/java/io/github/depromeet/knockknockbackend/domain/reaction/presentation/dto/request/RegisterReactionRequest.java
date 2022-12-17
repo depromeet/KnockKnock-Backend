@@ -5,7 +5,6 @@ import lombok.Getter;
 @Getter
 public class RegisterReactionRequest {
 
-    private Long notificationReactionId;
     private Long notificationId;
     private Long reactionId;
 
