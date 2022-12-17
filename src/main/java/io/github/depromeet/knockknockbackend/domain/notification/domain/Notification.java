@@ -5,7 +5,9 @@ import io.github.depromeet.knockknockbackend.domain.reaction.domain.Notification
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.global.database.BaseTimeEntity;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import javax.persistence.Entity;
@@ -53,9 +55,9 @@ public class Notification extends BaseTimeEntity {
     @OneToOne(fetch = FetchType.LAZY)
     private User sendUser;
 
-    @JoinColumn(name = "receive_user_id")
-    @OneToOne(fetch = FetchType.LAZY)
-    private User receiveUser;
+    @Builder.Default
+    @OneToMany(mappedBy = "notification", fetch = FetchType.LAZY)
+    private List<NotificationReceiver> receivers = new ArrayList<>();
 
     @Builder.Default
     @OneToMany(mappedBy = "notification", fetch = FetchType.LAZY)
