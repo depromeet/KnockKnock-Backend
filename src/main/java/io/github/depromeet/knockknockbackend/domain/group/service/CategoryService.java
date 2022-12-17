@@ -9,6 +9,7 @@ import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.respo
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -38,6 +39,7 @@ public class CategoryService {
         return new CategoryDto(category);
     }
 
+    @Cacheable(cacheNames = "famousCategory" , cacheManager = "redisCacheManager")
     public CategoryListResponse findFamousCategory(){
         List<CategoryDto> categoryDtos = categoryRepository.findFamousCategory().stream()
             .map(CategoryDto::new)

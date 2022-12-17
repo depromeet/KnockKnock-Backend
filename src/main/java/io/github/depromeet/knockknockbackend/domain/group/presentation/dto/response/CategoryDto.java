@@ -4,8 +4,10 @@ package io.github.depromeet.knockknockbackend.domain.group.presentation.dto.resp
 import io.github.depromeet.knockknockbackend.domain.group.domain.Category;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor
 public class CategoryDto {
     @Schema(description = "이모지 정보")
     private String emoji;

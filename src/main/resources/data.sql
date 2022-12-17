@@ -69,3 +69,8 @@ VALUES
     (11,'https://user-images.githubusercontent.com/13329304/207664192-f91c9508-ea3c-474e-8038-34c2da08eb77.png','party',1100),
     (12,'https://user-images.githubusercontent.com/13329304/207664212-5dfdba3b-4de9-40c4-a564-f14f6474955e.png','eye',1200)
     ON DUPLICATE KEY UPDATE image_url = VALUES (image_url) ,title = VALUES (title) ,list_order = VALUES (list_order);
+
+INSERT INTO tbl_app_version(id, version)
+VALUES
+    (1,'0.0.1')
+    ON DUPLICATE KEY UPDATE version = VALUES (version);
