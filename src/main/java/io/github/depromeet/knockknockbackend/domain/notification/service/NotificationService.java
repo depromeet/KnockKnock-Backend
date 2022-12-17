@@ -166,22 +166,18 @@ public class NotificationService {
     }
 
     private List<String> getTokens(SendInstanceRequest request, Long sendUserId) {
-        List<DeviceToken> deviceTokens = getDeviceTokensOfGroupUserSettingAlarm(
-            request.getGroupId());
-
-        return deviceTokens.stream()
-            .filter(deviceToken -> !deviceToken.getUserId().equals(sendUserId))
-            .map(DeviceToken::getToken)
-            .collect(Collectors.toList());
-    }
-
-    private List<DeviceToken> getDeviceTokensOfGroupUserSettingAlarm(Long groupId) {
         Boolean nightOption = null;
         if (NightCondition.isNight()) {
             nightOption = true;
         }
 
-        return deviceTokenRepository.findUserByGroupIdAndNewOption(groupId, true, nightOption);
+        List<DeviceToken> deviceTokens = notificationRepository.findTokenByGroupAndOptionAndNonBlock(
+            sendUserId, request.getGroupId(), nightOption
+        );
+
+        return deviceTokens.stream()
+            .map(DeviceToken::getToken)
+            .collect(Collectors.toList());
     }
 
     private static Slice<QueryNotificationListResponseElement> generateQueryNotificationListResponseElements(
