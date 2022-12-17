@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.domain.option.service;
 
+
 import io.github.depromeet.knockknockbackend.domain.option.domain.Option;
 import io.github.depromeet.knockknockbackend.domain.option.domain.repository.OptionRepository;
 import io.github.depromeet.knockknockbackend.domain.option.exception.OptionNotFoundException;
@@ -38,8 +39,8 @@ public class OptionService {
     }
 
     private Option queryOption() {
-        return optionRepository.findById(SecurityUtils.getCurrentUserId())
+        return optionRepository
+                .findById(SecurityUtils.getCurrentUserId())
                 .orElseThrow(() -> OptionNotFoundException.EXCEPTION);
     }
-
 }

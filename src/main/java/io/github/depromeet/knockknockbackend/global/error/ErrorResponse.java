@@ -1,7 +1,7 @@
 package io.github.depromeet.knockknockbackend.global.error;
 
+
 import java.time.LocalDateTime;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
@@ -14,7 +14,8 @@ public class ErrorResponse {
     private final LocalDateTime timeStamp;
 
     private final String path;
-    public ErrorResponse(int status, String code, String reason , String path) {
+
+    public ErrorResponse(int status, String code, String reason, String path) {
         this.status = status;
         this.code = code;
         this.reason = reason;

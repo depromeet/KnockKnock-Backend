@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.global.event;
 
+
 import org.springframework.context.ApplicationEventPublisher;
 
 public class Events {
@@ -16,6 +17,7 @@ public class Events {
     static void setPublisher(ApplicationEventPublisher publisher) {
         publisherLocal.set(publisher);
     }
+
     static void reset() {
         publisherLocal.remove();
     }

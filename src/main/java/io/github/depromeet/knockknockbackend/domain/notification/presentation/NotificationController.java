@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.domain.notification.presentation;
 
+
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.request.RegisterFcmTokenRequest;
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.request.SendInstanceRequest;
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.response.QueryNotificationListResponse;
@@ -32,7 +33,8 @@ public class NotificationController {
     @Operation(summary = "최신 푸쉬알림 리스트")
     @GetMapping
     public QueryNotificationListResponse queryAlarmHistoryByUserId(
-        @PageableDefault(size = 5, sort = "sendAt", direction = Direction.DESC) Pageable pageable) {
+            @PageableDefault(size = 5, sort = "sendAt", direction = Direction.DESC)
+                    Pageable pageable) {
         return notificationService.queryAlarmHistoryByUserId(pageable);
     }
 
@@ -53,10 +55,9 @@ public class NotificationController {
     @Operation(summary = "알림방 푸쉬알림 리스트")
     @GetMapping("/{group_id}")
     public QueryNotificationListResponse queryListByGroupId(
-        @PageableDefault(size = 20, sort = "sendAt", direction = Direction.DESC) Pageable pageable,
-        @PathVariable(value = "group_id") Long groupId) {
+            @PageableDefault(size = 20, sort = "sendAt", direction = Direction.DESC)
+                    Pageable pageable,
+            @PathVariable(value = "group_id") Long groupId) {
         return notificationService.queryListByGroupId(pageable, groupId);
     }
-
-
 }

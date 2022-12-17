@@ -1,9 +1,9 @@
 package io.github.depromeet.knockknockbackend.domain.group.service;
 
 
+import io.github.depromeet.knockknockbackend.domain.group.domain.Category;
 import io.github.depromeet.knockknockbackend.domain.group.domain.Group;
 import io.github.depromeet.knockknockbackend.domain.group.domain.Group.GroupBuilder;
-import io.github.depromeet.knockknockbackend.domain.group.domain.Category;
 import io.github.depromeet.knockknockbackend.domain.group.domain.GroupType;
 import io.github.depromeet.knockknockbackend.domain.group.domain.GroupUser;
 import io.github.depromeet.knockknockbackend.domain.group.domain.InviteTokenRedisEntity;
@@ -21,12 +21,12 @@ import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.reque
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupBriefInfoDto;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupBriefInfos;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupInviteLinkResponse;
-import io.github.depromeet.knockknockbackend.global.utils.generate.TokenGenerator;
-import io.github.depromeet.knockknockbackend.global.utils.security.SecurityUtils;
-import io.github.depromeet.knockknockbackend.global.utils.user.UserUtils;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupResponse;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.global.exception.UserNotFoundException;
+import io.github.depromeet.knockknockbackend.global.utils.generate.TokenGenerator;
+import io.github.depromeet.knockknockbackend.global.utils.security.SecurityUtils;
+import io.github.depromeet.knockknockbackend.global.utils.user.UserUtils;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -53,43 +53,46 @@ public class GroupService implements GroupUtils {
 
     /**
      * 카테고리 정보를 가져옵니다.
+     *
      * @param categoryId 카테고리 아이디
      * @throws CategoryNotFoundException
      */
-    private Category queryGroupCategoryById(Long categoryId){
-        return categoryRepository.findById(categoryId)
-            .orElseThrow(() -> CategoryNotFoundException.EXCEPTION);
+    private Category queryGroupCategoryById(Long categoryId) {
+        return categoryRepository
+                .findById(categoryId)
+                .orElseThrow(() -> CategoryNotFoundException.EXCEPTION);
     }
 
     /**
      * 그룹 정보를 가져옵니다.
+     *
      * @param groupId 그룹 아이디
      * @return
      */
     @Override
     public Group queryGroup(Long groupId) {
-        return groupRepository.findById(groupId)
-            .orElseThrow(() -> GroupNotFoundException.EXCEPTION);
+        return groupRepository
+                .findById(groupId)
+                .orElseThrow(() -> GroupNotFoundException.EXCEPTION);
     }
-
 
     /**
      * 방에 집어넣을 유저가 존재하는 유저인지 판단합니다.
+     *
      * @param findUserList
      * @param requestUserIdList
      * @throws UserNotFoundException
      */
-    private void validReqMemberNotExist(List<User> findUserList, List<Long> requestUserIdList
-    ) {
-        //요청한 유저중에 없는 유저가 있으면 안됩니다.
-        if(requestUserIdList.size() != findUserList.size()){
+    private void validReqMemberNotExist(List<User> findUserList, List<Long> requestUserIdList) {
+        // 요청한 유저중에 없는 유저가 있으면 안됩니다.
+        if (requestUserIdList.size() != findUserList.size()) {
             throw UserNotFoundException.EXCEPTION;
         }
     }
 
-
     /**
      * 오픈 그룹(홀로 외침방 )을 생성합니다.
+     *
      * @return CreateGroupResponse
      */
     @Transactional
@@ -98,13 +101,13 @@ public class GroupService implements GroupUtils {
         User currentUser = userUtils.getUserFromSecurityContext();
 
         List<Long> memberIds = createOpenGroupRequest.getMemberIds();
-        //요청받은 id 목록들로 디비에서 조회
+        // 요청받은 id 목록들로 디비에서 조회
         List<User> members = userUtils.findByIdIn(memberIds);
 
         // 요청받은 유저 아이디 목록이 디비에 존재하는 지 확인
         validReqMemberNotExist(members, createOpenGroupRequest.getMemberIds());
         // 오픈 그룹 만들기
-        Group group = makeOpenGroup(createOpenGroupRequest,currentUser);
+        Group group = makeOpenGroup(createOpenGroupRequest, currentUser);
         // 그룹 유저 리스트 추가
         groupRepository.save(group);
 
@@ -115,15 +118,16 @@ public class GroupService implements GroupUtils {
 
     /**
      * 친구그룹을 만듭니다
+     *
      * @return CreateGroupResponse
      */
     @Transactional
     public GroupResponse createFriendGroup(CreateFriendGroupRequest createFriendGroupRequest) {
         User currentUser = userUtils.getUserFromSecurityContext();
 
-        //TODO : 요청 받은 memeberId가 친구 목록에 속해있는지 검증.
+        // TODO : 요청 받은 memeberId가 친구 목록에 속해있는지 검증.
         List<Long> memberIds = createFriendGroupRequest.getMemberIds();
-        //요청받은 id 목록들로 디비에서 조회
+        // 요청받은 id 목록들로 디비에서 조회
         List<User> members = userUtils.findByIdIn(memberIds);
         // 그룹 만들기
         Group group = makeFriendGroup(currentUser, memberIds.size());
@@ -135,71 +139,61 @@ public class GroupService implements GroupUtils {
         return getGroupResponse(group, currentUser.getId());
     }
 
-
     /**
-     * 오픈 그룹 생성 로직 뺀 함수입니다..
-     * 썸네일, 백그라운드 서비스를 파사드로 빼고
-     * 그룹 도메인으로 옮길 예정입니다.
+     * 오픈 그룹 생성 로직 뺀 함수입니다.. 썸네일, 백그라운드 서비스를 파사드로 빼고 그룹 도메인으로 옮길 예정입니다.
+     *
      * @return Group
      */
     private Group makeOpenGroup(CreateOpenGroupRequest createOpenGroupRequest, User host) {
-        GroupBuilder groupBuilder = Group.builder()
-            .publicAccess(createOpenGroupRequest.getPublicAccess())
-            .thumbnailPath(
-                StringUtils.hasText(createOpenGroupRequest.getThumbnailPath()) ?
-                    createOpenGroupRequest.getThumbnailPath() :
-                    assetUtils.getRandomThumbnailUrl()
-            )
-            .backgroundImagePath(
-                StringUtils.hasText(createOpenGroupRequest.getBackgroundImagePath()) ?
-                    createOpenGroupRequest.getBackgroundImagePath() :
-                    assetUtils.getRandomBackgroundImageUrl()
-            )
-            .description(createOpenGroupRequest.getDescription())
-            .title(createOpenGroupRequest.getTitle())
-            .groupType(GroupType.OPEN)
-            .host(host);
+        GroupBuilder groupBuilder =
+                Group.builder()
+                        .publicAccess(createOpenGroupRequest.getPublicAccess())
+                        .thumbnailPath(
+                                StringUtils.hasText(createOpenGroupRequest.getThumbnailPath())
+                                        ? createOpenGroupRequest.getThumbnailPath()
+                                        : assetUtils.getRandomThumbnailUrl())
+                        .backgroundImagePath(
+                                StringUtils.hasText(createOpenGroupRequest.getBackgroundImagePath())
+                                        ? createOpenGroupRequest.getBackgroundImagePath()
+                                        : assetUtils.getRandomBackgroundImageUrl())
+                        .description(createOpenGroupRequest.getDescription())
+                        .title(createOpenGroupRequest.getTitle())
+                        .groupType(GroupType.OPEN)
+                        .host(host);
 
-        Category category = queryGroupCategoryById(
-            createOpenGroupRequest.getCategoryId());
+        Category category = queryGroupCategoryById(createOpenGroupRequest.getCategoryId());
         groupBuilder.category(category);
 
         return groupBuilder.build();
     }
 
-
     /**
-     * 친구 그룹 생성 로직 뺀 함수입니다..
-     * 썸네일, 백그라운드 서비스를 파사드로 빼고
-     * 그룹 도메인으로 옮길 예정입니다.
+     * 친구 그룹 생성 로직 뺀 함수입니다.. 썸네일, 백그라운드 서비스를 파사드로 빼고 그룹 도메인으로 옮길 예정입니다.
+     *
      * @return Group
      */
     private Group makeFriendGroup(User host, Integer memberCount) {
-        //defaultCategory
+        // defaultCategory
         Category category = queryGroupCategoryById(Category.defaultEmptyCategoryId);
 
         return Group.builder()
-            .publicAccess(false)
-            .thumbnailPath(
-                assetUtils.getRandomThumbnailUrl()
-            )
-            .backgroundImagePath(
-                assetUtils.getRandomBackgroundImageUrl()
-            )
-            .category(category)
-            .title(Group.generateGroupTitle(host.getNickname(),memberCount))
-            .groupType(GroupType.FRIEND)
-            .host(host)
-            .build();
+                .publicAccess(false)
+                .thumbnailPath(assetUtils.getRandomThumbnailUrl())
+                .backgroundImagePath(assetUtils.getRandomBackgroundImageUrl())
+                .category(category)
+                .title(Group.generateGroupTitle(host.getNickname(), memberCount))
+                .groupType(GroupType.FRIEND)
+                .host(host)
+                .build();
     }
-
 
     /**
      * 그룹을 업데이트 합니다
+     *
      * @return GroupResponse
      */
     @Transactional
-    public GroupResponse updateGroup(Long groupId , UpdateGroupRequest updateGroupRequest) {
+    public GroupResponse updateGroup(Long groupId, UpdateGroupRequest updateGroupRequest) {
         Long currentUserId = SecurityUtils.getCurrentUserId();
         Group group = queryGroup(groupId);
         group.validUserIsHost(currentUserId);
@@ -210,9 +204,9 @@ public class GroupService implements GroupUtils {
         return getGroupResponse(group, currentUserId);
     }
 
-
     /**
      * 그룹을 삭제합니다
+     *
      * @param groupId
      */
     @Transactional
@@ -227,6 +221,7 @@ public class GroupService implements GroupUtils {
 
     /**
      * id를 통해서 그룹의 디테일한 정보를 가져옵니다.
+     *
      * @return GroupResponse
      */
     public GroupResponse getGroupDetailById(Long groupId) {
@@ -236,54 +231,62 @@ public class GroupService implements GroupUtils {
         return getGroupResponse(group, currentUserId);
     }
 
-
     /**
      * 모든 그룹의 정보를 가져옵니다.
+     *
      * @return GroupBriefInfoListResponse
      */
     public Slice<Group> findSliceOpenGroups(PageRequest pageRequest) {
-        Slice<Group> groupList = groupRepository.findSliceByGroupType(GroupType.OPEN , pageRequest);
+        Slice<Group> groupList = groupRepository.findSliceByGroupType(GroupType.OPEN, pageRequest);
 
         return groupList;
     }
 
     /**
      * 내가 들어가 있는 그룹목록을 가져옵니다.
+     *
      * @return GroupBriefInfoListResponse
      */
     public Slice<GroupBriefInfoDto> findAllJoinedGroups(PageRequest pageRequest) {
         Long currentUserId = SecurityUtils.getCurrentUserId();
 
-        Slice<GroupUser> sliceGroupUsers = groupUserRepository.findJoinedGroupUser(
-            currentUserId, pageRequest);
+        Slice<GroupUser> sliceGroupUsers =
+                groupUserRepository.findJoinedGroupUser(currentUserId, pageRequest);
 
-        return sliceGroupUsers.map(groupUser -> {
-            Group group = groupUser.getGroup();
-            return new GroupBriefInfoDto(group.getGroupBaseInfoVo(), group.getMemberCount());
-        });
+        return sliceGroupUsers.map(
+                groupUser -> {
+                    Group group = groupUser.getGroup();
+                    return new GroupBriefInfoDto(
+                            group.getGroupBaseInfoVo(), group.getMemberCount());
+                });
     }
 
     /**
      * 내가 들어가 있는 그룹 목록중에서 GroupType에 따라 필터링합니다.
+     *
      * @param groupInTypeRequest
      * @return GroupBriefInfoListResponse
      */
-    public Slice<GroupBriefInfoDto> findJoinedGroupByType(GroupInTypeRequest groupInTypeRequest,PageRequest pageRequest) {
+    public Slice<GroupBriefInfoDto> findJoinedGroupByType(
+            GroupInTypeRequest groupInTypeRequest, PageRequest pageRequest) {
 
-        if(groupInTypeRequest == GroupInTypeRequest.ALL){
+        if (groupInTypeRequest == GroupInTypeRequest.ALL) {
             return findAllJoinedGroups(pageRequest);
         }
 
         Long currentUserId = SecurityUtils.getCurrentUserId();
         GroupType groupType = GroupType.valueOf(groupInTypeRequest.getValue());
 
-        Slice<GroupUser> sliceGroupUsers = groupUserRepository.findJoinedGroupUserByGroupType(
-            currentUserId, groupType, pageRequest);
+        Slice<GroupUser> sliceGroupUsers =
+                groupUserRepository.findJoinedGroupUserByGroupType(
+                        currentUserId, groupType, pageRequest);
 
-        return sliceGroupUsers.map(groupUser -> {
-            Group group = groupUser.getGroup();
-            return new GroupBriefInfoDto(group.getGroupBaseInfoVo(), group.getMemberCount());
-        });
+        return sliceGroupUsers.map(
+                groupUser -> {
+                    Group group = groupUser.getGroup();
+                    return new GroupBriefInfoDto(
+                            group.getGroupBaseInfoVo(), group.getMemberCount());
+                });
     }
 
     /**
@@ -291,29 +294,33 @@ public class GroupService implements GroupUtils {
      *
      * @return GroupBriefInfoListResponse
      */
-    public Slice<GroupBriefInfoDto> findOpenGroupByCategory(Long categoryId , PageRequest pageRequest) {
+    public Slice<GroupBriefInfoDto> findOpenGroupByCategory(
+            Long categoryId, PageRequest pageRequest) {
         if (categoryId.equals(Category.defaultEmptyCategoryId)) {
             Slice<Group> allOpenGroups = findSliceOpenGroups(pageRequest);
             return allOpenGroups.map(
-                group -> new GroupBriefInfoDto(group.getGroupBaseInfoVo(), group.getMemberCount()));
+                    group ->
+                            new GroupBriefInfoDto(
+                                    group.getGroupBaseInfoVo(), group.getMemberCount()));
         }
         Category category = queryGroupCategoryById(categoryId);
 
-        Slice<Group> groupList = groupRepository.findSliceByGroupTypeAndCategory(GroupType.OPEN,category ,pageRequest);
+        Slice<Group> groupList =
+                groupRepository.findSliceByGroupTypeAndCategory(
+                        GroupType.OPEN, category, pageRequest);
 
         return groupList.map(
-            group -> new GroupBriefInfoDto(group.getGroupBaseInfoVo(), group.getMemberCount()));
+                group -> new GroupBriefInfoDto(group.getGroupBaseInfoVo(), group.getMemberCount()));
     }
 
+    public Slice<GroupBriefInfoDto> searchOpenGroups(String searchString, PageRequest pageRequest) {
 
-
-    public Slice<GroupBriefInfoDto> searchOpenGroups(String searchString ,PageRequest pageRequest) {
-
-        Slice<Group> groupList = groupRepository
-            .findByGroupTypeAndTitleContaining(GroupType.OPEN ,searchString,pageRequest);
+        Slice<Group> groupList =
+                groupRepository.findByGroupTypeAndTitleContaining(
+                        GroupType.OPEN, searchString, pageRequest);
 
         return groupList.map(
-            group -> new GroupBriefInfoDto(group.getGroupBaseInfoVo(), group.getMemberCount()));
+                group -> new GroupBriefInfoDto(group.getGroupBaseInfoVo(), group.getMemberCount()));
     }
 
     @Transactional
@@ -335,8 +342,9 @@ public class GroupService implements GroupUtils {
     public void acceptMemberToGroup(Group group, User newUser) {
         Long currentUserId = SecurityUtils.getCurrentUserId();
 
-        group.hostAcceptMember(currentUserId,newUser);
+        group.hostAcceptMember(currentUserId, newUser);
     }
+
     @Transactional
     public GroupResponse leaveFromGroup(Long groupId) {
         Long currentUserId = SecurityUtils.getCurrentUserId();
@@ -347,6 +355,7 @@ public class GroupService implements GroupUtils {
 
         return getGroupResponse(group, currentUserId);
     }
+
     @Transactional
     public GroupInviteLinkResponse createGroupInviteLink(Long groupId) {
         Group group = queryGroup(groupId);
@@ -357,12 +366,13 @@ public class GroupService implements GroupUtils {
 
         String token = tokenGenerator.nextString();
 
-        InviteTokenRedisEntity tokenRedisEntity = InviteTokenRedisEntity.builder()
-            .token(token)
-            .groupId(groupId)
-            .issuerId(currentUserId)
-            .ttl(24L)
-            .build();
+        InviteTokenRedisEntity tokenRedisEntity =
+                InviteTokenRedisEntity.builder()
+                        .token(token)
+                        .groupId(groupId)
+                        .issuerId(currentUserId)
+                        .ttl(24L)
+                        .build();
 
         inviteTokenRedisEntityRepository.save(tokenRedisEntity);
 
@@ -371,10 +381,12 @@ public class GroupService implements GroupUtils {
 
     @Transactional
     public GroupResponse checkGroupInviteLink(Long groupId, String token) {
-        InviteTokenRedisEntity inviteToken = inviteTokenRedisEntityRepository.findById(token)
-            .orElseThrow(() -> InvalidInviteTokenException.EXCEPTION);
+        InviteTokenRedisEntity inviteToken =
+                inviteTokenRedisEntityRepository
+                        .findById(token)
+                        .orElseThrow(() -> InvalidInviteTokenException.EXCEPTION);
 
-        if(!inviteToken.getGroupId().equals(groupId)){
+        if (!inviteToken.getGroupId().equals(groupId)) {
             throw InvalidInviteTokenException.EXCEPTION;
         }
 
@@ -386,28 +398,33 @@ public class GroupService implements GroupUtils {
 
         return getGroupResponse(group, currentUserId);
     }
+
     @Transactional
     public GroupResponse deleteMemberFromGroup(Long groupId, Long userId) {
         Long currentUserId = SecurityUtils.getCurrentUserId();
         Group group = queryGroup(groupId);
 
-        group.kickUserFromGroup(currentUserId,userId);
+        group.kickUserFromGroup(currentUserId, userId);
 
         return getGroupResponse(group, currentUserId);
     }
 
     private GroupResponse getGroupResponse(Group group, Long currentUserId) {
         return new GroupResponse(
-            group.getGroupBaseInfoVo(),
-            group.getMemberInfoVOs(),
-            group.checkUserIsHost(currentUserId)
-        );
+                group.getGroupBaseInfoVo(),
+                group.getMemberInfoVOs(),
+                group.checkUserIsHost(currentUserId));
     }
-    @Cacheable(cacheNames = "famousGroup" , cacheManager = "redisCacheManager")
+
+    @Cacheable(cacheNames = "famousGroup", cacheManager = "redisCacheManager")
     public GroupBriefInfos getFamousGroup() {
-        List<GroupBriefInfoDto> collect = groupRepository.findFamousGroup().stream()
-            .map(group -> new GroupBriefInfoDto(group.getGroupBaseInfoVo() ,group.getMemberCount()))
-            .collect(Collectors.toList());
+        List<GroupBriefInfoDto> collect =
+                groupRepository.findFamousGroup().stream()
+                        .map(
+                                group ->
+                                        new GroupBriefInfoDto(
+                                                group.getGroupBaseInfoVo(), group.getMemberCount()))
+                        .collect(Collectors.toList());
 
         return new GroupBriefInfos(collect);
     }

@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.domain.credential.domain;
 
+
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.data.annotation.Id;
@@ -11,11 +12,9 @@ import org.springframework.data.redis.core.index.Indexed;
 @Getter
 public class RefreshTokenRedisEntity {
 
-    @Id
-    private String id;
+    @Id private String id;
 
-    @Indexed
-    private String refreshToken;
+    @Indexed private String refreshToken;
 
     @TimeToLive // TTL
     private Long ttl;
@@ -30,5 +29,4 @@ public class RefreshTokenRedisEntity {
     public void updateTTL(Long ttl) {
         this.ttl += ttl;
     }
-
 }

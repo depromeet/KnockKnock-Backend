@@ -1,12 +1,13 @@
 package io.github.depromeet.knockknockbackend.domain.reaction.service;
 
+
+import io.github.depromeet.knockknockbackend.domain.asset.domain.Reaction;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.Notification;
 import io.github.depromeet.knockknockbackend.domain.reaction.domain.NotificationReaction;
-import io.github.depromeet.knockknockbackend.domain.asset.domain.Reaction;
+import io.github.depromeet.knockknockbackend.domain.reaction.domain.repository.NotificationReactionRepository;
 import io.github.depromeet.knockknockbackend.domain.reaction.exception.ReactionAlreadyExistException;
 import io.github.depromeet.knockknockbackend.domain.reaction.exception.ReactionForbiddenException;
 import io.github.depromeet.knockknockbackend.domain.reaction.presentation.dto.request.RegisterReactionRequest;
-import io.github.depromeet.knockknockbackend.domain.reaction.domain.repository.NotificationReactionRepository;
 import io.github.depromeet.knockknockbackend.global.utils.security.SecurityUtils;
 import io.github.depromeet.knockknockbackend.global.utils.user.UserUtils;
 import lombok.RequiredArgsConstructor;
@@ -24,12 +25,11 @@ public class ReactionService {
     public void registerReaction(RegisterReactionRequest request) {
         try {
             notificationReactionRepository.save(
-                NotificationReaction.of(
-                    Notification.of(request.getNotificationId()),
-                    Reaction.of(request.getReactionId()),
-                    userUtils.getUserFromSecurityContext()
-                ));
-        } catch(Exception e) {
+                    NotificationReaction.of(
+                            Notification.of(request.getNotificationId()),
+                            Reaction.of(request.getReactionId()),
+                            userUtils.getUserFromSecurityContext()));
+        } catch (Exception e) {
             throw ReactionAlreadyExistException.EXCEPTION;
         }
     }
@@ -38,10 +38,8 @@ public class ReactionService {
         validateMyReactionTheNotification(notificationReactionId);
 
         notificationReactionRepository.save(
-            NotificationReaction.of(
-                notificationReactionId,
-                Reaction.of(request.getReactionId())
-            ));
+                NotificationReaction.of(
+                        notificationReactionId, Reaction.of(request.getReactionId())));
     }
 
     @Transactional
@@ -51,11 +49,15 @@ public class ReactionService {
     }
 
     private void validateMyReactionTheNotification(Long notificationReactionId) {
-        notificationReactionRepository.findById(notificationReactionId)
-            .ifPresent(notificationReaction -> {
-                if (!notificationReaction.getUser().getId().equals(SecurityUtils.getCurrentUserId()))
-                    throw ReactionForbiddenException.EXCEPTION;
-            });
+        notificationReactionRepository
+                .findById(notificationReactionId)
+                .ifPresent(
+                        notificationReaction -> {
+                            if (!notificationReaction
+                                    .getUser()
+                                    .getId()
+                                    .equals(SecurityUtils.getCurrentUserId()))
+                                throw ReactionForbiddenException.EXCEPTION;
+                        });
     }
-
 }

@@ -15,6 +15,7 @@ public class OauthProperties {
 
     private OAuthSecret kakao;
     private OAuthSecret google;
+
     @Getter
     @Setter
     public static class OAuthSecret {

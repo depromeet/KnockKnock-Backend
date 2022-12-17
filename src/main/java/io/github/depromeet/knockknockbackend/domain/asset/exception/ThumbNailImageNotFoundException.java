@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.domain.asset.exception;
 
+
 import io.github.depromeet.knockknockbackend.global.error.exception.ErrorCode;
 import io.github.depromeet.knockknockbackend.global.error.exception.KnockException;
 
@@ -10,5 +11,4 @@ public class ThumbNailImageNotFoundException extends KnockException {
     private ThumbNailImageNotFoundException() {
         super(ErrorCode.THUMBNAIL_NOT_FOUND);
     }
-
 }

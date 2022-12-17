@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.domain.reaction.domain;
 
+
 import io.github.depromeet.knockknockbackend.domain.asset.domain.Reaction;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.Notification;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
@@ -19,15 +20,13 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-
 @Getter
 @Builder(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "tbl_notification_reaction",
-        uniqueConstraints = {
-            @UniqueConstraint(columnNames = {"notification_id", "user_id"})
-        })
+@Table(
+        name = "tbl_notification_reaction",
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"notification_id", "user_id"})})
 @Entity
 public class NotificationReaction extends BaseTimeEntity {
 
@@ -48,17 +47,14 @@ public class NotificationReaction extends BaseTimeEntity {
     private User user;
 
     public static NotificationReaction of(Long id, Reaction reaction) {
-        return NotificationReaction.builder()
-            .id(id)
-            .reaction(reaction)
-            .build();
+        return NotificationReaction.builder().id(id).reaction(reaction).build();
     }
 
     public static NotificationReaction of(Notification notification, Reaction reaction, User user) {
         return NotificationReaction.builder()
-            .notification(notification)
-            .reaction(reaction)
-            .user(user)
-            .build();
+                .notification(notification)
+                .reaction(reaction)
+                .user(user)
+                .build();
     }
 }

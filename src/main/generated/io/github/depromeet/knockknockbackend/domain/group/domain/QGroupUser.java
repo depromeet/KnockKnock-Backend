@@ -2,17 +2,13 @@ package io.github.depromeet.knockknockbackend.domain.group.domain;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
-import com.querydsl.core.types.dsl.*;
-
-import com.querydsl.core.types.PathMetadata;
-import javax.annotation.processing.Generated;
 import com.querydsl.core.types.Path;
+import com.querydsl.core.types.PathMetadata;
+import com.querydsl.core.types.dsl.*;
 import com.querydsl.core.types.dsl.PathInits;
+import javax.annotation.processing.Generated;
 
-
-/**
- * QGroupUser is a Querydsl query type for GroupUser
- */
+/** QGroupUser is a Querydsl query type for GroupUser */
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
 public class QGroupUser extends EntityPathBase<GroupUser> {
 
@@ -22,9 +18,10 @@ public class QGroupUser extends EntityPathBase<GroupUser> {
 
     public static final QGroupUser groupUser = new QGroupUser("groupUser");
 
-    public final io.github.depromeet.knockknockbackend.global.database.QBaseTimeEntity _super = new io.github.depromeet.knockknockbackend.global.database.QBaseTimeEntity(this);
+    public final io.github.depromeet.knockknockbackend.global.database.QBaseTimeEntity _super =
+            new io.github.depromeet.knockknockbackend.global.database.QBaseTimeEntity(this);
 
-    //inherited
+    // inherited
     public final DateTimePath<java.time.LocalDateTime> createdDate = _super.createdDate;
 
     public final QGroup group;
@@ -33,7 +30,7 @@ public class QGroupUser extends EntityPathBase<GroupUser> {
 
     public final BooleanPath isHost = createBoolean("isHost");
 
-    //inherited
+    // inherited
     public final DateTimePath<java.time.LocalDateTime> modifiedDate = _super.modifiedDate;
 
     public final io.github.depromeet.knockknockbackend.domain.user.domain.QUser user;
@@ -56,9 +53,14 @@ public class QGroupUser extends EntityPathBase<GroupUser> {
 
     public QGroupUser(Class<? extends GroupUser> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.group = inits.isInitialized("group") ? new QGroup(forProperty("group"), inits.get("group")) : null;
-        this.user = inits.isInitialized("user") ? new io.github.depromeet.knockknockbackend.domain.user.domain.QUser(forProperty("user")) : null;
+        this.group =
+                inits.isInitialized("group")
+                        ? new QGroup(forProperty("group"), inits.get("group"))
+                        : null;
+        this.user =
+                inits.isInitialized("user")
+                        ? new io.github.depromeet.knockknockbackend.domain.user.domain.QUser(
+                                forProperty("user"))
+                        : null;
     }
-
 }
-

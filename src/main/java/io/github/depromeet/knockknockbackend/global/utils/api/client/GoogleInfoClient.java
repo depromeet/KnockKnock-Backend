@@ -11,5 +11,4 @@ public interface GoogleInfoClient {
 
     @GetMapping("?alt=json")
     GoogleInformationResponse googleInfo(@RequestHeader("Authorization") String token);
-
 }

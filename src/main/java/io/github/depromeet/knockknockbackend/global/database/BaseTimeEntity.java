@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.global.database;
 
+
 import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.EntityListeners;
@@ -17,6 +18,5 @@ public class BaseTimeEntity {
     @Column(updatable = false)
     private LocalDateTime createdDate;
 
-    @LastModifiedDate
-    private LocalDateTime modifiedDate;
+    @LastModifiedDate private LocalDateTime modifiedDate;
 }

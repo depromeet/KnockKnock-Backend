@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.global.error.exception;
 
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -8,5 +9,4 @@ import lombok.Getter;
 public class KnockException extends RuntimeException {
 
     private ErrorCode errorCode;
-
 }

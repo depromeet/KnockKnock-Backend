@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.domain.admission.domain;
 
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
