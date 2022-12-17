@@ -29,14 +29,12 @@ public class ReactionService {
             ));
     }
 
-    public void changeReaction(RegisterReactionRequest request) {
-        if (request.getNotificationReactionId() != null) {
-            validateMyReactionTheNotification(request.getNotificationReactionId());
-        }
+    public void changeReaction(Long notificationReactionId, RegisterReactionRequest request) {
+        validateMyReactionTheNotification(notificationReactionId);
 
         notificationReactionRepository.save(
             NotificationReaction.of(
-                request.getNotificationReactionId(),
+                notificationReactionId,
                 Reaction.of(request.getReactionId())
             ));
     }

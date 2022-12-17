@@ -34,9 +34,10 @@ public class ReactionController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "알림에 리액션 수정")
-    @PatchMapping
-    public void changeReaction(@RequestBody RegisterReactionRequest request) {
-        reactionService.changeReaction(request);
+    @PatchMapping("{notification_reaction_id}")
+    public void changeReaction(@PathVariable("notification_reaction_id") Long notificationReactionId,
+        @RequestBody RegisterReactionRequest request) {
+        reactionService.changeReaction(notificationReactionId, request);
     }
 
     @ResponseStatus(HttpStatus.OK)
