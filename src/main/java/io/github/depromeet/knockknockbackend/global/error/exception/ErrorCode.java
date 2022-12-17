@@ -10,6 +10,8 @@ public enum ErrorCode {
 
     EXAMPLE_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "EXAMPLE-404-1", "Example Not Found."),
 
+    ARGUMENT_NOT_VALID_ERROR(HttpStatus.BAD_REQUEST.value(), "GLOBAL-400-1", "validation error"),
+
     EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED.value(), "GLOBAL-401-1", "Expired Jwt Token."),
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED.value(), "GLOBAL-401-1", "Invalid Jwt Token."),
 
@@ -51,10 +53,14 @@ public enum ErrorCode {
     STORAGE_FORBIDDEN(HttpStatus.FORBIDDEN.value(), "STORAGE-403-1", "The user has no access to the storage"),
     STORAGE_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "STORAGE-404-1", "Storage Not Found"),
 
+    FILE_EMPTY(HttpStatus.BAD_REQUEST.value(), "IMAGE-400-1", "File is Empty."),
+    BAD_FILE_EXTENSION(HttpStatus.BAD_REQUEST.value(), "IMAGE-400-1", "Bad File Extension."),
+    FILE_UPLOAD_FAIL(HttpStatus.INTERNAL_SERVER_ERROR.value(), "IMAGE-500-1", "File upload fail"),
+
     PROFILE_IMAGE_NOT_FOUND(404,"ASSET-404-1", "PROFILE Not Found"),
     BACKGROUND_NOT_FOUND(404,"ASSET-404-2", "BACKGROUND Not Found"),
-    THUMBNAIL_NOT_FOUND(404,"ASSET-404-3", "THUMBNAIL Not Found");
-
+    THUMBNAIL_NOT_FOUND(404,"ASSET-404-3", "THUMBNAIL Not Found"),
+    APP_VERSION_NOT_FOUND(404,"ASSET-404-4", "APP_VERSION Not Found");
 
     private int status;
     private String code;
