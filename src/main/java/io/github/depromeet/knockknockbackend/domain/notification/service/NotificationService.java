@@ -130,46 +130,51 @@ public class NotificationService {
         return generateQueryNotificationListResponseElements(notifications, notificationReactions);
     }
 
-    private Slice<QueryNotificationListResponseElement> generateQueryNotificationListResponseElements(
-        Slice<Notification> notifications, Slice<NotificationReaction> notificationReactions) {
-        return notifications
-            .map(notification -> {
-                    MyNotificationReactionResponseElement myNotificationReactionResponseElement = null;
+    private Slice<QueryNotificationListResponseElement>
+            generateQueryNotificationListResponseElements(
+                    Slice<Notification> notifications,
+                    Slice<NotificationReaction> notificationReactions) {
+        return notifications.map(
+                notification -> {
+                    MyNotificationReactionResponseElement myNotificationReactionResponseElement =
+                            null;
                     Optional<NotificationReaction> myNotificationReaction =
-                        notificationReactions.stream()
-                            .filter(notificationReaction -> notification.equals(
-                                    notificationReaction.getNotification()
-                                )
-                            ).findAny();
+                            notificationReactions.stream()
+                                    .filter(
+                                            notificationReaction ->
+                                                    notification.equals(
+                                                            notificationReaction.getNotification()))
+                                    .findAny();
 
                     List<NotificationReactionCountInfoVo> notificationReactionCountInfoVo =
-                        notificationReactionRepository.findAllCountByNotification(notification);
+                            notificationReactionRepository.findAllCountByNotification(notification);
 
                     if (myNotificationReaction.isPresent()) {
-                        myNotificationReactionResponseElement
-                            = MyNotificationReactionResponseElement.builder()
-                            .notificationReactionId(myNotificationReaction.get().getId())
-                            .reactionId(myNotificationReaction.get().getReaction().getId())
-                            .build();
+                        myNotificationReactionResponseElement =
+                                MyNotificationReactionResponseElement.builder()
+                                        .notificationReactionId(
+                                                myNotificationReaction.get().getId())
+                                        .reactionId(
+                                                myNotificationReaction.get().getReaction().getId())
+                                        .build();
                     }
 
-                    QueryNotificationReactionResponseElement notificationReactionResponseElement
-                        = QueryNotificationReactionResponseElement.builder()
-                        .myReactionInfo(myNotificationReactionResponseElement)
-                        .reactionCountInfos(notificationReactionCountInfoVo)
-                        .build();
+                    QueryNotificationReactionResponseElement notificationReactionResponseElement =
+                            QueryNotificationReactionResponseElement.builder()
+                                    .myReactionInfo(myNotificationReactionResponseElement)
+                                    .reactionCountInfos(notificationReactionCountInfoVo)
+                                    .build();
 
                     return QueryNotificationListResponseElement.builder()
-                        .notificationId(notification.getId())
-                        .title(notification.getTitle())
-                        .content(notification.getContent())
-                        .imageUrl(notification.getImageUrl())
-                        .sendAt(notification.getSendAt())
-                        .sendUserId(notification.getSendUser().getId())
-                        .reactions(notificationReactionResponseElement)
-                        .build();
-                }
-            );
+                            .notificationId(notification.getId())
+                            .title(notification.getTitle())
+                            .content(notification.getContent())
+                            .imageUrl(notification.getImageUrl())
+                            .sendAt(notification.getSendAt())
+                            .sendUserId(notification.getSendUser().getId())
+                            .reactions(notificationReactionResponseElement)
+                            .build();
+                });
     }
 
     private void handleFcmMessagingException(BatchResponse batchResponse) {

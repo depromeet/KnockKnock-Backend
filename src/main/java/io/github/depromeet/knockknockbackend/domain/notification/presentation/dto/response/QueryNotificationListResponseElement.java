@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.response;
 
+
 import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,5 +15,4 @@ public class QueryNotificationListResponseElement {
     private LocalDateTime sendAt;
     private Long sendUserId;
     private QueryNotificationReactionResponseElement reactions;
-
 }
