@@ -17,7 +17,11 @@ public class AdmissionInfoDto {
     private LocalDateTime createdAt;
 
     @Builder
-    public AdmissionInfoDto(UserInfoVO userInfoVO, AdmissionState admissionState, Long id, LocalDateTime createdAt) {
+    public AdmissionInfoDto(
+            UserInfoVO userInfoVO,
+            AdmissionState admissionState,
+            Long id,
+            LocalDateTime createdAt) {
         this.user = new MemberInfoDto(userInfoVO);
         this.admissionState = admissionState;
         this.id = id;

@@ -43,41 +43,41 @@ public class Admission extends BaseTimeEntity {
     @Enumerated(value = EnumType.STRING)
     private AdmissionState admissionState;
 
-
     @Builder
-    public Admission(User requester, Group group,
-        AdmissionState admissionState) {
+    public Admission(User requester, Group group, AdmissionState admissionState) {
         this.requester = requester;
         this.group = group;
         this.admissionState = admissionState;
     }
 
-    public static Admission createAdmission(User requester, Group group){
+    public static Admission createAdmission(User requester, Group group) {
         return Admission.builder()
-            .admissionState(AdmissionState.PENDING)
-            .requester(requester)
-            .group(group)
-            .build();
+                .admissionState(AdmissionState.PENDING)
+                .requester(requester)
+                .group(group)
+                .build();
     }
 
     @PostPersist
-    private void requestAdmission(){
+    private void requestAdmission() {
         Group group = getGroup();
 
-        NewAdmissionEvent newAdmissionEvent = NewAdmissionEvent.builder()
-            .requesterId(requester.getId())
-            .groupId(group.getId())
-            .admissionId(getId())
-            .hostId(group.getHost().getId())
-            .build();
+        NewAdmissionEvent newAdmissionEvent =
+                NewAdmissionEvent.builder()
+                        .requesterId(requester.getId())
+                        .groupId(group.getId())
+                        .admissionId(getId())
+                        .hostId(group.getHost().getId())
+                        .build();
 
         Events.raise(newAdmissionEvent);
     }
 
-    public void refuseAdmission(){
+    public void refuseAdmission() {
         admissionState = AdmissionState.REFUSE;
     }
-    public void acceptAdmission(){
+
+    public void acceptAdmission() {
         admissionState = AdmissionState.ACCEPT;
     }
 }

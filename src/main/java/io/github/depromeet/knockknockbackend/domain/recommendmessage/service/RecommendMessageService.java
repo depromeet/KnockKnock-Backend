@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.domain.recommendmessage.service;
 
+
 import io.github.depromeet.knockknockbackend.domain.recommendmessage.domain.RecommendMessage;
 import io.github.depromeet.knockknockbackend.domain.recommendmessage.domain.repository.RecommendMessageRepository;
 import io.github.depromeet.knockknockbackend.domain.recommendmessage.presentation.dto.response.QueryRecommendMessageResponse;
@@ -20,11 +21,11 @@ public class RecommendMessageService {
         RecommendMessage recommendMessage = recommendMessageRepository.findAllByEnable(true);
 
         return new QueryRecommendMessageResponse(
-            recommendMessage.getRecommendMessageContents().stream()
-                .map(recommendMessageContent ->
-                    new QueryRecommendMessageResponseElement(recommendMessageContent.getContent())
-                ).collect(Collectors.toList())
-        );
+                recommendMessage.getRecommendMessageContents().stream()
+                        .map(
+                                recommendMessageContent ->
+                                        new QueryRecommendMessageResponseElement(
+                                                recommendMessageContent.getContent()))
+                        .collect(Collectors.toList()));
     }
-
 }

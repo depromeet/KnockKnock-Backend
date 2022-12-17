@@ -2,17 +2,13 @@ package io.github.depromeet.knockknockbackend.domain.group.domain;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 
-import com.querydsl.core.types.dsl.*;
-
-import com.querydsl.core.types.PathMetadata;
-import javax.annotation.processing.Generated;
 import com.querydsl.core.types.Path;
+import com.querydsl.core.types.PathMetadata;
+import com.querydsl.core.types.dsl.*;
 import com.querydsl.core.types.dsl.PathInits;
+import javax.annotation.processing.Generated;
 
-
-/**
- * QGroup is a Querydsl query type for Group
- */
+/** QGroup is a Querydsl query type for Group */
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
 public class QGroup extends EntityPathBase<Group> {
 
@@ -22,13 +18,14 @@ public class QGroup extends EntityPathBase<Group> {
 
     public static final QGroup group = new QGroup("group1");
 
-    public final io.github.depromeet.knockknockbackend.global.database.QBaseTimeEntity _super = new io.github.depromeet.knockknockbackend.global.database.QBaseTimeEntity(this);
+    public final io.github.depromeet.knockknockbackend.global.database.QBaseTimeEntity _super =
+            new io.github.depromeet.knockknockbackend.global.database.QBaseTimeEntity(this);
 
     public final StringPath backgroundImagePath = createString("backgroundImagePath");
 
     public final QCategory category;
 
-    //inherited
+    // inherited
     public final DateTimePath<java.time.LocalDateTime> createdDate = _super.createdDate;
 
     public final StringPath description = createString("description");
@@ -39,10 +36,25 @@ public class QGroup extends EntityPathBase<Group> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
-    //inherited
+    // inherited
     public final DateTimePath<java.time.LocalDateTime> modifiedDate = _super.modifiedDate;
 
-    public final ListPath<io.github.depromeet.knockknockbackend.domain.notification.domain.Notification, io.github.depromeet.knockknockbackend.domain.notification.domain.QNotification> notifications = this.<io.github.depromeet.knockknockbackend.domain.notification.domain.Notification, io.github.depromeet.knockknockbackend.domain.notification.domain.QNotification>createList("notifications", io.github.depromeet.knockknockbackend.domain.notification.domain.Notification.class, io.github.depromeet.knockknockbackend.domain.notification.domain.QNotification.class, PathInits.DIRECT2);
+    public final ListPath<
+                    io.github.depromeet.knockknockbackend.domain.notification.domain.Notification,
+                    io.github.depromeet.knockknockbackend.domain.notification.domain.QNotification>
+            notifications =
+                    this
+                            .<io.github.depromeet.knockknockbackend.domain.notification.domain
+                                            .Notification,
+                                    io.github.depromeet.knockknockbackend.domain.notification.domain
+                                            .QNotification>
+                                    createList(
+                                            "notifications",
+                                            io.github.depromeet.knockknockbackend.domain
+                                                    .notification.domain.Notification.class,
+                                            io.github.depromeet.knockknockbackend.domain
+                                                    .notification.domain.QNotification.class,
+                                            PathInits.DIRECT2);
 
     public final BooleanPath publicAccess = createBoolean("publicAccess");
 
@@ -68,9 +80,11 @@ public class QGroup extends EntityPathBase<Group> {
 
     public QGroup(Class<? extends Group> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.category = inits.isInitialized("category") ? new QCategory(forProperty("category")) : null;
-        this.groupUsers = inits.isInitialized("groupUsers") ? new QGroupUsers(forProperty("groupUsers")) : null;
+        this.category =
+                inits.isInitialized("category") ? new QCategory(forProperty("category")) : null;
+        this.groupUsers =
+                inits.isInitialized("groupUsers")
+                        ? new QGroupUsers(forProperty("groupUsers"))
+                        : null;
     }
-
 }
-

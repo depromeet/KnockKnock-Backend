@@ -42,7 +42,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners(AuditingEntityListener.class)
 public class Group extends BaseTimeEntity {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String title;
@@ -58,7 +59,6 @@ public class Group extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private GroupType groupType;
 
-
     @OneToMany(mappedBy = "group", cascade = CascadeType.ALL)
     private List<GroupUser> groupUsers = new ArrayList<>();
 
@@ -72,9 +72,18 @@ public class Group extends BaseTimeEntity {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "host_id")
     private User host;
+
     @Builder
-    public Group(Long id, String title, String description, String thumbnailPath, String backgroundImagePath,
-        Boolean publicAccess , Category category ,GroupType groupType ,User host) {
+    public Group(
+            Long id,
+            String title,
+            String description,
+            String thumbnailPath,
+            String backgroundImagePath,
+            Boolean publicAccess,
+            Category category,
+            GroupType groupType,
+            User host) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -84,31 +93,31 @@ public class Group extends BaseTimeEntity {
         this.category = category;
         this.groupType = groupType;
         this.host = host;
-        this.groupUsers.add(new GroupUser(this,host));
+        this.groupUsers.add(new GroupUser(this, host));
     }
 
-    public static String generateGroupTitle(String reqUserName, Integer memberCount){
-        if(memberCount <= 1){
+    public static String generateGroupTitle(String reqUserName, Integer memberCount) {
+        if (memberCount <= 1) {
             return reqUserName + "님의 방";
         }
         return reqUserName + "님 외 " + (memberCount - 1) + "명";
     }
 
-    public GroupBaseInfoVo getGroupBaseInfoVo(){
+    public GroupBaseInfoVo getGroupBaseInfoVo() {
         return GroupBaseInfoVo.builder()
-            .title(title)
-            .description(description)
-            .thumbnailPath(thumbnailPath)
-            .backgroundImagePath(backgroundImagePath)
-            .publicAccess(publicAccess)
-            .category(category)
-            .groupType(groupType)
-            .groupId(id)
-            .hostInfoVO(host.getUserInfo())
-            .build();
+                .title(title)
+                .description(description)
+                .thumbnailPath(thumbnailPath)
+                .backgroundImagePath(backgroundImagePath)
+                .publicAccess(publicAccess)
+                .category(category)
+                .groupType(groupType)
+                .groupId(id)
+                .hostInfoVO(host.getUserInfo())
+                .build();
     }
 
-    public void updateGroup(UpdateGroupDto updateGroupDto,Category category) {
+    public void updateGroup(UpdateGroupDto updateGroupDto, Category category) {
         this.title = updateGroupDto.getTitle();
         this.description = updateGroupDto.getDescription();
         this.thumbnailPath = updateGroupDto.getThumbnailPath();
@@ -117,60 +126,54 @@ public class Group extends BaseTimeEntity {
         this.category = category;
     }
 
-    public int getMemberCount(){
+    public int getMemberCount() {
         return this.groupUsers.size();
     }
 
     public static Group of(Long id) {
-        return Group.builder()
-            .id(id)
-            .build();
+        return Group.builder().id(id).build();
     }
 
-    public void validUserIsHost(Long userId){
-        if(!checkUserIsHost(userId)){
+    public void validUserIsHost(Long userId) {
+        if (!checkUserIsHost(userId)) {
             throw NotHostException.EXCEPTION;
         }
     }
-    public Boolean checkUserIsHost(Long userId){
+
+    public Boolean checkUserIsHost(Long userId) {
         return host.getId().equals(userId);
     }
 
-    public void validUserIsAlreadyEnterGroup(Long userId){
-        if(checkUserIsMemberOfGroup(userId))
-            throw AlreadyGroupEnterException.EXCEPTION;
+    public void validUserIsAlreadyEnterGroup(Long userId) {
+        if (checkUserIsMemberOfGroup(userId)) throw AlreadyGroupEnterException.EXCEPTION;
     }
 
-    public void validUserIsMemberOfGroup(Long userId){
-        if(!checkUserIsMemberOfGroup(userId)){
+    public void validUserIsMemberOfGroup(Long userId) {
+        if (!checkUserIsMemberOfGroup(userId)) {
             throw NotMemberException.EXCEPTION;
         }
     }
 
     public boolean checkUserIsMemberOfGroup(Long userId) {
-        return groupUsers.stream()
-            .anyMatch(groupUser ->
-                groupUser.getUserId().equals(userId));
+        return groupUsers.stream().anyMatch(groupUser -> groupUser.getUserId().equals(userId));
     }
 
-    public List<UserInfoVO> getMemberInfoVOs(){
-        return groupUsers.stream()
-            .map(GroupUser::getMemberUserInfo)
-            .collect(Collectors.toList());
+    public List<UserInfoVO> getMemberInfoVOs() {
+        return groupUsers.stream().map(GroupUser::getMemberUserInfo).collect(Collectors.toList());
     }
 
-    public void memberInviteNewUsers(Long reqUserId, List<User> newMembers){
+    public void memberInviteNewUsers(Long reqUserId, List<User> newMembers) {
         newMembers.forEach(user -> memberInviteNewUser(reqUserId, user));
     }
 
-    public void removeMemberByUserId(Long userId){
-        if(checkUserIsHost(userId)){
+    public void removeMemberByUserId(Long userId) {
+        if (checkUserIsHost(userId)) {
             throw HostCanNotLeaveGroupException.EXCEPTION;
         }
         groupUsers.removeIf(groupUser -> groupUser.getUserId().equals(userId));
     }
 
-    public void kickUserFromGroup(Long reqUserId, Long kickUserId){
+    public void kickUserFromGroup(Long reqUserId, Long kickUserId) {
         validUserIsHost(reqUserId);
         removeMemberByUserId(kickUserId);
     }
@@ -179,11 +182,12 @@ public class Group extends BaseTimeEntity {
         validUserIsMemberOfGroup(reqUserId);
         addMember(newUser);
 
-        EnterGroupEvent.MemberInvite memberInviteEvent = EnterGroupEvent.MemberInvite.builder()
-            .enterUserId(newUser.getId())
-            .inviterId(reqUserId)
-            .groupId(getId())
-            .build();
+        EnterGroupEvent.MemberInvite memberInviteEvent =
+                EnterGroupEvent.MemberInvite.builder()
+                        .enterUserId(newUser.getId())
+                        .inviterId(reqUserId)
+                        .groupId(getId())
+                        .build();
 
         Events.raise(memberInviteEvent);
     }
@@ -194,28 +198,28 @@ public class Group extends BaseTimeEntity {
         groupUsers.add(groupUser);
     }
 
-    public void hostAcceptMember(Long reqUserId ,User newUser){
+    public void hostAcceptMember(Long reqUserId, User newUser) {
         validUserIsHost(reqUserId);
         addMember(newUser);
 
-        EnterGroupEvent.HostAccept hostAcceptEvent = EnterGroupEvent.HostAccept.builder()
-            .groupId(getId())
-            .hostUserId(host.getId())
-            .enterUserId(newUser.getId())
-            .build();
+        EnterGroupEvent.HostAccept hostAcceptEvent =
+                EnterGroupEvent.HostAccept.builder()
+                        .groupId(getId())
+                        .hostUserId(host.getId())
+                        .enterUserId(newUser.getId())
+                        .build();
 
         Events.raise(hostAcceptEvent);
     }
 
-    public void enterGroup(User newUser){
+    public void enterGroup(User newUser) {
         addMember(newUser);
-        EnterGroupEvent.InviteLink inviteLinkEvent = EnterGroupEvent.InviteLink.builder()
-            .enterUserId(newUser.getId())
-            .groupId(getId())
-            .build();
+        EnterGroupEvent.InviteLink inviteLinkEvent =
+                EnterGroupEvent.InviteLink.builder()
+                        .enterUserId(newUser.getId())
+                        .groupId(getId())
+                        .build();
 
         Events.raise(inviteLinkEvent);
     }
-
-
 }

@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.global.config;
 
+
 import java.time.Duration;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
@@ -18,16 +19,18 @@ public class RedisCacheConfig {
 
     @Bean
     public CacheManager redisCacheManager(RedisConnectionFactory cf) {
-        RedisCacheConfiguration redisCacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
-            .serializeKeysWith(RedisSerializationContext
-                .SerializationPair.fromSerializer(new StringRedisSerializer()))
-            .serializeValuesWith(RedisSerializationContext.
-                SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()))
-            .entryTtl(Duration.ofHours(1L));
+        RedisCacheConfiguration redisCacheConfiguration =
+                RedisCacheConfiguration.defaultCacheConfig()
+                        .serializeKeysWith(
+                                RedisSerializationContext.SerializationPair.fromSerializer(
+                                        new StringRedisSerializer()))
+                        .serializeValuesWith(
+                                RedisSerializationContext.SerializationPair.fromSerializer(
+                                        new GenericJackson2JsonRedisSerializer()))
+                        .entryTtl(Duration.ofHours(1L));
 
-        return RedisCacheManager.RedisCacheManagerBuilder
-            .fromConnectionFactory(cf)
-            .cacheDefaults(redisCacheConfiguration)
-            .build();
+        return RedisCacheManager.RedisCacheManagerBuilder.fromConnectionFactory(cf)
+                .cacheDefaults(redisCacheConfiguration)
+                .build();
     }
 }

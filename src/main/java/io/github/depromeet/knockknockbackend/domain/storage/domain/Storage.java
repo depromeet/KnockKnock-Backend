@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.domain.storage.domain;
 
+
 import io.github.depromeet.knockknockbackend.domain.notification.domain.Notification;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.global.database.BaseTimeEntity;
@@ -39,9 +40,6 @@ public class Storage extends BaseTimeEntity {
     private User user;
 
     public static Storage of(Notification notification, User user) {
-        return Storage.builder()
-            .notification(notification)
-            .user(user)
-            .build();
+        return Storage.builder().notification(notification).user(user).build();
     }
 }

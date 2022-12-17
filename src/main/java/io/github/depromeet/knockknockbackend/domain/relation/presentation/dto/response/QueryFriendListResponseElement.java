@@ -1,7 +1,7 @@
 package io.github.depromeet.knockknockbackend.domain.relation.presentation.dto.response;
 
+
 import io.github.depromeet.knockknockbackend.domain.user.domain.vo.UserInfoVO;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
@@ -16,5 +16,4 @@ public class QueryFriendListResponseElement {
         this.nickname = infoVO.getNickname();
         this.profilePath = infoVO.getProfilePath();
     }
-
 }

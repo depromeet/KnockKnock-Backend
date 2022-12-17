@@ -1,4 +1,5 @@
- package io.github.depromeet.knockknockbackend.domain.notification.domain;
+package io.github.depromeet.knockknockbackend.domain.notification.domain;
+
 
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import javax.persistence.Entity;
@@ -35,5 +36,4 @@ public class NotificationReceiver {
     @JoinColumn(name = "receiver_user_id")
     @OneToOne(fetch = FetchType.LAZY)
     private User receiver;
-
 }

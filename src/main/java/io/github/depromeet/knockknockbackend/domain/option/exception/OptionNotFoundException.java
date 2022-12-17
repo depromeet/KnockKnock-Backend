@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.domain.option.exception;
 
+
 import io.github.depromeet.knockknockbackend.global.error.exception.ErrorCode;
 import io.github.depromeet.knockknockbackend.global.error.exception.KnockException;
 
@@ -10,5 +11,4 @@ public class OptionNotFoundException extends KnockException {
     private OptionNotFoundException() {
         super(ErrorCode.OPTION_NOT_FOUND);
     }
-
 }

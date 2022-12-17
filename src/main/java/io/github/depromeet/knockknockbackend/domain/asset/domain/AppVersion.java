@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.domain.asset.domain;
 
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;

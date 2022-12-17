@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.response;
 
+
 import lombok.Builder;
 import lombok.Getter;
 

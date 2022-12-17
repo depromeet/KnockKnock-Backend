@@ -5,10 +5,9 @@ import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.domain.user.domain.repository.UserRepository;
 import io.github.depromeet.knockknockbackend.global.exception.UserNotFoundException;
 import io.github.depromeet.knockknockbackend.global.utils.security.SecurityUtils;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @RequiredArgsConstructor
 @Service
@@ -18,7 +17,8 @@ public class UserUtilsImpl implements UserUtils {
 
     @Override
     public User getUserById(Long id) {
-        return userRepository.findById(SecurityUtils.getCurrentUserId())
+        return userRepository
+                .findById(SecurityUtils.getCurrentUserId())
                 .orElseThrow(() -> UserNotFoundException.EXCEPTION);
     }
 
@@ -27,8 +27,7 @@ public class UserUtilsImpl implements UserUtils {
         return userRepository.findByIdIn(ids);
     }
 
-
-    public User getUserFromSecurityContext(){
+    public User getUserFromSecurityContext() {
         Long currentUserId = SecurityUtils.getCurrentUserId();
         User user = getUserById(currentUserId);
         return user;
