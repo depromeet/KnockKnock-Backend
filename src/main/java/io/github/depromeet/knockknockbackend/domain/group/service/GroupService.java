@@ -30,6 +30,7 @@ import io.github.depromeet.knockknockbackend.global.exception.UserNotFoundExcept
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -402,7 +403,7 @@ public class GroupService implements GroupUtils {
             group.checkUserIsHost(currentUserId)
         );
     }
-
+    @Cacheable(cacheNames = "famousGroup" , cacheManager = "redisCacheManager")
     public GroupBriefInfos getFamousGroup() {
         List<GroupBriefInfoDto> collect = groupRepository.findFamousGroup().stream()
             .map(group -> new GroupBriefInfoDto(group.getGroupBaseInfoVo() ,group.getMemberCount()))
