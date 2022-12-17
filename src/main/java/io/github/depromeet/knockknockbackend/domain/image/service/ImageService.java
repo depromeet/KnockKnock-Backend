@@ -5,6 +5,7 @@ import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.util.IOUtils;
+import io.github.depromeet.knockknockbackend.domain.image.exception.BadFileExtensionException;
 import io.github.depromeet.knockknockbackend.domain.image.exception.FileEmptyException;
 import io.github.depromeet.knockknockbackend.domain.image.exception.FileUploadFailException;
 import io.github.depromeet.knockknockbackend.domain.image.presentation.dto.response.UploadImageResponse;
@@ -38,6 +39,11 @@ public class ImageService {
         if(file.isEmpty() && file.getOriginalFilename() != null) throw FileEmptyException.EXCEPTION;
         String originalFilename = file.getOriginalFilename();
         String ext = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
+
+        if (!(ext.equals("jpg") || ext.equals("HEIC") || ext.equals("jpeg") || ext.equals("png") || ext.equals("heic"))) {
+            throw BadFileExtensionException.EXCEPTION;
+        }
+        
         String randomName = UUID.randomUUID().toString();
 
         String fileName = SecurityUtils.getCurrentUserId() + "|" + randomName + "." + ext;
