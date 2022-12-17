@@ -51,6 +51,9 @@ public enum ErrorCode {
     STORAGE_FORBIDDEN(HttpStatus.FORBIDDEN.value(), "STORAGE-403-1", "The user has no access to the storage"),
     STORAGE_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "STORAGE-404-1", "Storage Not Found"),
 
+    FILE_EMPTY(HttpStatus.BAD_REQUEST.value(), "IMAGE-400-1", "Image is Empty."),
+    FILE_UPLOAD_FAIL(HttpStatus.INTERNAL_SERVER_ERROR.value(), "IMAGE-500-1", "Image upload fail"),
+
     PROFILE_IMAGE_NOT_FOUND(404,"ASSET-404-1", "PROFILE Not Found"),
     BACKGROUND_NOT_FOUND(404,"ASSET-404-2", "BACKGROUND Not Found"),
     THUMBNAIL_NOT_FOUND(404,"ASSET-404-3", "THUMBNAIL Not Found");
