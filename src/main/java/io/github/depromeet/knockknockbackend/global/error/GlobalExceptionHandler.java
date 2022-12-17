@@ -5,6 +5,7 @@ import io.github.depromeet.knockknockbackend.global.error.exception.KnockExcepti
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -12,10 +13,19 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
-    //TODO : 밸리데이션 에러라던지 무언가 다른 응답이 필요한 에러항목들을... 바꿔주기!
 
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> methodArgumentNotValidExceptionHandler(MethodArgumentNotValidException e) {
+        ErrorCode validationError = ErrorCode.VALIDATION_ERROR;
+        return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body(new ErrorResponse(validationError.getStatus(),
+                validationError.getCode(),
+                e.getMessage())
+            );
+    }
     @ExceptionHandler(KnockException.class)
-    public ResponseEntity<ErrorResponse> hanulExceptionHandler(KnockException e) {
+    public ResponseEntity<ErrorResponse> KnockExceptionHandler(KnockException e) {
         ErrorCode code = e.getErrorCode();
         return new ResponseEntity<>(new ErrorResponse(code.getStatus(), code.getCode(), code.getReason()),
             HttpStatus.valueOf(code.getStatus()));
