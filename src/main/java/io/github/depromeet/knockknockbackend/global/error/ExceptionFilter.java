@@ -25,21 +25,28 @@ public class ExceptionFilter extends OncePerRequestFilter {
         try {
             filterChain.doFilter(request, response);
         } catch (KnockException e) {
-            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
             response.getWriter()
-                    .write(
-                            objectMapper.writeValueAsString(
-                                    getErrorResponse(
-                                            e.getErrorCode(), request.getRequestURL().toString())));
+                    .write(objectMapper.writeValueAsString(getErrorResponse(
+                            e.getErrorCode(),
+                            request.getRequestURL().toString()
+                    )));
         } catch (Exception e) {
-            e.printStackTrace();
+            if (e.getCause() instanceof KnockException) {
+                response.getWriter()
+                        .write(objectMapper.writeValueAsString(getErrorResponse(
+                                ((KnockException) e.getCause()).getErrorCode(),
+                                request.getRequestURL().toString()
+                        )));
+            } else {
+                e.printStackTrace();
+                getErrorResponse(ErrorCode.INTERNAL_SERVER_ERROR, request.getRequestURL().toString());
+            }
+        } finally {
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-            getErrorResponse(ErrorCode.INTERNAL_SERVER_ERROR, request.getRequestURL().toString());
         }
     }
 
     private ErrorResponse getErrorResponse(ErrorCode errorCode, String path) {
-        return new ErrorResponse(
-                errorCode.getStatus(), errorCode.getCode(), errorCode.getReason(), path);
+        return new ErrorResponse(errorCode.getStatus(), errorCode.getCode(), errorCode.getReason(), path);
     }
 }
