@@ -24,16 +24,16 @@ public class ExceptionFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         } catch (KnockException e) {
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-            response.getWriter().write(objectMapper.writeValueAsString(getErrorResponse(e.getErrorCode())));
+            response.getWriter().write(objectMapper.writeValueAsString(getErrorResponse(e.getErrorCode(),request.getRequestURL().toString())));
         } catch (Exception e) {
             e.printStackTrace();
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-            getErrorResponse(ErrorCode.INTERNAL_SERVER_ERROR);
+            getErrorResponse(ErrorCode.INTERNAL_SERVER_ERROR,request.getRequestURL().toString());
         }
     }
 
-    private ErrorResponse getErrorResponse(ErrorCode errorCode) {
-        return new ErrorResponse(errorCode.getStatus(), errorCode.getCode(), errorCode.getReason());
+    private ErrorResponse getErrorResponse(ErrorCode errorCode , String path) {
+        return new ErrorResponse(errorCode.getStatus(), errorCode.getCode(), errorCode.getReason(),path);
     }
 
 
