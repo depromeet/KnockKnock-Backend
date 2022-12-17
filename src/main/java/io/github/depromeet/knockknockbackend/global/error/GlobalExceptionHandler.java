@@ -27,7 +27,7 @@ public class GlobalExceptionHandler {
         MethodArgumentNotValidException e,
         HttpServletRequest request
     ) throws JsonProcessingException {
-        ErrorCode validationError = ErrorCode.VALIDATION_ERROR;
+        ErrorCode validationError = ErrorCode.ARGUMENT_NOT_VALID_ERROR;
         List<FieldError> errors = e.getBindingResult().getFieldErrors();
 
         Map<String, Object> fieldAndErrorMessages = errors.stream()

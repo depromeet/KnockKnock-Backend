@@ -10,7 +10,7 @@ public enum ErrorCode {
 
     EXAMPLE_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "EXAMPLE-404-1", "Example Not Found."),
 
-    VALIDATION_ERROR(HttpStatus.BAD_REQUEST.value(), "GLOBAL-400-1", "validation error"),
+    ARGUMENT_NOT_VALID_ERROR(HttpStatus.BAD_REQUEST.value(), "GLOBAL-400-1", "validation error"),
 
     EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED.value(), "GLOBAL-401-1", "Expired Jwt Token."),
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED.value(), "GLOBAL-401-1", "Invalid Jwt Token."),
