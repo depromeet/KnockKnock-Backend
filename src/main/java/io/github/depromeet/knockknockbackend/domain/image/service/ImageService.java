@@ -8,6 +8,7 @@ import com.amazonaws.util.IOUtils;
 import io.github.depromeet.knockknockbackend.domain.image.exception.FileEmptyException;
 import io.github.depromeet.knockknockbackend.domain.image.exception.FileUploadFailException;
 import io.github.depromeet.knockknockbackend.domain.image.presentation.dto.response.UploadImageResponse;
+import io.github.depromeet.knockknockbackend.global.utils.security.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -38,7 +39,8 @@ public class ImageService {
         String originalFilename = file.getOriginalFilename();
         String ext = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
         String randomName = UUID.randomUUID().toString();
-        String fileName = randomName + "." + ext;
+
+        String fileName = SecurityUtils.getCurrentUserId() + "|" + randomName + "." + ext;
 
         try {
             ObjectMetadata objMeta = new ObjectMetadata();
