@@ -7,6 +7,7 @@ import io.github.depromeet.knockknockbackend.global.error.exception.KnockExcepti
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -22,8 +23,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> methodArgumentNotValidExceptionHandler(MethodArgumentNotValidException e)
-        throws JsonProcessingException {
+    public ResponseEntity<ErrorResponse> methodArgumentNotValidExceptionHandler(
+        MethodArgumentNotValidException e,
+        HttpServletRequest request
+    ) throws JsonProcessingException {
         ErrorCode validationError = ErrorCode.VALIDATION_ERROR;
         List<FieldError> errors = e.getBindingResult().getFieldErrors();
 
@@ -33,29 +36,36 @@ public class GlobalExceptionHandler {
             );
 
         String errorsToJsonString = new ObjectMapper().writeValueAsString(fieldAndErrorMessages);
+        ErrorResponse errorResponse = new ErrorResponse(validationError.getStatus(),
+            validationError.getCode(),
+            errorsToJsonString,
+            request.getRequestURL().toString());
+
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
-            .body(new ErrorResponse(validationError.getStatus(),
-                validationError.getCode(),
-                errorsToJsonString)
-            );
+            .body(errorResponse);
     }
 
     @ExceptionHandler(KnockException.class)
-    public ResponseEntity<ErrorResponse> KnockExceptionHandler(KnockException e) {
+    public ResponseEntity<ErrorResponse> KnockExceptionHandler(KnockException e, HttpServletRequest request) {
         ErrorCode code = e.getErrorCode();
-        return new ResponseEntity<>(new ErrorResponse(code.getStatus(), code.getCode(), code.getReason()),
-            HttpStatus.valueOf(code.getStatus()));
+        ErrorResponse errorResponse = new ErrorResponse(code.getStatus(), code.getCode(),
+            code.getReason(), request.getRequestURL().toString());
+        return ResponseEntity
+            .status(HttpStatus.valueOf(code.getStatus()))
+            .body(errorResponse);
     }
 
 
     @ExceptionHandler(Exception.class)
-    protected ResponseEntity<ErrorResponse> handleException(Exception e) {
+    protected ResponseEntity<ErrorResponse> handleException(Exception e, HttpServletRequest request) {
         log.error("INTERNAL_SERVER_ERROR", e);
         ErrorCode internalServerError = ErrorCode.INTERNAL_SERVER_ERROR;
-        return new ResponseEntity<>(new ErrorResponse(internalServerError.getStatus(),
+        ErrorResponse errorResponse = new ErrorResponse(internalServerError.getStatus(),
             internalServerError.getCode(),
-            internalServerError.getReason()),
-            HttpStatus.valueOf(internalServerError.getStatus()));
+            internalServerError.getReason(), request.getRequestURL().toString());
+        return ResponseEntity
+            .status(HttpStatus.valueOf(internalServerError.getStatus()))
+            .body(errorResponse);
     }
 }
