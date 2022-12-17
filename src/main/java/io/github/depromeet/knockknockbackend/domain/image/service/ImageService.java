@@ -25,7 +25,7 @@ public class ImageService {
     @Value("${aws.s3.bucket}")
     private String bucket;
 
-    @Value("${aws.s3.base_image_url}")
+    @Value("${aws.s3.base-url}")
     private String baseUrl;
 
     private final AmazonS3 amazonS3;
