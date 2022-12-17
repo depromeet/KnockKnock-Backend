@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.global.config;
 
+
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
@@ -27,5 +28,4 @@ public class S3Config {
                 .withRegion(Regions.AP_NORTHEAST_2)
                 .build();
     }
-
 }
