@@ -27,7 +27,7 @@ public class ReactionController {
     private final ReactionService reactionService;
 
     @Operation(summary = "알림에 리액션 등록")
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(HttpStatus.OK)
     @PostMapping
     public void registerReaction(@RequestBody RegisterReactionRequest request) {
         reactionService.registerReaction(request);
