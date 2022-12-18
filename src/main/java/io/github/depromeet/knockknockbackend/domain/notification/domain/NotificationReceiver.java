@@ -2,6 +2,7 @@ package io.github.depromeet.knockknockbackend.domain.notification.domain;
 
 
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
+import io.github.depromeet.knockknockbackend.global.database.BaseTimeEntity;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -23,7 +24,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "tbl_notification_receiver")
 @Entity
-public class NotificationReceiver {
+public class NotificationReceiver extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,9 +38,12 @@ public class NotificationReceiver {
     @OneToOne(fetch = FetchType.LAZY)
     private User receiver;
 
-    public NotificationReceiver(Notification notification, User receiver) {
+    private String fcmToken;
+
+    public NotificationReceiver(Notification notification, User receiver, String fcmToken) {
         this.notification = notification;
         this.receiver = receiver;
+        this.fcmToken = fcmToken;
     }
 
 }
