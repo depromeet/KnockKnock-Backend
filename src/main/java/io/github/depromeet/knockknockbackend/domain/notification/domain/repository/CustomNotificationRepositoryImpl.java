@@ -3,6 +3,7 @@ package io.github.depromeet.knockknockbackend.domain.notification.domain.reposit
 import static io.github.depromeet.knockknockbackend.domain.group.domain.QGroupUser.groupUser;
 import static io.github.depromeet.knockknockbackend.domain.notification.domain.QDeviceToken.deviceToken;
 import static io.github.depromeet.knockknockbackend.domain.notification.domain.QNotification.notification;
+import static io.github.depromeet.knockknockbackend.domain.notification.domain.QNotificationReceiver.notificationReceiver;
 import static io.github.depromeet.knockknockbackend.domain.option.domain.QOption.option;
 import static io.github.depromeet.knockknockbackend.domain.relation.domain.QBlockUser.blockUser;
 import static io.github.depromeet.knockknockbackend.domain.storage.domain.QStorage.storage;
@@ -51,7 +52,7 @@ public class CustomNotificationRepositoryImpl implements CustomNotificationRepos
                                 storage.user.id.eq(userId),
                                 eqGroupId(groupId),
                                 greaterEqualPeriodOfMonth(periodOfMonth))
-                        .orderBy(sort(pageable))
+                        .orderBy(sort("storage", pageable))
                         .offset(pageable.getOffset())
                         .limit(pageable.getPageSize() + NEXT_SLICE_CHECK)
                         .fetch();
@@ -81,6 +82,27 @@ public class CustomNotificationRepositoryImpl implements CustomNotificationRepos
                 .fetch();
     }
 
+    @Override
+    public Slice<Notification> findSliceLatestByReceiver(Long receiveUserId, Pageable pageable) {
+        List<Notification> notifications =
+                queryFactory
+                        .selectFrom(notification)
+                        .where(
+                                notification.deleted.eq(false),
+                                JPAExpressions.selectFrom(notificationReceiver)
+                                        .where(
+                                                notificationReceiver.notification.id.eq(
+                                                        notification.id),
+                                                notificationReceiver.receiver.id.eq(receiveUserId))
+                                        .exists())
+                        .orderBy(sort("notification", pageable))
+                        .offset(pageable.getOffset())
+                        .limit(pageable.getPageSize() + NEXT_SLICE_CHECK)
+                        .fetch();
+
+        return new SliceImpl<>(notifications, pageable, hasNext(notifications, pageable));
+    }
+
     private BooleanExpression eqNightOption(Boolean nightOption) {
         if (nightOption == null) {
             return null;
@@ -103,7 +125,7 @@ public class CustomNotificationRepositoryImpl implements CustomNotificationRepos
         return storage.createdDate.goe(dateCondition.atStartOfDay());
     }
 
-    private OrderSpecifier<?> sort(Pageable pageable) {
+    private OrderSpecifier<?> sort(String domain, Pageable pageable) {
         OrderSpecifier<?> orderSpecifier = null;
 
         Sort sort = pageable.getSort();
@@ -116,15 +138,26 @@ public class CustomNotificationRepositoryImpl implements CustomNotificationRepos
                     order.getDirection().isAscending()
                             ? com.querydsl.core.types.Order.ASC
                             : com.querydsl.core.types.Order.DESC;
-            switch (order.getProperty()) {
-                case "createdDate":
-                    orderSpecifier = new OrderSpecifier<>(direction, storage.createdDate);
-                    break;
-                default:
-                    break;
-            }
+            orderSpecifier = getOrderSpecifier(domain, orderSpecifier, direction);
         }
 
+        return orderSpecifier;
+    }
+
+    private static OrderSpecifier<?> getOrderSpecifier(
+            String domain,
+            OrderSpecifier<?> orderSpecifier,
+            com.querydsl.core.types.Order direction) {
+        switch (domain) {
+            case "storage":
+                orderSpecifier = new OrderSpecifier<>(direction, storage.createdDate);
+                break;
+            case "notification":
+                orderSpecifier = new OrderSpecifier<>(direction, notification.id);
+                break;
+            default:
+                break;
+        }
         return orderSpecifier;
     }
 }
