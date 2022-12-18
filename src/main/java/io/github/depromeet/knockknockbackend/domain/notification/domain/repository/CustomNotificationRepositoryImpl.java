@@ -1,5 +1,7 @@
 package io.github.depromeet.knockknockbackend.domain.notification.domain.repository;
 
+import static io.github.depromeet.knockknockbackend.domain.group.domain.QGroupUser.groupUser;
+import static io.github.depromeet.knockknockbackend.domain.notification.domain.QDeviceToken.deviceToken;
 import static io.github.depromeet.knockknockbackend.domain.notification.domain.QNotification.notification;
 import static io.github.depromeet.knockknockbackend.domain.relation.domain.QBlockUser.blockUser;
 import static io.github.depromeet.knockknockbackend.domain.storage.domain.QStorage.storage;
