@@ -42,6 +42,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class NotificationService {
 
+    private static final boolean DELETED = false;
     private final NotificationRepository notificationRepository;
     private final DeviceTokenRepository deviceTokenRepository;
     private final NotificationReactionRepository notificationReactionRepository;
@@ -55,7 +56,7 @@ public class NotificationService {
     @Transactional(readOnly = true)
     public QueryNotificationListResponse queryListByGroupId(Pageable pageable, Long groupId) {
         Slice<Notification> notifications =
-                notificationRepository.findAllByGroupId(groupId, pageable);
+                notificationRepository.findAllByGroupIdAndDeleted(groupId, DELETED, pageable);
 
         Slice<QueryNotificationListResponseElement> notificationListResponseElements =
                 getNotificationListResponseElements(notifications);
