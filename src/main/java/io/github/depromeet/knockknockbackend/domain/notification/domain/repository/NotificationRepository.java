@@ -12,7 +12,8 @@ public interface NotificationRepository
         extends JpaRepository<Notification, Long>, CustomNotificationRepository {
 
     @EntityGraph(attributePaths = {"group"})
-    Slice<Notification> findAllByGroupId(Long groupId, Pageable pageable);
+    Slice<Notification> findAllByGroupIdAndDeleted(
+            Long groupId, boolean deleted, Pageable pageable);
 
     @EntityGraph(attributePaths = {"group"})
     Optional<Notification> findById(Long notificationId);
