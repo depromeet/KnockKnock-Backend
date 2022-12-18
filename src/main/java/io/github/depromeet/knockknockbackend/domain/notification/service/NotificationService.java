@@ -138,7 +138,8 @@ public class NotificationService {
     }
 
     public void deleteByNotificationId(Long notificationId) {
-        Notification notification = validateQueryDeletePermission(notificationId);
+        Notification notification = queryNotificationById(notificationId);
+        validateDeletePermission(notification);
         notification.deleteNotification();
         notificationRepository.save(notification);
     }
@@ -247,14 +248,15 @@ public class NotificationService {
                 SecurityUtils.getCurrentUserId(), notifications.getContent());
     }
 
-    private Notification validateQueryDeletePermission(Long notificationId) {
-        Notification notification =
-                notificationRepository
-                        .findById(notificationId)
-                        .orElseThrow(() -> NotificationNotFoundException.EXCEPTION);
+    private void validateDeletePermission(Notification notification) {
         if (!SecurityUtils.getCurrentUserId().equals(notification.getSendUser().getId())) {
             throw NotificationForbiddenException.EXCEPTION;
         }
-        return notification;
+    }
+
+    private Notification queryNotificationById(Long notificationId) {
+        return notificationRepository
+                .findById(notificationId)
+                .orElseThrow(() -> NotificationNotFoundException.EXCEPTION);
     }
 }
