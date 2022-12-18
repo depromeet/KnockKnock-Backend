@@ -51,8 +51,15 @@ public class NotificationService {
     private final EntityManager entityManager;
 
     @Transactional(readOnly = true)
-    public QueryNotificationListResponse queryAlarmHistoryByUserId(Pageable pageable) {
-        return null;
+    public QueryNotificationListResponse queryListLatest(Pageable pageable) {
+        Slice<Notification> notifications =
+                notificationRepository.findSliceLatestByReceiver(
+                        SecurityUtils.getCurrentUserId(), pageable);
+
+        Slice<QueryNotificationListResponseElement> notificationListResponseElements =
+                getNotificationListResponseElements(notifications);
+
+        return new QueryNotificationListResponse(null, notificationListResponseElements);
     }
 
     @Transactional(readOnly = true)
