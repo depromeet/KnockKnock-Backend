@@ -26,15 +26,15 @@ public class ReactionController {
 
     private final ReactionService reactionService;
 
-    @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "알림에 리액션 등록")
+    @ResponseStatus(HttpStatus.OK)
     @PostMapping
     public void registerReaction(@RequestBody RegisterReactionRequest request) {
         reactionService.registerReaction(request);
     }
 
+    @Operation(summary = "알림 리액션 수정")
     @ResponseStatus(HttpStatus.CREATED)
-    @Operation(summary = "알림에 리액션 수정")
     @PatchMapping("{notification_reaction_id}")
     public void changeReaction(
             @PathVariable("notification_reaction_id") Long notificationReactionId,
@@ -42,6 +42,7 @@ public class ReactionController {
         reactionService.changeReaction(notificationReactionId, request);
     }
 
+    @Operation(summary = "알림 리액션 삭제")
     @ResponseStatus(HttpStatus.OK)
     @DeleteMapping("{notification_reaction_id}")
     public void deleteReaction(
