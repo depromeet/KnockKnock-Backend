@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "유저 관련 컨트롤러", description = "")
 @SecurityRequirement(name = "access-token")
 @RequiredArgsConstructor
-@RequestMapping("/users")
+@RequestMapping("/api/v1/users")
 @SecurityRequirement(name = "access-token")
 @RestController
 public class UserController {

@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @SecurityRequirement(name = "access-token")
 @Tag(name = "추천메세지 관련 컨트롤러", description = "")
 @RequiredArgsConstructor
-@RequestMapping("/recommendmessage")
+@RequestMapping("/api/v1/recommendmessage")
 @RestController
 public class RecommendMessageController {
 
