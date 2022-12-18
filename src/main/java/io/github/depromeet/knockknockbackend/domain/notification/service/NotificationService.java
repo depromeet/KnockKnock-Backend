@@ -15,6 +15,8 @@ import io.github.depromeet.knockknockbackend.domain.notification.domain.reposito
 import io.github.depromeet.knockknockbackend.domain.notification.domain.repository.NotificationRepository;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.vo.NotificationReactionCountInfoVo;
 import io.github.depromeet.knockknockbackend.domain.notification.exception.FcmResponseException;
+import io.github.depromeet.knockknockbackend.domain.notification.exception.NotificationForbiddenException;
+import io.github.depromeet.knockknockbackend.domain.notification.exception.NotificationNotFoundException;
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.request.RegisterFcmTokenRequest;
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.request.SendInstanceRequest;
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.response.MyNotificationReactionResponseElement;
@@ -42,6 +44,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class NotificationService {
 
+    private static final boolean CREATED_DELETED_STATUS = false;
     private final NotificationRepository notificationRepository;
     private final DeviceTokenRepository deviceTokenRepository;
     private final NotificationReactionRepository notificationReactionRepository;
@@ -55,7 +58,8 @@ public class NotificationService {
     @Transactional(readOnly = true)
     public QueryNotificationListResponse queryListByGroupId(Pageable pageable, Long groupId) {
         Slice<Notification> notifications =
-                notificationRepository.findAllByGroupId(groupId, pageable);
+                notificationRepository.findAllByGroupIdAndDeleted(
+                        groupId, CREATED_DELETED_STATUS, pageable);
 
         Slice<QueryNotificationListResponseElement> notificationListResponseElements =
                 getNotificationListResponseElements(notifications);
@@ -130,6 +134,13 @@ public class NotificationService {
                                                 User.of(deviceToken.getUserId()),
                                                 deviceToken.getToken()))
                         .collect(Collectors.toList()));
+        notificationRepository.save(notification);
+    }
+
+    public void deleteByNotificationId(Long notificationId) {
+        Notification notification = queryNotificationById(notificationId);
+        validateDeletePermission(notification);
+        notification.deleteNotification();
         notificationRepository.save(notification);
     }
 
@@ -235,5 +246,17 @@ public class NotificationService {
             Slice<Notification> notifications) {
         return notificationReactionRepository.findByUserIdAndNotificationIn(
                 SecurityUtils.getCurrentUserId(), notifications.getContent());
+    }
+
+    private void validateDeletePermission(Notification notification) {
+        if (!SecurityUtils.getCurrentUserId().equals(notification.getSendUser().getId())) {
+            throw NotificationForbiddenException.EXCEPTION;
+        }
+    }
+
+    private Notification queryNotificationById(Long notificationId) {
+        return notificationRepository
+                .findById(notificationId)
+                .orElseThrow(() -> NotificationNotFoundException.EXCEPTION);
     }
 }
