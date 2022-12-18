@@ -36,4 +36,10 @@ public class NotificationReceiver {
     @JoinColumn(name = "receiver_user_id")
     @OneToOne(fetch = FetchType.LAZY)
     private User receiver;
+
+    public NotificationReceiver(Notification notification, User receiver) {
+        this.notification = notification;
+        this.receiver = receiver;
+    }
+
 }
