@@ -27,14 +27,14 @@ public class ReactionController {
     private final ReactionService reactionService;
 
     @Operation(summary = "알림에 리액션 등록")
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     public void registerReaction(@RequestBody RegisterReactionRequest request) {
         reactionService.registerReaction(request);
     }
 
     @Operation(summary = "알림 리액션 수정")
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(HttpStatus.OK)
     @PatchMapping("{notification_reaction_id}")
     public void changeReaction(
             @PathVariable("notification_reaction_id") Long notificationReactionId,
