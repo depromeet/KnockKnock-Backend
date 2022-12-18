@@ -26,10 +26,10 @@ public class NotificationController {
 
     @Operation(summary = "최신 푸쉬알림 리스트")
     @GetMapping
-    public QueryNotificationListResponse queryAlarmHistoryByUserId(
-            @PageableDefault(size = 5, sort = "sendAt", direction = Direction.DESC)
+    public QueryNotificationListResponse queryListLatest(
+            @PageableDefault(size = 10, sort = "id", direction = Direction.DESC)
                     Pageable pageable) {
-        return notificationService.queryAlarmHistoryByUserId(pageable);
+        return notificationService.queryListLatest(pageable);
     }
 
     @Operation(summary = "FCM 토큰 등록")
