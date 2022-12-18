@@ -29,6 +29,7 @@ import org.springframework.stereotype.Repository;
 public class CustomNotificationRepositoryImpl implements CustomNotificationRepository {
 
     private static final long NEXT_SLICE_CHECK = 1;
+    private static final int NUMBER_OF_LATEST_NOTIFICATIONS = 10;
     private final JPAQueryFactory queryFactory;
 
     private boolean hasNext(List<Notification> notifications, Pageable pageable) {
@@ -83,24 +84,19 @@ public class CustomNotificationRepositoryImpl implements CustomNotificationRepos
     }
 
     @Override
-    public Slice<Notification> findSliceLatestByReceiver(Long receiveUserId, Pageable pageable) {
-        List<Notification> notifications =
-                queryFactory
-                        .selectFrom(notification)
-                        .where(
-                                notification.deleted.eq(false),
-                                JPAExpressions.selectFrom(notificationReceiver)
-                                        .where(
-                                                notificationReceiver.notification.id.eq(
-                                                        notification.id),
-                                                notificationReceiver.receiver.id.eq(receiveUserId))
-                                        .exists())
-                        .orderBy(sort("notification", pageable))
-                        .offset(pageable.getOffset())
-                        .limit(pageable.getPageSize() + NEXT_SLICE_CHECK)
-                        .fetch();
-
-        return new SliceImpl<>(notifications, pageable, hasNext(notifications, pageable));
+    public List<Notification> findSliceLatestByReceiver(Long receiveUserId, Pageable pageable) {
+        return queryFactory
+                .selectFrom(notification)
+                .where(
+                        notification.deleted.eq(false),
+                        JPAExpressions.selectFrom(notificationReceiver)
+                                .where(
+                                        notificationReceiver.notification.id.eq(notification.id),
+                                        notificationReceiver.receiver.id.eq(receiveUserId))
+                                .exists())
+                .orderBy(notification.id.desc())
+                .limit(NUMBER_OF_LATEST_NOTIFICATIONS)
+                .fetch();
     }
 
     private BooleanExpression eqNightOption(Boolean nightOption) {
