@@ -3,9 +3,9 @@ package io.github.depromeet.knockknockbackend.domain.notification.domain.reposit
 import static io.github.depromeet.knockknockbackend.domain.group.domain.QGroupUser.groupUser;
 import static io.github.depromeet.knockknockbackend.domain.notification.domain.QDeviceToken.deviceToken;
 import static io.github.depromeet.knockknockbackend.domain.notification.domain.QNotification.notification;
+import static io.github.depromeet.knockknockbackend.domain.option.domain.QOption.option;
 import static io.github.depromeet.knockknockbackend.domain.relation.domain.QBlockUser.blockUser;
 import static io.github.depromeet.knockknockbackend.domain.storage.domain.QStorage.storage;
-import static io.github.depromeet.knockknockbackend.domain.option.domain.QOption.option;
 
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -40,41 +40,45 @@ public class CustomNotificationRepositoryImpl implements CustomNotificationRepos
     }
 
     @Override
-    public Slice<Notification> findSliceFromStorage(Long userId, Long groupId, Integer periodOfMonth, Pageable pageable) {
-        List<Notification> notifications = queryFactory
-            .select(notification)
-            .from(storage)
-            .innerJoin(storage.notification, notification)
-            .where(storage.user.id.eq(userId),
-                eqGroupId(groupId),
-                greaterEqualPeriodOfMonth(periodOfMonth)
-            )
-            .orderBy(sort(pageable))
-            .offset(pageable.getOffset())
-            .limit(pageable.getPageSize() + NEXT_SLICE_CHECK)
-            .fetch();
+    public Slice<Notification> findSliceFromStorage(
+            Long userId, Long groupId, Integer periodOfMonth, Pageable pageable) {
+        List<Notification> notifications =
+                queryFactory
+                        .select(notification)
+                        .from(storage)
+                        .innerJoin(storage.notification, notification)
+                        .where(
+                                storage.user.id.eq(userId),
+                                eqGroupId(groupId),
+                                greaterEqualPeriodOfMonth(periodOfMonth))
+                        .orderBy(sort(pageable))
+                        .offset(pageable.getOffset())
+                        .limit(pageable.getPageSize() + NEXT_SLICE_CHECK)
+                        .fetch();
 
         return new SliceImpl<>(notifications, pageable, hasNext(notifications, pageable));
     }
 
     @Override
-    public List<DeviceToken> findTokenByGroupAndOptionAndNonBlock(Long userId, Long groupId, Boolean nightOption) {
+    public List<DeviceToken> findTokenByGroupAndOptionAndNonBlock(
+            Long userId, Long groupId, Boolean nightOption) {
         return queryFactory
-            .select(deviceToken)
-            .from(deviceToken)
-            .leftJoin(groupUser)
-            .on(deviceToken.user.id.eq(groupUser.user.id))
-            .innerJoin(option)
-            .on(groupUser.user.id.eq(option.userId))
-            .where(
-                groupUser.group.id.eq(groupId),
-                option.newOption.eq(true),
-                eqNightOption(nightOption),
-                JPAExpressions.selectFrom(blockUser)
-                    .where(blockUser.user.eq(groupUser.user),
-                        blockUser.blockedUser.id.eq(userId)
-                    ).notExists()
-            ).fetch();
+                .select(deviceToken)
+                .from(deviceToken)
+                .leftJoin(groupUser)
+                .on(deviceToken.user.id.eq(groupUser.user.id))
+                .innerJoin(option)
+                .on(groupUser.user.id.eq(option.userId))
+                .where(
+                        groupUser.group.id.eq(groupId),
+                        option.newOption.eq(true),
+                        eqNightOption(nightOption),
+                        JPAExpressions.selectFrom(blockUser)
+                                .where(
+                                        blockUser.user.eq(groupUser.user),
+                                        blockUser.blockedUser.id.eq(userId))
+                                .notExists())
+                .fetch();
     }
 
     private BooleanExpression eqNightOption(Boolean nightOption) {
@@ -123,5 +127,4 @@ public class CustomNotificationRepositoryImpl implements CustomNotificationRepos
 
         return orderSpecifier;
     }
-
 }

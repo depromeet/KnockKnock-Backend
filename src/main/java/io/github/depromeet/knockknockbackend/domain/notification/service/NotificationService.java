@@ -37,7 +37,6 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
 @Slf4j
 @RequiredArgsConstructor
 @Service
@@ -47,7 +46,6 @@ public class NotificationService {
     private final DeviceTokenRepository deviceTokenRepository;
     private final NotificationReactionRepository notificationReactionRepository;
     private final EntityManager entityManager;
-
 
     @Transactional(readOnly = true)
     public QueryNotificationListResponse queryAlarmHistoryByUserId(Pageable pageable) {
@@ -62,9 +60,10 @@ public class NotificationService {
         Slice<QueryNotificationListResponseElement> notificationListResponseElements =
                 getNotificationListResponseElements(notifications);
 
-        Optional<GroupBaseInfoVo> groupBaseInfoVo = notifications.stream()
-            .findFirst()
-            .map(notification -> notification.getGroup().getGroupBaseInfoVo());
+        Optional<GroupBaseInfoVo> groupBaseInfoVo =
+                notifications.stream()
+                        .findFirst()
+                        .map(notification -> notification.getGroup().getGroupBaseInfoVo());
 
         return new QueryNotificationListResponse(
                 groupBaseInfoVo.orElse(null), notificationListResponseElements);
@@ -104,8 +103,8 @@ public class NotificationService {
         MulticastMessage multicastMessage = makeMulticastMessageForFcm(request, tokens);
 
         try {
-            BatchResponse batchResponse = FirebaseMessaging.getInstance()
-                .sendMulticast(multicastMessage);
+            BatchResponse batchResponse =
+                    FirebaseMessaging.getInstance().sendMulticast(multicastMessage);
             if (batchResponse.getFailureCount() >= 1) {
                 logFcmMessagingException(batchResponse);
             }
@@ -114,22 +113,23 @@ public class NotificationService {
             throw FcmResponseException.EXCEPTION;
         }
 
-        Notification notification = Notification.of(
-            request.getTitle(),
-            request.getContent(),
-            request.getImageUrl(),
-            Group.of(request.getGroupId()),
-            User.of(sendUserId),
-            LocalDateTime.now()
-        );
+        Notification notification =
+                Notification.of(
+                        request.getTitle(),
+                        request.getContent(),
+                        request.getImageUrl(),
+                        Group.of(request.getGroupId()),
+                        User.of(sendUserId),
+                        LocalDateTime.now());
         notification.addReceivers(
-            deviceTokens.stream()
-                .map(
-                    deviceToken -> new NotificationReceiver(
-                        notification, User.of(deviceToken.getUserId()), deviceToken.getToken()
-                    )
-                ).collect(Collectors.toList())
-        );
+                deviceTokens.stream()
+                        .map(
+                                deviceToken ->
+                                        new NotificationReceiver(
+                                                notification,
+                                                User.of(deviceToken.getUserId()),
+                                                deviceToken.getToken()))
+                        .collect(Collectors.toList()));
         notificationRepository.save(notification);
     }
 
@@ -142,11 +142,14 @@ public class NotificationService {
         return generateQueryNotificationListResponseElements(notifications, notificationReactions);
     }
 
-    private Slice<QueryNotificationListResponseElement> generateQueryNotificationListResponseElements(
-        Slice<Notification> notifications, Slice<NotificationReaction> notificationReactions) {
-        return notifications
-            .map(notification -> {
-                    MyNotificationReactionResponseElement myNotificationReactionResponseElement = null;
+    private Slice<QueryNotificationListResponseElement>
+            generateQueryNotificationListResponseElements(
+                    Slice<Notification> notifications,
+                    Slice<NotificationReaction> notificationReactions) {
+        return notifications.map(
+                notification -> {
+                    MyNotificationReactionResponseElement myNotificationReactionResponseElement =
+                            null;
                     Optional<NotificationReaction> myNotificationReaction =
                             notificationReactions.stream()
                                     .filter(
@@ -191,11 +194,8 @@ public class NotificationService {
                 "[**FCM notification sending Error] successCount : {}, failureCount : {} ",
                 batchResponse.getSuccessCount(),
                 batchResponse.getFailureCount());
-        batchResponse
-                .getResponses()
-                .stream().filter(
-                    sendResponse -> sendResponse.getException() != null
-                 )
+        batchResponse.getResponses().stream()
+                .filter(sendResponse -> sendResponse.getException() != null)
                 .forEach(
                         sendResponse ->
                                 log.error(
@@ -224,14 +224,11 @@ public class NotificationService {
         }
 
         return notificationRepository.findTokenByGroupAndOptionAndNonBlock(
-            sendUserId, request.getGroupId(), nightOption
-        );
+                sendUserId, request.getGroupId(), nightOption);
     }
 
     private List<String> getTokens(List<DeviceToken> deviceTokens) {
-        return deviceTokens.stream()
-            .map(DeviceToken::getToken)
-            .collect(Collectors.toList());
+        return deviceTokens.stream().map(DeviceToken::getToken).collect(Collectors.toList());
     }
 
     private Slice<NotificationReaction> retrieveNotificationReactions(

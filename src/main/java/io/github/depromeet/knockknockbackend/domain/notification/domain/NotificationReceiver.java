@@ -45,5 +45,4 @@ public class NotificationReceiver extends BaseTimeEntity {
         this.receiver = receiver;
         this.fcmToken = fcmToken;
     }
-
 }
