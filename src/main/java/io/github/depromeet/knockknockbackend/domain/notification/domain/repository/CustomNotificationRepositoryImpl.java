@@ -1,11 +1,17 @@
 package io.github.depromeet.knockknockbackend.domain.notification.domain.repository;
 
+import static io.github.depromeet.knockknockbackend.domain.group.domain.QGroupUser.groupUser;
+import static io.github.depromeet.knockknockbackend.domain.notification.domain.QDeviceToken.deviceToken;
 import static io.github.depromeet.knockknockbackend.domain.notification.domain.QNotification.notification;
+import static io.github.depromeet.knockknockbackend.domain.option.domain.QOption.option;
+import static io.github.depromeet.knockknockbackend.domain.relation.domain.QBlockUser.blockUser;
 import static io.github.depromeet.knockknockbackend.domain.storage.domain.QStorage.storage;
 
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import io.github.depromeet.knockknockbackend.domain.notification.domain.DeviceToken;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.Notification;
 import java.time.LocalDate;
 import java.util.List;
@@ -51,6 +57,35 @@ public class CustomNotificationRepositoryImpl implements CustomNotificationRepos
                         .fetch();
 
         return new SliceImpl<>(notifications, pageable, hasNext(notifications, pageable));
+    }
+
+    @Override
+    public List<DeviceToken> findTokenByGroupAndOptionAndNonBlock(
+            Long userId, Long groupId, Boolean nightOption) {
+        return queryFactory
+                .select(deviceToken)
+                .from(deviceToken)
+                .leftJoin(groupUser)
+                .on(deviceToken.user.id.eq(groupUser.user.id))
+                .innerJoin(option)
+                .on(groupUser.user.id.eq(option.userId))
+                .where(
+                        groupUser.group.id.eq(groupId),
+                        option.newOption.eq(true),
+                        eqNightOption(nightOption),
+                        JPAExpressions.selectFrom(blockUser)
+                                .where(
+                                        blockUser.user.eq(groupUser.user),
+                                        blockUser.blockedUser.id.eq(userId))
+                                .notExists())
+                .fetch();
+    }
+
+    private BooleanExpression eqNightOption(Boolean nightOption) {
+        if (nightOption == null) {
+            return null;
+        }
+        return option.nightOption.eq(nightOption);
     }
 
     private BooleanExpression eqGroupId(Long groupId) {

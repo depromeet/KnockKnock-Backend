@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -56,12 +57,16 @@ public class Notification extends BaseTimeEntity {
     private User sendUser;
 
     @Builder.Default
-    @OneToMany(mappedBy = "notification", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "notification", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<NotificationReceiver> receivers = new ArrayList<>();
 
     @Builder.Default
     @OneToMany(mappedBy = "notification", fetch = FetchType.LAZY)
     private Set<NotificationReaction> notificationReactions = new HashSet<>();
+
+    public void addReceivers(List<NotificationReceiver> receivers) {
+        this.receivers.addAll(receivers);
+    }
 
     public static Notification of(Long notificationId) {
         return Notification.builder().id(notificationId).build();
