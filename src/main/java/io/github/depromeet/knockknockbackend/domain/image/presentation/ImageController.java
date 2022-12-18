@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
-@RequestMapping("/images")
+@RequestMapping("/api/v1/images")
 @RestController
 public class ImageController {
 

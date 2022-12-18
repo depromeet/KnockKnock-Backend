@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "알림 설정 관련 컨트롤러", description = "")
 @SecurityRequirement(name = "access-token")
 @RequiredArgsConstructor
-@RequestMapping("/options")
+@RequestMapping("/api/v1/options")
 @RestController
 public class OptionController {
 

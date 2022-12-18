@@ -25,15 +25,15 @@ public class SecurityConfig {
         http.formLogin().disable().cors().and().csrf().disable();
 
         http.authorizeHttpRequests()
-                .antMatchers("/")
+                .antMatchers("/api/v1/")
                 .permitAll()
                 .antMatchers(SwaggerPatterns)
                 .permitAll()
-                .antMatchers("/actuator/**")
+                .antMatchers("/api/v1/actuator/**")
                 .permitAll()
-                .antMatchers("/credentials/**")
+                .antMatchers("/api/v1/credentials/**")
                 .permitAll()
-                .antMatchers("/asset/version")
+                .antMatchers("/api/v1/asset/version")
                 .permitAll()
                 .anyRequest()
                 .authenticated();
