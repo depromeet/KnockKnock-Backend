@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.domain.relation.domain;
 
+
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -34,5 +35,4 @@ public class BlockUser {
     @JoinColumn(name = "blocked_user_id")
     @OneToOne(fetch = FetchType.LAZY)
     private User blockedUser;
-
 }
