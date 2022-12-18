@@ -98,28 +98,35 @@ public class NotificationService {
     public void sendInstance(SendInstanceRequest request) {
         Long sendUserId = SecurityUtils.getCurrentUserId();
 
-        List<String> tokens = getTokens(request, sendUserId);
+        List<DeviceToken> deviceTokens = getDeviceTokens(request, sendUserId);
+        List<String> tokens = getTokens(deviceTokens);
         MulticastMessage multicastMessage = makeMulticastMessageForFcm(request, tokens);
 
         try {
-            BatchResponse batchResponse =
-                    FirebaseMessaging.getInstance().sendMulticast(multicastMessage);
+            BatchResponse batchResponse = FirebaseMessaging.getInstance()
+                .sendMulticast(multicastMessage);
             if (batchResponse.getFailureCount() >= 1) {
-                handleFcmMessagingException(batchResponse);
+                logFcmMessagingException(batchResponse);
             }
         } catch (FirebaseMessagingException e) {
             log.error("[**FCM notification sending Error] {} ", e.getMessage());
             throw FcmResponseException.EXCEPTION;
         }
 
-        notificationRepository.save(
-                Notification.of(
-                        request.getTitle(),
-                        request.getContent(),
-                        request.getImageUrl(),
-                        Group.of(request.getGroupId()),
-                        User.of(sendUserId),
-                        LocalDateTime.now()));
+        Notification notification = Notification.of(
+            request.getTitle(),
+            request.getContent(),
+            request.getImageUrl(),
+            Group.of(request.getGroupId()),
+            User.of(sendUserId),
+            LocalDateTime.now()
+        );
+        notification.addReceivers(deviceTokens.stream()
+            .map(DeviceToken::getUserId)
+            .distinct()
+            .map(User::of)
+            .collect(Collectors.toList()));
+        notificationRepository.save(notification);
     }
 
     public Slice<QueryNotificationListResponseElement> getNotificationListResponseElements(
@@ -131,14 +138,11 @@ public class NotificationService {
         return generateQueryNotificationListResponseElements(notifications, notificationReactions);
     }
 
-    private Slice<QueryNotificationListResponseElement>
-            generateQueryNotificationListResponseElements(
-                    Slice<Notification> notifications,
-                    Slice<NotificationReaction> notificationReactions) {
-        return notifications.map(
-                notification -> {
-                    MyNotificationReactionResponseElement myNotificationReactionResponseElement =
-                            null;
+    private Slice<QueryNotificationListResponseElement> generateQueryNotificationListResponseElements(
+        Slice<Notification> notifications, Slice<NotificationReaction> notificationReactions) {
+        return notifications
+            .map(notification -> {
+                    MyNotificationReactionResponseElement myNotificationReactionResponseElement = null;
                     Optional<NotificationReaction> myNotificationReaction =
                             notificationReactions.stream()
                                     .filter(
@@ -178,13 +182,16 @@ public class NotificationService {
                 });
     }
 
-    private void handleFcmMessagingException(BatchResponse batchResponse) {
+    private void logFcmMessagingException(BatchResponse batchResponse) {
         log.error(
                 "[**FCM notification sending Error] successCount : {}, failureCount : {} ",
                 batchResponse.getSuccessCount(),
                 batchResponse.getFailureCount());
         batchResponse
                 .getResponses()
+                .stream().filter(
+                    sendResponse -> sendResponse.getException() != null
+                 )
                 .forEach(
                         sendResponse ->
                                 log.error(
@@ -192,7 +199,6 @@ public class NotificationService {
                                         sendResponse.getException().getErrorCode(),
                                         sendResponse.getException().getMessage()));
 
-        throw FcmResponseException.EXCEPTION;
     }
 
     private MulticastMessage makeMulticastMessageForFcm(
@@ -208,16 +214,18 @@ public class NotificationService {
                 .build();
     }
 
-    private List<String> getTokens(SendInstanceRequest request, Long sendUserId) {
+    private List<DeviceToken> getDeviceTokens(SendInstanceRequest request, Long sendUserId) {
         Boolean nightOption = null;
         if (NightCondition.isNight()) {
             nightOption = true;
         }
 
-        List<DeviceToken> deviceTokens = notificationRepository.findTokenByGroupAndOptionAndNonBlock(
+        return notificationRepository.findTokenByGroupAndOptionAndNonBlock(
             sendUserId, request.getGroupId(), nightOption
         );
+    }
 
+    private List<String> getTokens(List<DeviceToken> deviceTokens) {
         return deviceTokens.stream()
             .map(DeviceToken::getToken)
             .collect(Collectors.toList());
