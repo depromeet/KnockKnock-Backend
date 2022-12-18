@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.domain.recommendmessage.domain;
 
+
 import io.github.depromeet.knockknockbackend.global.database.BaseTimeEntity;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +15,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
 
 @Getter
 @Builder(access = AccessLevel.PRIVATE)
@@ -35,5 +35,4 @@ public class RecommendMessage extends BaseTimeEntity {
     @Builder.Default
     @OneToMany(mappedBy = "recommendMessage")
     private List<RecommendMessageContent> recommendMessageContents = new ArrayList<>();
-
 }

@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.domain.group.event;
 
+
 import io.github.depromeet.knockknockbackend.global.event.DomainEvent;
 import lombok.Builder;
 import lombok.Getter;

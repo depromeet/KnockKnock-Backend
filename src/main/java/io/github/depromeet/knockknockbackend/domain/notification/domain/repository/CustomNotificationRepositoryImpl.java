@@ -1,7 +1,5 @@
 package io.github.depromeet.knockknockbackend.domain.notification.domain.repository;
 
-import static io.github.depromeet.knockknockbackend.domain.group.domain.QGroupUser.groupUser;
-import static io.github.depromeet.knockknockbackend.domain.notification.domain.QDeviceToken.deviceToken;
 import static io.github.depromeet.knockknockbackend.domain.notification.domain.QNotification.notification;
 import static io.github.depromeet.knockknockbackend.domain.relation.domain.QBlockUser.blockUser;
 import static io.github.depromeet.knockknockbackend.domain.storage.domain.QStorage.storage;
@@ -40,8 +38,7 @@ public class CustomNotificationRepositoryImpl implements CustomNotificationRepos
     }
 
     @Override
-    public Slice<Notification> findSliceFromStorage(Long userId, Long groupId,
-        Integer periodOfMonth, Pageable pageable) {
+    public Slice<Notification> findSliceFromStorage(Long userId, Long groupId, Integer periodOfMonth, Pageable pageable) {
         List<Notification> notifications = queryFactory
             .select(notification)
             .from(storage)
@@ -110,8 +107,9 @@ public class CustomNotificationRepositoryImpl implements CustomNotificationRepos
 
         for (Order order : sort) {
             com.querydsl.core.types.Order direction =
-                order.getDirection().isAscending() ?
-                    com.querydsl.core.types.Order.ASC : com.querydsl.core.types.Order.DESC;
+                    order.getDirection().isAscending()
+                            ? com.querydsl.core.types.Order.ASC
+                            : com.querydsl.core.types.Order.DESC;
             switch (order.getProperty()) {
                 case "createdDate":
                     orderSpecifier = new OrderSpecifier<>(direction, storage.createdDate);

@@ -1,6 +1,6 @@
 package io.github.depromeet.knockknockbackend.domain.asset.presentation.dto.response;
 
-import io.github.depromeet.knockknockbackend.domain.asset.domain.ProfileImage;
+
 import io.github.depromeet.knockknockbackend.domain.asset.domain.Reaction;
 import lombok.Getter;
 

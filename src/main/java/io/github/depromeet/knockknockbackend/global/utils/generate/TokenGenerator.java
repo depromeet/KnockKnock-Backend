@@ -1,19 +1,17 @@
 package io.github.depromeet.knockknockbackend.global.utils.generate;
 
+
 import java.security.SecureRandom;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Random;
 import org.springframework.stereotype.Component;
 
-
-//https://stackoverflow.com/questions/41107/how-to-generate-a-random-alpha-numeric-string/41156#41156
-//위에서 가져왔슴다...!
+// https://stackoverflow.com/questions/41107/how-to-generate-a-random-alpha-numeric-string/41156#41156
+// 위에서 가져왔슴다...!
 @Component
 public class TokenGenerator {
-    /**
-     * Generate a random string.
-     */
+    /** Generate a random string. */
     public String nextString() {
         for (int idx = 0; idx < buf.length; ++idx)
             buf[idx] = symbols[random.nextInt(symbols.length)];
@@ -42,23 +40,17 @@ public class TokenGenerator {
         this.buf = new char[length];
     }
 
-    /**
-     * Create an alphanumeric string generator.
-     */
+    /** Create an alphanumeric string generator. */
     public TokenGenerator(int length, Random random) {
         this(length, random, alphanum);
     }
 
-    /**
-     * Create an alphanumeric strings from a secure generator.
-     */
+    /** Create an alphanumeric strings from a secure generator. */
     public TokenGenerator(int length) {
         this(length, new SecureRandom());
     }
 
-    /**
-     * Create session identifiers.
-     */
+    /** Create session identifiers. */
     public TokenGenerator() {
         this(21);
     }

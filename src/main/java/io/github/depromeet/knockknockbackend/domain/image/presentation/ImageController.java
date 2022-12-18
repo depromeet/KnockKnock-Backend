@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.domain.image.presentation;
 
+
 import io.github.depromeet.knockknockbackend.domain.image.presentation.dto.response.UploadImageResponse;
 import io.github.depromeet.knockknockbackend.domain.image.service.ImageService;
 import lombok.RequiredArgsConstructor;
@@ -20,5 +21,4 @@ public class ImageController {
     public UploadImageResponse uploadImage(@RequestPart MultipartFile file) {
         return imageService.uploadImage(file);
     }
-
 }

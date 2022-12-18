@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.domain.notification.domain;
 
+
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.global.database.BaseTimeEntity;
 import javax.persistence.Column;
@@ -44,10 +45,10 @@ public class DeviceToken extends BaseTimeEntity {
 
     public static DeviceToken of(Long userId, String deviceId, String deviceToken) {
         return DeviceToken.builder()
-            .user(User.of(userId))
-            .deviceId(deviceId)
-            .token(deviceToken)
-            .build();
+                .user(User.of(userId))
+                .deviceId(deviceId)
+                .token(deviceToken)
+                .build();
     }
 
     public DeviceToken changeToken(String token) {

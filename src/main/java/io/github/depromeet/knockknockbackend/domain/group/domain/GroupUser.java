@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.domain.group.domain;
 
+
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.domain.user.domain.vo.UserInfoVO;
 import io.github.depromeet.knockknockbackend.global.database.BaseTimeEntity;
@@ -17,12 +18,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-
 @Getter
-@Table(name = "tbl_group_user",
-    uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"group_id", "user_id"})
-    })
+@Table(
+        name = "tbl_group_user",
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"group_id", "user_id"})})
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class GroupUser extends BaseTimeEntity {
@@ -32,19 +31,21 @@ public class GroupUser extends BaseTimeEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "group_id" , updatable = false)
-    private Group group; //그룹 아이디
+    @JoinColumn(name = "group_id", updatable = false)
+    private Group group; // 그룹 아이디
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id" , updatable = false)
-    private User user; //유저
+    @JoinColumn(name = "user_id", updatable = false)
+    private User user; // 유저
 
     public UserInfoVO getMemberUserInfo() {
         return this.user.getUserInfo();
     }
 
-    public Long getUserId(){
+    public Long getUserId() {
         return user.getId();
     }
+
     @Builder
     public GroupUser(Group group, User user) {
         this.group = group;

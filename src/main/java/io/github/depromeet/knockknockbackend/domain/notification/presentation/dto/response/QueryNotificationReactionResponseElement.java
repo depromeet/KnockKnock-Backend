@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.response;
 
+
 import io.github.depromeet.knockknockbackend.domain.notification.domain.vo.NotificationReactionCountInfoVo;
 import java.util.List;
 import lombok.Builder;

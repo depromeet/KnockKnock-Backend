@@ -1,5 +1,3 @@
 package io.github.depromeet.knockknockbackend.global.event;
 
-public interface DomainEvent {
-
-}
+public interface DomainEvent {}

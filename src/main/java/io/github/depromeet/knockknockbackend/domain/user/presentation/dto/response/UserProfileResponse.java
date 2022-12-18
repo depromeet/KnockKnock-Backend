@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.domain.user.presentation.dto.response;
 
+
 import io.github.depromeet.knockknockbackend.domain.user.domain.vo.UserInfoVO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

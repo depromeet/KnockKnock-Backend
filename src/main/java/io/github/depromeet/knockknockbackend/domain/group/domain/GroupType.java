@@ -8,7 +8,6 @@ import lombok.Getter;
 @Getter
 public enum GroupType {
 
-
     // 홀로 외침방 ( 카카오톡 오픈 채팅 느낌 )
     OPEN("open"),
 
@@ -16,5 +15,4 @@ public enum GroupType {
     FRIEND("friend");
 
     private String type;
-
 }

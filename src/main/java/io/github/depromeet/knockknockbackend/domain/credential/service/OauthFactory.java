@@ -9,11 +9,9 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 public class OauthFactory {
 
+    private final Map<String, OauthStrategy> oauthStrategyMap;
 
-    private final Map<String, OauthStrategy> oauthStrategyMap ;
-
-
-    public OauthStrategy getOauthstrategy(OauthProvider oauthProvider){
+    public OauthStrategy getOauthstrategy(OauthProvider oauthProvider) {
 
         return oauthStrategyMap.get(oauthProvider.getValue());
     }

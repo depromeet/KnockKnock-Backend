@@ -1,6 +1,6 @@
 package io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.response;
 
-import lombok.AllArgsConstructor;
+
 import lombok.Builder;
 import lombok.Getter;
 
@@ -8,7 +8,6 @@ import lombok.Getter;
 @Builder
 public class AuthTokensResponse {
 
-	private final String accessToken;
-	private final String refreshToken;
-
+    private final String accessToken;
+    private final String refreshToken;
 }

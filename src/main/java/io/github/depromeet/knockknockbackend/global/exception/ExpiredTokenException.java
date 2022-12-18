@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.global.exception;
 
+
 import io.github.depromeet.knockknockbackend.global.error.exception.ErrorCode;
 import io.github.depromeet.knockknockbackend.global.error.exception.KnockException;
 
@@ -10,5 +11,4 @@ public class ExpiredTokenException extends KnockException {
     private ExpiredTokenException() {
         super(ErrorCode.EXPIRED_TOKEN);
     }
-
 }

@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.domain.notification.domain;
 
+
 import io.github.depromeet.knockknockbackend.domain.group.domain.Group;
 import io.github.depromeet.knockknockbackend.domain.reaction.domain.NotificationReaction;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
@@ -25,7 +26,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
 
 @Getter
 @Builder(access = AccessLevel.PRIVATE)
@@ -64,21 +64,24 @@ public class Notification extends BaseTimeEntity {
     private Set<NotificationReaction> notificationReactions = new HashSet<>();
 
     public static Notification of(Long notificationId) {
-        return Notification.builder()
-            .id(notificationId)
-            .build();
+        return Notification.builder().id(notificationId).build();
     }
 
-    public static Notification of(String title, String content, String imageUrl, Group group,
-        User sendUser, LocalDateTime sendAt) {
+    public static Notification of(
+            String title,
+            String content,
+            String imageUrl,
+            Group group,
+            User sendUser,
+            LocalDateTime sendAt) {
         return Notification.builder()
-            .title(title)
-            .content(content)
-            .imageUrl(imageUrl)
-            .group(group)
-            .sendUser(sendUser)
-            .sendAt(sendAt)
-            .build();
+                .title(title)
+                .content(content)
+                .imageUrl(imageUrl)
+                .group(group)
+                .sendUser(sendUser)
+                .sendAt(sendAt)
+                .build();
     }
 
     @Override

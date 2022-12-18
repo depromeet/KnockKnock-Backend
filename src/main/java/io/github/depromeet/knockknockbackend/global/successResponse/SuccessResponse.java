@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.global.successResponse;
 
+
 import java.time.LocalDateTime;
 import lombok.Getter;
 
