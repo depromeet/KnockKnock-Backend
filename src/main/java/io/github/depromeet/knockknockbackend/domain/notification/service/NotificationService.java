@@ -10,6 +10,7 @@ import io.github.depromeet.knockknockbackend.domain.group.domain.vo.GroupBaseInf
 import io.github.depromeet.knockknockbackend.domain.notification.domain.DeviceToken;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.NightCondition;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.Notification;
+import io.github.depromeet.knockknockbackend.domain.notification.domain.NotificationReceiver;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.repository.DeviceTokenRepository;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.repository.NotificationRepository;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.vo.NotificationReactionCountInfoVo;
@@ -121,11 +122,14 @@ public class NotificationService {
             User.of(sendUserId),
             LocalDateTime.now()
         );
-        notification.addReceivers(deviceTokens.stream()
-            .map(DeviceToken::getUserId)
-            .distinct()
-            .map(User::of)
-            .collect(Collectors.toList()));
+        notification.addReceivers(
+            deviceTokens.stream()
+                .map(
+                    deviceToken -> new NotificationReceiver(
+                        notification, User.of(deviceToken.getUserId()), deviceToken.getToken()
+                    )
+                ).collect(Collectors.toList())
+        );
         notificationRepository.save(notification);
     }
 
@@ -198,7 +202,6 @@ public class NotificationService {
                                         "[**FCM notification sending Error] errorCode: {}, errorMessage : {}",
                                         sendResponse.getException().getErrorCode(),
                                         sendResponse.getException().getMessage()));
-
     }
 
     private MulticastMessage makeMulticastMessageForFcm(
