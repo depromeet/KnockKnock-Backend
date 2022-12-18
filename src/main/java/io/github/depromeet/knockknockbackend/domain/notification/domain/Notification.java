@@ -70,6 +70,10 @@ public class Notification extends BaseTimeEntity {
         this.receivers.addAll(receivers);
     }
 
+    public void deleteNotification() {
+        this.deleted = true;
+    }
+
     public static Notification of(Long notificationId) {
         return Notification.builder().id(notificationId).build();
     }
