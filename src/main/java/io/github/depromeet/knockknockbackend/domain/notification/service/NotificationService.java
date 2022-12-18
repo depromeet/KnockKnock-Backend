@@ -19,10 +19,7 @@ import io.github.depromeet.knockknockbackend.domain.notification.exception.Notif
 import io.github.depromeet.knockknockbackend.domain.notification.exception.NotificationNotFoundException;
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.request.RegisterFcmTokenRequest;
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.request.SendInstanceRequest;
-import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.response.MyNotificationReactionResponseElement;
-import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.response.QueryNotificationListResponse;
-import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.response.QueryNotificationListResponseElement;
-import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.response.QueryNotificationReactionResponseElement;
+import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.response.*;
 import io.github.depromeet.knockknockbackend.domain.reaction.domain.NotificationReaction;
 import io.github.depromeet.knockknockbackend.domain.reaction.domain.repository.NotificationReactionRepository;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
@@ -36,6 +33,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,15 +49,15 @@ public class NotificationService {
     private final EntityManager entityManager;
 
     @Transactional(readOnly = true)
-    public QueryNotificationListResponse queryListLatest(Pageable pageable) {
-        Slice<Notification> notifications =
+    public QueryNotificationListLatestResponse queryListLatest(Pageable pageable) {
+        List<Notification> notifications =
                 notificationRepository.findSliceLatestByReceiver(
                         SecurityUtils.getCurrentUserId(), pageable);
 
-        Slice<QueryNotificationListResponseElement> notificationListResponseElements =
+        List<QueryNotificationListResponseElement> notificationListResponseElements =
                 getNotificationListResponseElements(notifications);
 
-        return new QueryNotificationListResponse(null, notificationListResponseElements);
+        return new QueryNotificationListLatestResponse(notificationListResponseElements);
     }
 
     @Transactional(readOnly = true)
@@ -68,8 +66,8 @@ public class NotificationService {
                 notificationRepository.findAllByGroupIdAndDeleted(
                         groupId, CREATED_DELETED_STATUS, pageable);
 
-        Slice<QueryNotificationListResponseElement> notificationListResponseElements =
-                getNotificationListResponseElements(notifications);
+        List<QueryNotificationListResponseElement> notificationListResponseElements =
+                getNotificationListResponseElements(notifications.getContent());
 
         Optional<GroupBaseInfoVo> groupBaseInfoVo =
                 notifications.stream()
@@ -77,7 +75,11 @@ public class NotificationService {
                         .map(notification -> notification.getGroup().getGroupBaseInfoVo());
 
         return new QueryNotificationListResponse(
-                groupBaseInfoVo.orElse(null), notificationListResponseElements);
+                groupBaseInfoVo.orElse(null),
+                new SliceImpl(
+                        notificationListResponseElements,
+                        notifications.getPageable(),
+                        notifications.hasNext()));
     }
 
     @Transactional
@@ -151,60 +153,70 @@ public class NotificationService {
         notificationRepository.save(notification);
     }
 
-    public Slice<QueryNotificationListResponseElement> getNotificationListResponseElements(
-            Slice<Notification> notifications) {
+    public List<QueryNotificationListResponseElement> getNotificationListResponseElements(
+            List<Notification> notifications) {
 
-        Slice<NotificationReaction> notificationReactions =
+        List<NotificationReaction> notificationReactions =
                 retrieveNotificationReactions(notifications);
 
         return generateQueryNotificationListResponseElements(notifications, notificationReactions);
     }
 
-    private Slice<QueryNotificationListResponseElement>
+    private List<QueryNotificationListResponseElement>
             generateQueryNotificationListResponseElements(
-                    Slice<Notification> notifications,
-                    Slice<NotificationReaction> notificationReactions) {
-        return notifications.map(
-                notification -> {
-                    MyNotificationReactionResponseElement myNotificationReactionResponseElement =
-                            null;
-                    Optional<NotificationReaction> myNotificationReaction =
-                            notificationReactions.stream()
-                                    .filter(
-                                            notificationReaction ->
-                                                    notification.equals(
-                                                            notificationReaction.getNotification()))
-                                    .findAny();
+                    List<Notification> notifications,
+                    List<NotificationReaction> notificationReactions) {
+        return notifications.stream()
+                .map(
+                        notification -> {
+                            MyNotificationReactionResponseElement
+                                    myNotificationReactionResponseElement = null;
+                            Optional<NotificationReaction> myNotificationReaction =
+                                    notificationReactions.stream()
+                                            .filter(
+                                                    notificationReaction ->
+                                                            notification.equals(
+                                                                    notificationReaction
+                                                                            .getNotification()))
+                                            .findAny();
 
-                    List<NotificationReactionCountInfoVo> notificationReactionCountInfoVo =
-                            notificationReactionRepository.findAllCountByNotification(notification);
+                            List<NotificationReactionCountInfoVo> notificationReactionCountInfoVo =
+                                    notificationReactionRepository.findAllCountByNotification(
+                                            notification);
 
-                    if (myNotificationReaction.isPresent()) {
-                        myNotificationReactionResponseElement =
-                                MyNotificationReactionResponseElement.builder()
-                                        .notificationReactionId(
-                                                myNotificationReaction.get().getId())
-                                        .reactionId(
-                                                myNotificationReaction.get().getReaction().getId())
-                                        .build();
-                    }
+                            if (myNotificationReaction.isPresent()) {
+                                myNotificationReactionResponseElement =
+                                        MyNotificationReactionResponseElement.builder()
+                                                .notificationReactionId(
+                                                        myNotificationReaction.get().getId())
+                                                .reactionId(
+                                                        myNotificationReaction
+                                                                .get()
+                                                                .getReaction()
+                                                                .getId())
+                                                .build();
+                            }
 
-                    QueryNotificationReactionResponseElement notificationReactionResponseElement =
-                            QueryNotificationReactionResponseElement.builder()
-                                    .myReactionInfo(myNotificationReactionResponseElement)
-                                    .reactionCountInfos(notificationReactionCountInfoVo)
+                            QueryNotificationReactionResponseElement
+                                    notificationReactionResponseElement =
+                                            QueryNotificationReactionResponseElement.builder()
+                                                    .myReactionInfo(
+                                                            myNotificationReactionResponseElement)
+                                                    .reactionCountInfos(
+                                                            notificationReactionCountInfoVo)
+                                                    .build();
+
+                            return QueryNotificationListResponseElement.builder()
+                                    .notificationId(notification.getId())
+                                    .title(notification.getTitle())
+                                    .content(notification.getContent())
+                                    .imageUrl(notification.getImageUrl())
+                                    .sendAt(notification.getSendAt())
+                                    .sendUserId(notification.getSendUser().getId())
+                                    .reactions(notificationReactionResponseElement)
                                     .build();
-
-                    return QueryNotificationListResponseElement.builder()
-                            .notificationId(notification.getId())
-                            .title(notification.getTitle())
-                            .content(notification.getContent())
-                            .imageUrl(notification.getImageUrl())
-                            .sendAt(notification.getSendAt())
-                            .sendUserId(notification.getSendUser().getId())
-                            .reactions(notificationReactionResponseElement)
-                            .build();
-                });
+                        })
+                .collect(Collectors.toList());
     }
 
     private void logFcmMessagingException(BatchResponse batchResponse) {
@@ -249,10 +261,10 @@ public class NotificationService {
         return deviceTokens.stream().map(DeviceToken::getToken).collect(Collectors.toList());
     }
 
-    private Slice<NotificationReaction> retrieveNotificationReactions(
-            Slice<Notification> notifications) {
+    private List<NotificationReaction> retrieveNotificationReactions(
+            List<Notification> notifications) {
         return notificationReactionRepository.findByUserIdAndNotificationIn(
-                SecurityUtils.getCurrentUserId(), notifications.getContent());
+                SecurityUtils.getCurrentUserId(), notifications);
     }
 
     private void validateDeletePermission(Notification notification) {

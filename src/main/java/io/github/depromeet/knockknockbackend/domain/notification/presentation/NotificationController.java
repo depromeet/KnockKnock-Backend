@@ -3,6 +3,7 @@ package io.github.depromeet.knockknockbackend.domain.notification.presentation;
 
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.request.RegisterFcmTokenRequest;
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.request.SendInstanceRequest;
+import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.response.QueryNotificationListLatestResponse;
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.response.QueryNotificationListResponse;
 import io.github.depromeet.knockknockbackend.domain.notification.service.NotificationService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,7 +27,7 @@ public class NotificationController {
 
     @Operation(summary = "최신 푸쉬알림 리스트")
     @GetMapping
-    public QueryNotificationListResponse queryListLatest(
+    public QueryNotificationListLatestResponse queryListLatest(
             @PageableDefault(size = 10, sort = "id", direction = Direction.DESC)
                     Pageable pageable) {
         return notificationService.queryListLatest(pageable);

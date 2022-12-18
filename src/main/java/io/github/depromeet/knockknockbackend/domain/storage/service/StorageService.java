@@ -7,6 +7,7 @@ import io.github.depromeet.knockknockbackend.domain.notification.domain.reposito
 import io.github.depromeet.knockknockbackend.domain.notification.exception.NotificationForbiddenException;
 import io.github.depromeet.knockknockbackend.domain.notification.exception.NotificationNotFoundException;
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.response.QueryNotificationListInStorageResponse;
+import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.response.QueryNotificationListResponseElement;
 import io.github.depromeet.knockknockbackend.domain.notification.service.NotificationService;
 import io.github.depromeet.knockknockbackend.domain.storage.domain.Storage;
 import io.github.depromeet.knockknockbackend.domain.storage.domain.repository.StorageRepository;
@@ -14,9 +15,11 @@ import io.github.depromeet.knockknockbackend.domain.storage.exception.StorageFor
 import io.github.depromeet.knockknockbackend.domain.storage.exception.StorageNotFoundException;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.global.utils.security.SecurityUtils;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,8 +56,14 @@ public class StorageService {
                 notificationRepository.findSliceFromStorage(
                         SecurityUtils.getCurrentUserId(), groupId, periodOfMonth, pageable);
 
+        List<QueryNotificationListResponseElement> notificationListResponseElements =
+                notificationService.getNotificationListResponseElements(notifications.getContent());
+
         return new QueryNotificationListInStorageResponse(
-                notificationService.getNotificationListResponseElements(notifications));
+                new SliceImpl(
+                        notificationListResponseElements,
+                        notifications.getPageable(),
+                        notifications.hasNext()));
     }
 
     private void validateAccessibleNotificationId(Long notificationId) {
