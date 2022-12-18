@@ -64,10 +64,8 @@ public class Notification extends BaseTimeEntity {
     @OneToMany(mappedBy = "notification", fetch = FetchType.LAZY)
     private Set<NotificationReaction> notificationReactions = new HashSet<>();
 
-    public void addReceivers(List<User> receiveUsers) {
-        receiveUsers.stream()
-            .map(user -> new NotificationReceiver(this, user))
-            .forEach(notificationReceiver -> receivers.add(notificationReceiver));
+    public void addReceivers(List<NotificationReceiver> receivers) {
+        this.receivers.addAll(receivers);
     }
 
     public static Notification of(Long notificationId) {
