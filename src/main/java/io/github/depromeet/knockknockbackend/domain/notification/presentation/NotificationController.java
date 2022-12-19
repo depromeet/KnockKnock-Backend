@@ -3,6 +3,7 @@ package io.github.depromeet.knockknockbackend.domain.notification.presentation;
 
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.request.RegisterFcmTokenRequest;
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.request.SendInstanceRequest;
+import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.request.SendInstanceToMeBeforeSignUpRequest;
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.response.QueryNotificationListLatestResponse;
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.response.QueryNotificationListResponse;
 import io.github.depromeet.knockknockbackend.domain.notification.service.NotificationService;
@@ -62,5 +63,13 @@ public class NotificationController {
     public void deleteByNotificationId(
             @PathVariable(value = "notification_id") Long notificationId) {
         notificationService.deleteByNotificationId(notificationId);
+    }
+
+    @Operation(summary = "똑똑 미리체험하기 : 회원가입 전 자신에게 푸쉬알림 보내기")
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping("/instance/experience")
+    public void sendInstanceToMeBeforeSignUp(
+            @RequestBody SendInstanceToMeBeforeSignUpRequest request) {
+        notificationService.sendInstanceToMeBeforeSignUp(request);
     }
 }
