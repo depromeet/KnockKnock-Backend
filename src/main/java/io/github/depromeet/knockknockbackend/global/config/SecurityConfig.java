@@ -29,7 +29,7 @@ public class SecurityConfig {
                 .permitAll()
                 .antMatchers(SwaggerPatterns)
                 .permitAll()
-                .antMatchers("/api/v1/actuator/**")
+                .antMatchers("/actuator/**")
                 .permitAll()
                 .antMatchers("/api/v1/credentials/**")
                 .permitAll()
