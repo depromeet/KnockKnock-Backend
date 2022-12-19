@@ -3,6 +3,7 @@ package io.github.depromeet.knockknockbackend.domain.notification.domain;
 
 import io.github.depromeet.knockknockbackend.domain.group.domain.Group;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
+import io.github.depromeet.knockknockbackend.global.database.BaseTimeEntity;
 import java.time.LocalDateTime;
 import javax.persistence.*;
 import lombok.*;
@@ -13,7 +14,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "tbl_reservation")
 @Entity
-public class Reservation {
+public class Reservation extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
