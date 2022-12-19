@@ -84,7 +84,7 @@ public class CustomNotificationRepositoryImpl implements CustomNotificationRepos
     }
 
     @Override
-    public List<Notification> findSliceLatestByReceiver(Long receiveUserId, Pageable pageable) {
+    public List<Notification> findSliceLatestByReceiver(Long receiveUserId) {
         return queryFactory
                 .selectFrom(notification)
                 .where(
