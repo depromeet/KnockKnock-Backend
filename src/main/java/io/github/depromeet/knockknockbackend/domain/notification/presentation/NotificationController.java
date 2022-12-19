@@ -41,7 +41,7 @@ public class NotificationController {
 
     @Operation(summary = "즉시 푸쉬알림 발송")
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping("/instance")
+    @PostMapping
     public void sendInstance(@RequestBody SendInstanceRequest request) {
         notificationService.sendInstance(request);
     }
@@ -65,7 +65,7 @@ public class NotificationController {
 
     @Operation(summary = "똑똑 미리체험하기 : 회원가입 전 자신에게 푸쉬알림 보내기")
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping("/instance/experience")
+    @PostMapping("/experience")
     public void sendInstanceToMeBeforeSignUp(
             @RequestBody SendInstanceToMeBeforeSignUpRequest request) {
         notificationService.sendInstanceToMeBeforeSignUp(request);
