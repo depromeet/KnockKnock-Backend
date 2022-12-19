@@ -22,20 +22,13 @@ public class NotificationExperience extends BaseTimeEntity {
 
     private LocalDateTime sendAt;
 
-    private String title;
-
     private String content;
 
-    private String imageUrl;
-
-    public static NotificationExperience of(
-            String token, LocalDateTime sendAt, String title, String content, String imageUrl) {
+    public static NotificationExperience of(String token, LocalDateTime sendAt, String content) {
         return NotificationExperience.builder()
                 .token(token)
                 .sendAt(sendAt)
-                .title(title)
                 .content(content)
-                .imageUrl(imageUrl)
                 .build();
     }
 }

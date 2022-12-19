@@ -194,11 +194,7 @@ public class NotificationService {
             FirebaseMessaging.getInstance().send(message);
             notificationExperienceRepository.save(
                     NotificationExperience.of(
-                            request.getToken(),
-                            LocalDateTime.now(),
-                            request.getTitle(),
-                            request.getContent(),
-                            request.getImageUrl()));
+                            request.getToken(), LocalDateTime.now(), request.getContent()));
         } catch (FirebaseMessagingException e) {
             log.error("[**FCM notification Experience sending Error] {} ", e.getMessage());
             throw FcmResponseException.EXCEPTION;
@@ -244,9 +240,7 @@ public class NotificationService {
         return Message.builder()
                 .setNotification(
                         com.google.firebase.messaging.Notification.builder()
-                                .setTitle(request.getTitle())
                                 .setBody(request.getContent())
-                                .setImage(request.getImageUrl())
                                 .build())
                 .setToken(token)
                 .build();

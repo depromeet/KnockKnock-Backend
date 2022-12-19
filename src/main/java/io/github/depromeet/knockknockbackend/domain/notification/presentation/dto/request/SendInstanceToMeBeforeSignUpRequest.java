@@ -7,7 +7,5 @@ import lombok.Getter;
 public class SendInstanceToMeBeforeSignUpRequest {
 
     private String token;
-    private String title;
     private String content;
-    private String imageUrl;
 }
