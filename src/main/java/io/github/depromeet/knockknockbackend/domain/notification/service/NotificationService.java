@@ -90,24 +90,24 @@ public class NotificationService {
     public QueryNotificationListResponseElement getQueryNotificationListResponseElements(
             Notification notification, List<NotificationReaction> notificationReactions) {
 
-        MyNotificationReactionResponseElement myNotificationReactionResponseElement = null;
-        Optional<NotificationReaction> myNotificationReaction =
+        MyNotificationReactionResponseElement myNotificationReactionResponseElement =
                 notificationReactions.stream()
                         .filter(
                                 notificationReaction ->
                                         notification.equals(notificationReaction.getNotification()))
-                        .findAny();
+                        .findAny()
+                        .map(
+                                notificationReaction ->
+                                        MyNotificationReactionResponseElement.builder()
+                                                .notificationReactionId(
+                                                        notificationReaction.getId())
+                                                .reactionId(
+                                                        notificationReaction.getReaction().getId())
+                                                .build())
+                        .orElse(null);
 
         List<NotificationReactionCountInfoVo> notificationReactionCountInfoVo =
                 notificationReactionRepository.findAllCountByNotification(notification);
-
-        if (myNotificationReaction.isPresent()) {
-            myNotificationReactionResponseElement =
-                    MyNotificationReactionResponseElement.builder()
-                            .notificationReactionId(myNotificationReaction.get().getId())
-                            .reactionId(myNotificationReaction.get().getReaction().getId())
-                            .build();
-        }
 
         QueryNotificationReactionResponseElement notificationReactionResponseElement =
                 QueryNotificationReactionResponseElement.builder()
