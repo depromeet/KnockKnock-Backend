@@ -1,17 +1,13 @@
 package io.github.depromeet.knockknockbackend.domain.notification.service;
 
 
-import com.google.firebase.messaging.BatchResponse;
-import com.google.firebase.messaging.FirebaseMessaging;
-import com.google.firebase.messaging.FirebaseMessagingException;
-import com.google.firebase.messaging.MulticastMessage;
+import com.google.firebase.messaging.*;
 import io.github.depromeet.knockknockbackend.domain.group.domain.Group;
 import io.github.depromeet.knockknockbackend.domain.group.domain.vo.GroupBaseInfoVo;
-import io.github.depromeet.knockknockbackend.domain.notification.domain.DeviceToken;
-import io.github.depromeet.knockknockbackend.domain.notification.domain.NightCondition;
+import io.github.depromeet.knockknockbackend.domain.notification.domain.*;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.Notification;
-import io.github.depromeet.knockknockbackend.domain.notification.domain.NotificationReceiver;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.repository.DeviceTokenRepository;
+import io.github.depromeet.knockknockbackend.domain.notification.domain.repository.NotificationExperienceRepository;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.repository.NotificationRepository;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.vo.NotificationReactionCountInfoVo;
 import io.github.depromeet.knockknockbackend.domain.notification.exception.FcmResponseException;
@@ -19,6 +15,7 @@ import io.github.depromeet.knockknockbackend.domain.notification.exception.Notif
 import io.github.depromeet.knockknockbackend.domain.notification.exception.NotificationNotFoundException;
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.request.RegisterFcmTokenRequest;
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.request.SendInstanceRequest;
+import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.request.SendInstanceToMeBeforeSignUpRequest;
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.response.*;
 import io.github.depromeet.knockknockbackend.domain.reaction.domain.NotificationReaction;
 import io.github.depromeet.knockknockbackend.domain.reaction.domain.repository.NotificationReactionRepository;
@@ -43,6 +40,7 @@ public class NotificationService {
 
     private static final boolean CREATED_DELETED_STATUS = false;
     private final NotificationRepository notificationRepository;
+    private final NotificationExperienceRepository notificationExperienceRepository;
     private final DeviceTokenRepository deviceTokenRepository;
     private final NotificationReactionRepository notificationReactionRepository;
     private final EntityManager entityManager;
@@ -190,6 +188,19 @@ public class NotificationService {
         notificationRepository.save(notification);
     }
 
+    public void sendInstanceToMeBeforeSignUp(SendInstanceToMeBeforeSignUpRequest request) {
+        Message message = makeMessageForFcm(request, request.getToken());
+        try {
+            FirebaseMessaging.getInstance().send(message);
+            notificationExperienceRepository.save(
+                    NotificationExperience.of(
+                            request.getToken(), LocalDateTime.now(), request.getContent()));
+        } catch (FirebaseMessagingException e) {
+            log.error("[**FCM notification Experience sending Error] {} ", e.getMessage());
+            throw FcmResponseException.EXCEPTION;
+        }
+    }
+
     public void deleteByNotificationId(Long notificationId) {
         Notification notification = queryNotificationById(notificationId);
         validateDeletePermission(notification);
@@ -222,6 +233,16 @@ public class NotificationService {
                                 .setImage(request.getImageUrl())
                                 .build())
                 .addAllTokens(tokens)
+                .build();
+    }
+
+    private Message makeMessageForFcm(SendInstanceToMeBeforeSignUpRequest request, String token) {
+        return Message.builder()
+                .setNotification(
+                        com.google.firebase.messaging.Notification.builder()
+                                .setBody(request.getContent())
+                                .build())
+                .setToken(token)
                 .build();
     }
 
