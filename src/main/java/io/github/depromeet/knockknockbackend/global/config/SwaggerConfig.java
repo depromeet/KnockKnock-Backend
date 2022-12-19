@@ -4,6 +4,8 @@ package io.github.depromeet.knockknockbackend.global.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.depromeet.knockknockbackend.global.annotation.DisableSecurity;
 import io.swagger.v3.core.jackson.ModelResolver;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.servers.Server;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -21,6 +23,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.HandlerMethod;
 
 /** Swagger 사용 환경을 위한 설정 파일 */
+@OpenAPIDefinition(servers = {@Server(url = "/", description = "Default Server URL")})
 @Configuration
 public class SwaggerConfig {
 
