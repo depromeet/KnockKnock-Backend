@@ -14,4 +14,6 @@ public interface CustomNotificationRepository {
 
     List<DeviceToken> findTokenByGroupAndOptionAndNonBlock(
             Long userId, Long groupId, Boolean nightOption);
+
+    List<Notification> findSliceLatestByReceiver(Long receiveUserId);
 }

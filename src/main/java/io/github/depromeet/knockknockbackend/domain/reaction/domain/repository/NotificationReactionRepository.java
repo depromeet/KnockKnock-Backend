@@ -5,7 +5,6 @@ import io.github.depromeet.knockknockbackend.domain.notification.domain.Notifica
 import io.github.depromeet.knockknockbackend.domain.notification.domain.vo.NotificationReactionCountInfoVo;
 import io.github.depromeet.knockknockbackend.domain.reaction.domain.NotificationReaction;
 import java.util.List;
-import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
@@ -18,6 +17,6 @@ public interface NotificationReactionRepository extends CrudRepository<Notificat
                     + "group by NR.reaction.id")
     List<NotificationReactionCountInfoVo> findAllCountByNotification(Notification notification);
 
-    Slice<NotificationReaction> findByUserIdAndNotificationIn(
+    List<NotificationReaction> findByUserIdAndNotificationIn(
             Long userId, List<Notification> notifications);
 }

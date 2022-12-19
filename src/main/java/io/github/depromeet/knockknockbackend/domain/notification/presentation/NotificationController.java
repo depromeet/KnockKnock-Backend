@@ -3,6 +3,7 @@ package io.github.depromeet.knockknockbackend.domain.notification.presentation;
 
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.request.RegisterFcmTokenRequest;
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.request.SendInstanceRequest;
+import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.response.QueryNotificationListLatestResponse;
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.response.QueryNotificationListResponse;
 import io.github.depromeet.knockknockbackend.domain.notification.service.NotificationService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,10 +27,8 @@ public class NotificationController {
 
     @Operation(summary = "최신 푸쉬알림 리스트")
     @GetMapping
-    public QueryNotificationListResponse queryAlarmHistoryByUserId(
-            @PageableDefault(size = 5, sort = "sendAt", direction = Direction.DESC)
-                    Pageable pageable) {
-        return notificationService.queryAlarmHistoryByUserId(pageable);
+    public QueryNotificationListLatestResponse queryListLatest() {
+        return notificationService.queryListLatest();
     }
 
     @Operation(summary = "FCM 토큰 등록")
