@@ -137,6 +137,7 @@ public class NotificationService {
                 .title(notification.getTitle())
                 .content(notification.getContent())
                 .imageUrl(notification.getImageUrl())
+                .createdDate(notification.getCreatedDate())
                 .sendUserId(notification.getSendUser().getId())
                 .reactions(notificationReactionResponseElement)
                 .build();
