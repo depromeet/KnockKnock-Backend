@@ -6,13 +6,14 @@ import io.github.depromeet.knockknockbackend.global.property.OauthProperties;
 import io.github.depromeet.knockknockbackend.global.utils.api.client.GoogleAuthClient;
 import io.github.depromeet.knockknockbackend.global.utils.api.client.GoogleInfoClient;
 import io.github.depromeet.knockknockbackend.global.utils.api.dto.response.GoogleInformationResponse;
+import io.github.depromeet.knockknockbackend.global.utils.api.dto.response.OIDCPublicKeysResponse;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @AllArgsConstructor
-@Component("google")
+@Component("GOOGLE")
 public class GoogleOauthStrategy implements OauthStrategy {
 
     private static final String QUERY_STRING =
@@ -22,6 +23,10 @@ public class GoogleOauthStrategy implements OauthStrategy {
     private final OauthProperties oauthProperties;
     private final GoogleAuthClient googleAuthClient;
     private final GoogleInfoClient googleInfoClient;
+
+    private final OauthOIDCProvider oauthOIDCProvider;
+
+    private static final String ISSUER = "https://accounts.google.com";
 
     // oauthLink 발급
     public String getOauthLink() {
@@ -47,6 +52,12 @@ public class GoogleOauthStrategy implements OauthStrategy {
                 .getAccessToken();
     }
 
+    @Override
+    public OIDCDecodePayload getOIDCDecodePayload(String token) {
+        OIDCPublicKeysResponse oidcPublicKeysResponse = googleAuthClient.getGoogleOIDCOpenKeys();
+        return oauthOIDCProvider.getPayloadFromIdToken(
+                token, ISSUER, oauthProperties.getGoogleClientId(), oidcPublicKeysResponse);
+    }
     // 발급된 어세스 토큰으로 유저정보 조회
     public OauthCommonUserInfoDto getUserInfo(String oauthAccessToken) {
 

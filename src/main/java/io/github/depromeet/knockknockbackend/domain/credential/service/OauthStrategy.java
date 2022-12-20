@@ -7,4 +7,6 @@ public interface OauthStrategy {
     String getOauthLink();
 
     String getAccessToken(String code);
+
+    OIDCDecodePayload getOIDCDecodePayload(String token);
 }
