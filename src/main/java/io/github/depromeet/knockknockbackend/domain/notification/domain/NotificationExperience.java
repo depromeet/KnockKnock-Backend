@@ -2,7 +2,6 @@ package io.github.depromeet.knockknockbackend.domain.notification.domain;
 
 
 import io.github.depromeet.knockknockbackend.global.database.BaseTimeEntity;
-import java.time.LocalDateTime;
 import javax.persistence.*;
 import lombok.*;
 
@@ -20,15 +19,9 @@ public class NotificationExperience extends BaseTimeEntity {
 
     private String token;
 
-    private LocalDateTime sendAt;
-
     private String content;
 
-    public static NotificationExperience of(String token, LocalDateTime sendAt, String content) {
-        return NotificationExperience.builder()
-                .token(token)
-                .sendAt(sendAt)
-                .content(content)
-                .build();
+    public static NotificationExperience of(String token, String content) {
+        return NotificationExperience.builder().token(token).content(content).build();
     }
 }

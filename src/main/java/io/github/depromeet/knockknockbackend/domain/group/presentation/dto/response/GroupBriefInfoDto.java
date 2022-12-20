@@ -29,6 +29,16 @@ public class GroupBriefInfoDto {
 
     private GroupType groupType;
 
+    public GroupBriefInfoDto(GroupBaseInfoVo groupBaseInfoVo) {
+        groupId = groupBaseInfoVo.getGroupId();
+        title = groupBaseInfoVo.getTitle();
+        description = groupBaseInfoVo.getDescription();
+        publicAccess = groupBaseInfoVo.getPublicAccess();
+        thumbnailPath = groupBaseInfoVo.getThumbnailPath();
+        groupType = groupBaseInfoVo.getGroupType();
+        category = new CategoryDto(groupBaseInfoVo.getCategory());
+    }
+
     public GroupBriefInfoDto(GroupBaseInfoVo groupBaseInfoVo, Integer memberCount) {
         groupId = groupBaseInfoVo.getGroupId();
         title = groupBaseInfoVo.getTitle();

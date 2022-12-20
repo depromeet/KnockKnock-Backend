@@ -12,7 +12,7 @@ public class QueryNotificationListResponseElement {
     private String title;
     private String content;
     private String imageUrl;
-    private LocalDateTime sendAt;
+    private LocalDateTime createdDate;
     private Long sendUserId;
     private QueryNotificationReactionResponseElement reactions;
 }

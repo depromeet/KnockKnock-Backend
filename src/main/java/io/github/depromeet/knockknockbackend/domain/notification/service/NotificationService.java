@@ -3,7 +3,7 @@ package io.github.depromeet.knockknockbackend.domain.notification.service;
 
 import com.google.firebase.messaging.*;
 import io.github.depromeet.knockknockbackend.domain.group.domain.Group;
-import io.github.depromeet.knockknockbackend.domain.group.domain.vo.GroupBaseInfoVo;
+import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupBriefInfoDto;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.*;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.Notification;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.repository.DeviceTokenRepository;
@@ -22,7 +22,6 @@ import io.github.depromeet.knockknockbackend.domain.reaction.domain.Notification
 import io.github.depromeet.knockknockbackend.domain.reaction.domain.repository.NotificationReactionRepository;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.global.utils.security.SecurityUtils;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -70,10 +69,13 @@ public class NotificationService {
                 notificationRepository.findAllByGroupIdAndDeleted(
                         groupId, CREATED_DELETED_STATUS, pageable);
 
-        Optional<GroupBaseInfoVo> groupBaseInfoVo =
+        Optional<GroupBriefInfoDto> groupBriefInfoDto =
                 notifications.stream()
                         .findFirst()
-                        .map(notification -> notification.getGroup().getGroupBaseInfoVo());
+                        .map(
+                                notification ->
+                                        new GroupBriefInfoDto(
+                                                notification.getGroup().getGroupBaseInfoVo()));
 
         List<NotificationReaction> myNotificationReactions =
                 retrieveMyReactions(notifications.getContent());
@@ -100,7 +102,7 @@ public class NotificationService {
                         .collect(Collectors.toList());
 
         return new QueryNotificationListResponse(
-                groupBaseInfoVo.orElse(null),
+                groupBriefInfoDto.orElse(null),
                 queryReservationListResponseElements,
                 queryNotificationListResponseElements);
     }
@@ -138,7 +140,7 @@ public class NotificationService {
                 .title(notification.getTitle())
                 .content(notification.getContent())
                 .imageUrl(notification.getImageUrl())
-                .sendAt(notification.getSendAt())
+                .createdDate(notification.getCreatedDate())
                 .sendUserId(notification.getSendUser().getId())
                 .reactions(notificationReactionResponseElement)
                 .build();
@@ -194,8 +196,7 @@ public class NotificationService {
                         request.getContent(),
                         request.getImageUrl(),
                         Group.of(request.getGroupId()),
-                        User.of(sendUserId),
-                        LocalDateTime.now());
+                        User.of(sendUserId));
         notification.addReceivers(
                 deviceTokens.stream()
                         .map(
@@ -213,8 +214,7 @@ public class NotificationService {
         try {
             FirebaseMessaging.getInstance().send(message);
             notificationExperienceRepository.save(
-                    NotificationExperience.of(
-                            request.getToken(), LocalDateTime.now(), request.getContent()));
+                    NotificationExperience.of(request.getToken(), request.getContent()));
         } catch (FirebaseMessagingException e) {
             log.error("[**FCM notification Experience sending Error] {} ", e.getMessage());
             throw FcmResponseException.EXCEPTION;

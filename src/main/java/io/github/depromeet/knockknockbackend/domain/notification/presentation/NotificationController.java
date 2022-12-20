@@ -49,7 +49,7 @@ public class NotificationController {
     @Operation(summary = "알림방 푸쉬알림 리스트")
     @GetMapping("/{group_id}")
     public QueryNotificationListResponse queryListByGroupId(
-            @PageableDefault(size = 20, sort = "sendAt", direction = Direction.DESC)
+            @PageableDefault(size = 20, sort = "createdDate", direction = Direction.DESC)
                     Pageable pageable,
             @PathVariable(value = "group_id") Long groupId) {
         return notificationService.queryListByGroupId(pageable, groupId);
