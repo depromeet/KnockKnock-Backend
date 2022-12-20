@@ -35,6 +35,8 @@ public class SecurityConfig {
                 .permitAll()
                 .antMatchers("/api/v1/asset/version")
                 .permitAll()
+                .antMatchers("/api/v1/asset/profiles/**")
+                .permitAll()
                 .anyRequest()
                 .authenticated();
         http.apply(new FilterConfig(jwtTokenProvider, objectMapper));
