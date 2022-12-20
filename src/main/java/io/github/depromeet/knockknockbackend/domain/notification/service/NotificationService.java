@@ -3,7 +3,7 @@ package io.github.depromeet.knockknockbackend.domain.notification.service;
 
 import com.google.firebase.messaging.*;
 import io.github.depromeet.knockknockbackend.domain.group.domain.Group;
-import io.github.depromeet.knockknockbackend.domain.group.domain.vo.GroupBaseInfoVo;
+import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupBriefInfoDto;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.*;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.Notification;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.repository.DeviceTokenRepository;
@@ -69,10 +69,13 @@ public class NotificationService {
                 notificationRepository.findAllByGroupIdAndDeleted(
                         groupId, CREATED_DELETED_STATUS, pageable);
 
-        Optional<GroupBaseInfoVo> groupBaseInfoVo =
+        Optional<GroupBriefInfoDto> groupBriefInfoDto =
                 notifications.stream()
                         .findFirst()
-                        .map(notification -> notification.getGroup().getGroupBaseInfoVo());
+                        .map(
+                                notification ->
+                                        new GroupBriefInfoDto(
+                                                notification.getGroup().getGroupBaseInfoVo()));
 
         List<NotificationReaction> myNotificationReactions =
                 retrieveMyReactions(notifications.getContent());
@@ -99,7 +102,7 @@ public class NotificationService {
                         .collect(Collectors.toList());
 
         return new QueryNotificationListResponse(
-                groupBaseInfoVo.orElse(null),
+                groupBriefInfoDto.orElse(null),
                 queryReservationListResponseElements,
                 queryNotificationListResponseElements);
     }
