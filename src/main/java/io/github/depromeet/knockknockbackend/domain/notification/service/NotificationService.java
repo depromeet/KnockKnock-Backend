@@ -9,6 +9,7 @@ import io.github.depromeet.knockknockbackend.domain.notification.domain.Notifica
 import io.github.depromeet.knockknockbackend.domain.notification.domain.repository.DeviceTokenRepository;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.repository.NotificationExperienceRepository;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.repository.NotificationRepository;
+import io.github.depromeet.knockknockbackend.domain.notification.domain.repository.ReservationRepository;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.vo.NotificationReactionCountInfoVo;
 import io.github.depromeet.knockknockbackend.domain.notification.exception.FcmResponseException;
 import io.github.depromeet.knockknockbackend.domain.notification.exception.NotificationForbiddenException;
@@ -40,6 +41,7 @@ public class NotificationService {
 
     private static final boolean CREATED_DELETED_STATUS = false;
     private final NotificationRepository notificationRepository;
+    private final ReservationRepository reservationRepository;
     private final NotificationExperienceRepository notificationExperienceRepository;
     private final DeviceTokenRepository deviceTokenRepository;
     private final NotificationReactionRepository notificationReactionRepository;
@@ -81,8 +83,26 @@ public class NotificationService {
                                 getQueryNotificationListResponseElements(
                                         notification, myNotificationReactions));
 
+        List<Reservation> reservations =
+                reservationRepository.findByGroupAndSendUserOrderBySendAtAsc(
+                        Group.of(groupId), User.of(SecurityUtils.getCurrentUserId()));
+        List<QueryReservationListResponseElement> queryReservationListResponseElements =
+                reservations.stream()
+                        .map(
+                                reservation ->
+                                        QueryReservationListResponseElement.builder()
+                                                .reservationId(reservation.getId())
+                                                .title(reservation.getTitle())
+                                                .content(reservation.getContent())
+                                                .imageUrl(reservation.getImageUrl())
+                                                .sendAt(reservation.getSendAt())
+                                                .build())
+                        .collect(Collectors.toList());
+
         return new QueryNotificationListResponse(
-                groupBaseInfoVo.orElse(null), queryNotificationListResponseElements);
+                groupBaseInfoVo.orElse(null),
+                queryReservationListResponseElements,
+                queryNotificationListResponseElements);
     }
 
     public QueryNotificationListResponseElement getQueryNotificationListResponseElements(
