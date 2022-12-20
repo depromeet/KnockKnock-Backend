@@ -3,11 +3,15 @@ package io.github.depromeet.knockknockbackend.domain.credential.service;
 
 import io.github.depromeet.knockknockbackend.domain.credential.domain.RefreshTokenRedisEntity;
 import io.github.depromeet.knockknockbackend.domain.credential.domain.repository.RefreshTokenRedisEntityRepository;
+import io.github.depromeet.knockknockbackend.domain.credential.exception.AlreadySignUpUserException;
+import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.request.RegisterRequest;
 import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.response.AfterOauthResponse;
 import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.response.AuthTokensResponse;
+import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.response.AvailableRegisterResponse;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.domain.user.domain.repository.UserRepository;
 import io.github.depromeet.knockknockbackend.global.exception.InvalidTokenException;
+import io.github.depromeet.knockknockbackend.global.exception.UserNotFoundException;
 import io.github.depromeet.knockknockbackend.global.security.JwtTokenProvider;
 import java.util.Date;
 import java.util.Optional;
@@ -101,6 +105,74 @@ public class CredentialService {
 
         String accessToken = jwtTokenProvider.generateAccessToken(userId);
         String refreshToken = generateRefreshToken(userId);
+
+        return AuthTokensResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
+    }
+
+    private void validUserCanRegister(
+            OIDCDecodePayload oidcDecodePayload, OauthProvider oauthProvider) {
+        if (!checkUserCanRegister(oidcDecodePayload, oauthProvider))
+            throw AlreadySignUpUserException.EXCEPTION;
+    }
+
+    private Boolean checkUserCanRegister(
+            OIDCDecodePayload oidcDecodePayload, OauthProvider oauthProvider) {
+        Optional<User> user =
+                userRepository.findByOauthIdAndOauthProvider(
+                        oidcDecodePayload.getSub(), oauthProvider.getValue());
+        return user.isEmpty();
+    }
+
+    public AvailableRegisterResponse getUserAvailableRegister(
+            String token, OauthProvider oauthProvider) {
+        OauthStrategy oauthStrategy = oauthFactory.getOauthstrategy(oauthProvider);
+        OIDCDecodePayload oidcDecodePayload = oauthStrategy.getOIDCDecodePayload(token);
+        Boolean isRegistered = checkUserCanRegister(oidcDecodePayload, oauthProvider);
+
+        return new AvailableRegisterResponse(isRegistered);
+    }
+
+    public AuthTokensResponse registerUserByOCIDToken(
+            String token, RegisterRequest registerUserRequest, OauthProvider oauthProvider) {
+        OauthStrategy oauthStrategy = oauthFactory.getOauthstrategy(oauthProvider);
+        OIDCDecodePayload oidcDecodePayload = oauthStrategy.getOIDCDecodePayload(token);
+
+        validUserCanRegister(oidcDecodePayload, oauthProvider);
+
+        User newUser =
+                User.builder()
+                        .oauthProvider(oauthProvider.getValue())
+                        .oauthId(oidcDecodePayload.getSub())
+                        .email(oidcDecodePayload.getEmail())
+                        .nickname(registerUserRequest.getNickname())
+                        .profilePath(registerUserRequest.getProfilePath())
+                        .build();
+        userRepository.save(newUser);
+
+        String accessToken = jwtTokenProvider.generateAccessToken(newUser.getId());
+        String refreshToken = generateRefreshToken(newUser.getId());
+
+        return AuthTokensResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
+    }
+
+    public AuthTokensResponse loginUserByOCIDToken(String token, OauthProvider oauthProvider) {
+        OauthStrategy oauthStrategy = oauthFactory.getOauthstrategy(oauthProvider);
+        OIDCDecodePayload oidcDecodePayload = oauthStrategy.getOIDCDecodePayload(token);
+
+        User user =
+                userRepository
+                        .findByOauthIdAndOauthProvider(
+                                oidcDecodePayload.getSub(), oauthProvider.getValue())
+                        .orElseThrow(() -> UserNotFoundException.EXCEPTION);
+
+        String accessToken = jwtTokenProvider.generateAccessToken(user.getId());
+        String refreshToken = generateRefreshToken(user.getId());
 
         return AuthTokensResponse.builder()
                 .accessToken(accessToken)

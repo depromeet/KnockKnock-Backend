@@ -66,10 +66,11 @@ public class KakaoOauthStrategy implements OauthStrategy {
 
         return oauthCommonUserInfoDtoBuilder.build();
     }
+
     @Override
     public OIDCDecodePayload getOIDCDecodePayload(String token) {
         OIDCPublicKeysResponse oidcPublicKeysResponse = kakaoOauthClient.getKakaoOIDCOpenKeys();
-        return oauthOIDCProvider.getPayloadFromIdToken(token,ISSUER,oauthProperties.getKakaoClientId(),oidcPublicKeysResponse);
+        return oauthOIDCProvider.getPayloadFromIdToken(
+                token, ISSUER, oauthProperties.getKakaoClientId(), oidcPublicKeysResponse);
     }
-
 }

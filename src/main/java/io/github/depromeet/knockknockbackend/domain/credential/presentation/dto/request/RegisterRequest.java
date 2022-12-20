@@ -1,4 +1,4 @@
-package io.github.depromeet.knockknockbackend.domain.user.presentation.dto.request;
+package io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.request;
 
 
 import javax.validation.constraints.NotEmpty;
@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class ChangeProfileRequest {
+public class RegisterRequest {
 
     @Size(max = 10)
     @NotEmpty

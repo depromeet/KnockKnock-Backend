@@ -26,7 +26,6 @@ public class GoogleOauthStrategy implements OauthStrategy {
 
     private final OauthOIDCProvider oauthOIDCProvider;
 
-
     private static final String ISSUER = "https://accounts.google.com";
 
     // oauthLink 발급
@@ -56,7 +55,8 @@ public class GoogleOauthStrategy implements OauthStrategy {
     @Override
     public OIDCDecodePayload getOIDCDecodePayload(String token) {
         OIDCPublicKeysResponse oidcPublicKeysResponse = googleAuthClient.getGoogleOIDCOpenKeys();
-        return oauthOIDCProvider.getPayloadFromIdToken(token,ISSUER,oauthProperties.getGoogleClientId(),oidcPublicKeysResponse);
+        return oauthOIDCProvider.getPayloadFromIdToken(
+                token, ISSUER, oauthProperties.getGoogleClientId(), oidcPublicKeysResponse);
     }
     // 발급된 어세스 토큰으로 유저정보 조회
     public OauthCommonUserInfoDto getUserInfo(String oauthAccessToken) {
