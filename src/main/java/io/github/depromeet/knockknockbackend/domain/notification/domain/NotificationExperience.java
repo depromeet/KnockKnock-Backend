@@ -20,14 +20,11 @@ public class NotificationExperience extends BaseTimeEntity {
 
     private String token;
 
-    private LocalDateTime sendAt;
-
     private String content;
 
-    public static NotificationExperience of(String token, LocalDateTime sendAt, String content) {
+    public static NotificationExperience of(String token, String content) {
         return NotificationExperience.builder()
                 .token(token)
-                .sendAt(sendAt)
                 .content(content)
                 .build();
     }

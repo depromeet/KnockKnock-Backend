@@ -40,8 +40,6 @@ public class Notification extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private LocalDateTime sendAt;
-
     private String title;
 
     private String content;
@@ -83,15 +81,13 @@ public class Notification extends BaseTimeEntity {
             String content,
             String imageUrl,
             Group group,
-            User sendUser,
-            LocalDateTime sendAt) {
+            User sendUser) {
         return Notification.builder()
                 .title(title)
                 .content(content)
                 .imageUrl(imageUrl)
                 .group(group)
                 .sendUser(sendUser)
-                .sendAt(sendAt)
                 .build();
     }
 
