@@ -39,12 +39,14 @@ public class AssetController {
     }
 
     @Operation(summary = "프로필 이미지")
+    @DisableSecurity
     @GetMapping("/profiles")
     public ProfileImagesResponse getAllProfileImages() {
         return assetService.getAllProfileImages();
     }
 
     @Operation(summary = "프로필 이미지 랜덤하게 받기")
+    @DisableSecurity
     @GetMapping("/profiles/random")
     public ProfileImageDto getRandomProfileImageUrl() {
         return assetService.getRandomProfileImageUrl();
