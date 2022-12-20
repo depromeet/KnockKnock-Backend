@@ -32,8 +32,7 @@ public class JwtOIDCProvider {
     private final String KID = "kid";
 
     public String getKidFromUnsignedTokenHeader(String token, String iss, String aud) {
-        return (String)
-                getUnsignedTokenClaims(token, iss, aud).getHeader().get(KID);
+        return (String) getUnsignedTokenClaims(token, iss, aud).getHeader().get(KID);
     }
 
     private Jwt<Header, Claims> getUnsignedTokenClaims(String token, String iss, String aud) {
@@ -53,8 +52,7 @@ public class JwtOIDCProvider {
 
     private String getUnsignedToken(String token) {
         String[] splitToken = token.split("\\.");
-        if(splitToken.length !=3)
-            throw InvalidTokenException.EXCEPTION;
+        if (splitToken.length != 3) throw InvalidTokenException.EXCEPTION;
         return splitToken[0] + "." + splitToken[1] + ".";
     }
 
@@ -74,8 +72,11 @@ public class JwtOIDCProvider {
 
     public OIDCDecodePayload getOIDCTokenBody(String token, String modulus, String exponent) {
         Claims body = getOIDCTokenJws(token, modulus, exponent).getBody();
-        return new OIDCDecodePayload(body.getIssuer(), body.getAudience(), body.getSubject(), body.get("email",String.class));
-
+        return new OIDCDecodePayload(
+                body.getIssuer(),
+                body.getAudience(),
+                body.getSubject(),
+                body.get("email", String.class));
     }
 
     private Key getRSAPublicKey(String modulus, String exponent)
