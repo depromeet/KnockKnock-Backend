@@ -22,7 +22,6 @@ import io.github.depromeet.knockknockbackend.domain.reaction.domain.Notification
 import io.github.depromeet.knockknockbackend.domain.reaction.domain.repository.NotificationReactionRepository;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.global.utils.security.SecurityUtils;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -211,8 +210,7 @@ public class NotificationService {
         try {
             FirebaseMessaging.getInstance().send(message);
             notificationExperienceRepository.save(
-                    NotificationExperience.of(
-                            request.getToken(), request.getContent()));
+                    NotificationExperience.of(request.getToken(), request.getContent()));
         } catch (FirebaseMessagingException e) {
             log.error("[**FCM notification Experience sending Error] {} ", e.getMessage());
             throw FcmResponseException.EXCEPTION;

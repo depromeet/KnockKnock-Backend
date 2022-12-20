@@ -5,7 +5,6 @@ import io.github.depromeet.knockknockbackend.domain.group.domain.Group;
 import io.github.depromeet.knockknockbackend.domain.reaction.domain.NotificationReaction;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.global.database.BaseTimeEntity;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -77,11 +76,7 @@ public class Notification extends BaseTimeEntity {
     }
 
     public static Notification of(
-            String title,
-            String content,
-            String imageUrl,
-            Group group,
-            User sendUser) {
+            String title, String content, String imageUrl, Group group, User sendUser) {
         return Notification.builder()
                 .title(title)
                 .content(content)
