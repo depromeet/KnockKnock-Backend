@@ -7,13 +7,16 @@ import io.github.depromeet.knockknockbackend.domain.notification.domain.reposito
 import io.github.depromeet.knockknockbackend.domain.notification.exception.NotificationForbiddenException;
 import io.github.depromeet.knockknockbackend.domain.notification.exception.NotificationNotFoundException;
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.response.QueryNotificationListInStorageResponse;
+import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.response.QueryNotificationListResponseElement;
 import io.github.depromeet.knockknockbackend.domain.notification.service.NotificationService;
+import io.github.depromeet.knockknockbackend.domain.reaction.domain.NotificationReaction;
 import io.github.depromeet.knockknockbackend.domain.storage.domain.Storage;
 import io.github.depromeet.knockknockbackend.domain.storage.domain.repository.StorageRepository;
 import io.github.depromeet.knockknockbackend.domain.storage.exception.StorageForbiddenException;
 import io.github.depromeet.knockknockbackend.domain.storage.exception.StorageNotFoundException;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.global.utils.security.SecurityUtils;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -53,8 +56,15 @@ public class StorageService {
                 notificationRepository.findSliceFromStorage(
                         SecurityUtils.getCurrentUserId(), groupId, periodOfMonth, pageable);
 
-        return new QueryNotificationListInStorageResponse(
-                notificationService.getNotificationListResponseElements(notifications));
+        List<NotificationReaction> myNotificationReactions =
+                notificationService.retrieveMyReactions(notifications.getContent());
+        Slice<QueryNotificationListResponseElement> queryNotificationListResponseElements =
+                notifications.map(
+                        notification ->
+                                notificationService.getQueryNotificationListResponseElements(
+                                        notification, myNotificationReactions));
+
+        return new QueryNotificationListInStorageResponse(queryNotificationListResponseElements);
     }
 
     private void validateAccessibleNotificationId(Long notificationId) {

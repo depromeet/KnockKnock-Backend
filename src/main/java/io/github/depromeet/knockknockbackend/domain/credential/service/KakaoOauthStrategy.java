@@ -7,11 +7,12 @@ import io.github.depromeet.knockknockbackend.global.utils.api.client.KakaoInfoCl
 import io.github.depromeet.knockknockbackend.global.utils.api.client.KakaoOauthClient;
 import io.github.depromeet.knockknockbackend.global.utils.api.dto.response.KakaoInformationResponse;
 import io.github.depromeet.knockknockbackend.global.utils.api.dto.response.KakaoInformationResponse.KakaoAccount;
+import io.github.depromeet.knockknockbackend.global.utils.api.dto.response.OIDCPublicKeysResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @AllArgsConstructor
-@Component("kakao")
+@Component("KAKAO")
 public class KakaoOauthStrategy implements OauthStrategy {
 
     private static final String QUERY_STRING =
@@ -20,6 +21,9 @@ public class KakaoOauthStrategy implements OauthStrategy {
     private final OauthProperties oauthProperties;
     private final KakaoOauthClient kakaoOauthClient;
     private final KakaoInfoClient kakaoInfoClient;
+    private final OauthOIDCProvider oauthOIDCProvider;
+
+    private static final String ISSUER = "https://kauth.kakao.com";
 
     // oauthLink 발급
     public String getOauthLink() {
@@ -44,7 +48,6 @@ public class KakaoOauthStrategy implements OauthStrategy {
 
     // 발급된 어세스 토큰으로 유저정보 조회
     public OauthCommonUserInfoDto getUserInfo(String oauthAccessToken) {
-
         KakaoInformationResponse response =
                 kakaoInfoClient.kakaoUserInfo(PREFIX + oauthAccessToken);
         KakaoAccount kakaoAccount = response.getKakaoAccount();
@@ -62,5 +65,12 @@ public class KakaoOauthStrategy implements OauthStrategy {
         }
 
         return oauthCommonUserInfoDtoBuilder.build();
+    }
+
+    @Override
+    public OIDCDecodePayload getOIDCDecodePayload(String token) {
+        OIDCPublicKeysResponse oidcPublicKeysResponse = kakaoOauthClient.getKakaoOIDCOpenKeys();
+        return oauthOIDCProvider.getPayloadFromIdToken(
+                token, ISSUER, oauthProperties.getKakaoClientId(), oidcPublicKeysResponse);
     }
 }

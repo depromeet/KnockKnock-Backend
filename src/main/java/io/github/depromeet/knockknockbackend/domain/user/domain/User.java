@@ -35,12 +35,19 @@ public class User {
     private String profilePath;
 
     @Builder
-    public User(Long id, String nickname, String oauthProvider, String oauthId, String email) {
+    public User(
+            Long id,
+            String nickname,
+            String oauthProvider,
+            String oauthId,
+            String email,
+            String profilePath) {
         this.id = id;
         this.nickname = nickname;
         this.oauthProvider = oauthProvider;
         this.oauthId = oauthId;
         this.email = email;
+        this.profilePath = profilePath;
     }
 
     public UserInfoVO getUserInfo() {

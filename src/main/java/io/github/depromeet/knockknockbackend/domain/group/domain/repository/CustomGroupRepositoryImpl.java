@@ -48,7 +48,7 @@ public class CustomGroupRepositoryImpl implements CustomGroupRepository {
         List<Group> groups =
                 getGroupWithRecentNotification()
                         .where(group.groupType.eq(groupType))
-                        .orderBy(notification.sendAt.coalesce(group.createdDate).desc())
+                        .orderBy(notification.createdDate.coalesce(group.createdDate).desc())
                         .offset(pageable.getOffset())
                         .limit(pageable.getPageSize() + 1)
                         .fetch();
@@ -62,7 +62,7 @@ public class CustomGroupRepositoryImpl implements CustomGroupRepository {
         List<Group> groups =
                 getGroupWithRecentNotification()
                         .where(group.groupType.eq(groupType).and(group.category.eq(category)))
-                        .orderBy(notification.sendAt.coalesce(group.createdDate).desc())
+                        .orderBy(notification.createdDate.coalesce(group.createdDate).desc())
                         .offset(pageable.getOffset())
                         .limit(pageable.getPageSize() + 1)
                         .fetch();

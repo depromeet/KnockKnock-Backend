@@ -7,12 +7,10 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class QueryNotificationListResponseElement {
-    private Long notificationId;
+public class QueryReservationListResponseElement {
+    private Long reservationId;
     private String title;
     private String content;
     private String imageUrl;
-    private LocalDateTime createdDate;
-    private Long sendUserId;
-    private QueryNotificationReactionResponseElement reactions;
+    private LocalDateTime sendAt;
 }

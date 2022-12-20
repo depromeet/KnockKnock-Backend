@@ -52,7 +52,7 @@ public class CustomGroupUserRepositoryImpl implements CustomGroupUserRepository 
         List<GroupUser> groupUsers =
                 getGroupUserWithGroupAndRecentNotification()
                         .where(groupUser.user.id.eq(userId))
-                        .orderBy(notification.sendAt.coalesce(group.createdDate).desc())
+                        .orderBy(notification.createdDate.coalesce(group.createdDate).desc())
                         .offset(pageable.getOffset())
                         .limit(pageable.getPageSize() + 1)
                         .fetch();
@@ -66,7 +66,7 @@ public class CustomGroupUserRepositoryImpl implements CustomGroupUserRepository 
         List<GroupUser> groupUsers =
                 getGroupUserWithGroupAndRecentNotification()
                         .where(groupUser.user.id.eq(userId).and(group.groupType.eq(groupType)))
-                        .orderBy(notification.sendAt.coalesce(group.createdDate).desc())
+                        .orderBy(notification.createdDate.coalesce(group.createdDate).desc())
                         .offset(pageable.getOffset())
                         .limit(pageable.getPageSize() + 1)
                         .fetch();

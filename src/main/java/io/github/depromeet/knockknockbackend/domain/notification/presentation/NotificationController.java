@@ -3,6 +3,8 @@ package io.github.depromeet.knockknockbackend.domain.notification.presentation;
 
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.request.RegisterFcmTokenRequest;
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.request.SendInstanceRequest;
+import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.request.SendInstanceToMeBeforeSignUpRequest;
+import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.response.QueryNotificationListLatestResponse;
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.response.QueryNotificationListResponse;
 import io.github.depromeet.knockknockbackend.domain.notification.service.NotificationService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,10 +28,8 @@ public class NotificationController {
 
     @Operation(summary = "최신 푸쉬알림 리스트")
     @GetMapping
-    public QueryNotificationListResponse queryAlarmHistoryByUserId(
-            @PageableDefault(size = 5, sort = "sendAt", direction = Direction.DESC)
-                    Pageable pageable) {
-        return notificationService.queryAlarmHistoryByUserId(pageable);
+    public QueryNotificationListLatestResponse queryListLatest() {
+        return notificationService.queryListLatest();
     }
 
     @Operation(summary = "FCM 토큰 등록")
@@ -41,7 +41,7 @@ public class NotificationController {
 
     @Operation(summary = "즉시 푸쉬알림 발송")
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping("/instance")
+    @PostMapping
     public void sendInstance(@RequestBody SendInstanceRequest request) {
         notificationService.sendInstance(request);
     }
@@ -49,7 +49,7 @@ public class NotificationController {
     @Operation(summary = "알림방 푸쉬알림 리스트")
     @GetMapping("/{group_id}")
     public QueryNotificationListResponse queryListByGroupId(
-            @PageableDefault(size = 20, sort = "sendAt", direction = Direction.DESC)
+            @PageableDefault(size = 20, sort = "createdDate", direction = Direction.DESC)
                     Pageable pageable,
             @PathVariable(value = "group_id") Long groupId) {
         return notificationService.queryListByGroupId(pageable, groupId);
@@ -61,5 +61,13 @@ public class NotificationController {
     public void deleteByNotificationId(
             @PathVariable(value = "notification_id") Long notificationId) {
         notificationService.deleteByNotificationId(notificationId);
+    }
+
+    @Operation(summary = "똑똑 미리체험하기 : 회원가입 전 자신에게 푸쉬알림 보내기")
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping("/experience")
+    public void sendInstanceToMeBeforeSignUp(
+            @RequestBody SendInstanceToMeBeforeSignUpRequest request) {
+        notificationService.sendInstanceToMeBeforeSignUp(request);
     }
 }
