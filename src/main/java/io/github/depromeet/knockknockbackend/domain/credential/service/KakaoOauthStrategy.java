@@ -12,7 +12,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @AllArgsConstructor
-@Component("kakao")
+@Component("KAKAO")
 public class KakaoOauthStrategy implements OauthStrategy {
 
     private static final String QUERY_STRING =

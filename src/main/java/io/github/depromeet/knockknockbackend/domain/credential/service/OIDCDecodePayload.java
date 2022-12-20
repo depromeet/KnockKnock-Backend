@@ -1,9 +1,11 @@
 package io.github.depromeet.knockknockbackend.domain.credential.service;
 
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
+@AllArgsConstructor
 public class OIDCDecodePayload {
     /** issuer ex https://kauth.kakao.com */
     private String iss;

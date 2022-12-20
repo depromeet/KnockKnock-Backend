@@ -130,7 +130,7 @@ public class CredentialService {
             String token, OauthProvider oauthProvider) {
         OauthStrategy oauthStrategy = oauthFactory.getOauthstrategy(oauthProvider);
         OIDCDecodePayload oidcDecodePayload = oauthStrategy.getOIDCDecodePayload(token);
-        Boolean isRegistered = checkUserCanRegister(oidcDecodePayload, oauthProvider);
+        Boolean isRegistered = !checkUserCanRegister(oidcDecodePayload, oauthProvider);
 
         return new AvailableRegisterResponse(isRegistered);
     }

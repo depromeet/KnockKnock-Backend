@@ -3,6 +3,7 @@ package io.github.depromeet.knockknockbackend.global.utils.api.client;
 
 import io.github.depromeet.knockknockbackend.global.utils.api.dto.response.OIDCPublicKeysResponse;
 import io.github.depromeet.knockknockbackend.global.utils.api.dto.response.OauthAccessTokenResponse;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,6 +22,7 @@ public interface GoogleAuthClient {
             @PathVariable("CODE") String code,
             @PathVariable("CLIENT_SECRET") String client_secret);
 
+    @Cacheable(cacheNames = "GoogleOICD", cacheManager = "oidcCacheManager")
     @GetMapping("/v3/certs")
     OIDCPublicKeysResponse getGoogleOIDCOpenKeys();
 }

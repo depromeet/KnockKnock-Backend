@@ -9,19 +9,10 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public enum OauthProvider {
-    KAKAO("kakao"),
-    GOOGLE("google");
+    KAKAO("KAKAO"),
+    GOOGLE("GOOGLE");
     private String oauthProviderName;
 
-    @JsonCreator
-    public static OauthProvider from(String value) {
-        for (OauthProvider provider : OauthProvider.values()) {
-            if (provider.getValue().equals(value)) {
-                return provider;
-            }
-        }
-        return null;
-    }
 
     @JsonValue
     public String getValue() {

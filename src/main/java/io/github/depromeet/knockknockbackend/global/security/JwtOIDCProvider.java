@@ -1,6 +1,7 @@
 package io.github.depromeet.knockknockbackend.global.security;
 
 
+import io.github.depromeet.knockknockbackend.domain.credential.service.OIDCDecodePayload;
 import io.github.depromeet.knockknockbackend.global.exception.ExpiredTokenException;
 import io.github.depromeet.knockknockbackend.global.exception.InvalidTokenException;
 import io.github.depromeet.knockknockbackend.global.property.JwtProperties;
@@ -17,12 +18,13 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
 import java.util.Base64;
-import java.util.Date;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
 @Component
+@Slf4j
 public class JwtOIDCProvider {
 
     private final JwtProperties jwtProperties;
@@ -31,7 +33,7 @@ public class JwtOIDCProvider {
 
     public String getKidFromUnsignedTokenHeader(String token, String iss, String aud) {
         return (String)
-                getUnsignedTokenClaims(getUnsignedToken(token), iss, aud).getHeader().get(KID);
+                getUnsignedTokenClaims(token, iss, aud).getHeader().get(KID);
     }
 
     private Jwt<Header, Claims> getUnsignedTokenClaims(String token, String iss, String aud) {
@@ -39,18 +41,20 @@ public class JwtOIDCProvider {
             return Jwts.parserBuilder()
                     .requireAudience(aud)
                     .requireIssuer(iss)
-                    .requireExpiration(new Date())
                     .build()
                     .parseClaimsJwt(getUnsignedToken(token));
         } catch (ExpiredJwtException e) {
             throw ExpiredTokenException.EXCEPTION;
         } catch (Exception e) {
+            log.error(e.toString());
             throw InvalidTokenException.EXCEPTION;
         }
     }
 
     private String getUnsignedToken(String token) {
         String[] splitToken = token.split("\\.");
+        if(splitToken.length !=3)
+            throw InvalidTokenException.EXCEPTION;
         return splitToken[0] + "." + splitToken[1] + ".";
     }
 
@@ -63,12 +67,15 @@ public class JwtOIDCProvider {
         } catch (ExpiredJwtException e) {
             throw ExpiredTokenException.EXCEPTION;
         } catch (Exception e) {
+            log.error(e.toString());
             throw InvalidTokenException.EXCEPTION;
         }
     }
 
-    public Claims getOIDCTokenBody(String token, String modulus, String exponent) {
-        return getOIDCTokenJws(token, modulus, exponent).getBody();
+    public OIDCDecodePayload getOIDCTokenBody(String token, String modulus, String exponent) {
+        Claims body = getOIDCTokenJws(token, modulus, exponent).getBody();
+        return new OIDCDecodePayload(body.getIssuer(), body.getAudience(), body.getSubject(), body.get("email",String.class));
+
     }
 
     private Key getRSAPublicKey(String modulus, String exponent)

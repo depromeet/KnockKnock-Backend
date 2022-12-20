@@ -13,7 +13,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @AllArgsConstructor
-@Component("google")
+@Component("GOOGLE")
 public class GoogleOauthStrategy implements OauthStrategy {
 
     private static final String QUERY_STRING =
