@@ -30,7 +30,7 @@ public class CredentialController {
 
     private final CredentialService credentialService;
 
-    @Operation(summary = "kakao oauth 링크발급", description = "kakao 링크를 받아볼수 있습니다.")
+    @Operation(summary = "kakao oauth 링크발급", description = "kakao 링크를 받아볼수 있습니다." ,deprecated = true)
     @GetMapping("/oauth/link/kakao")
     public OauthLoginLinkResponse getKakaoOauthLink() {
         return new OauthLoginLinkResponse(credentialService.getOauthLink(OauthProvider.KAKAO));
@@ -59,14 +59,14 @@ public class CredentialController {
                                         schema =
                                                 @Schema(implementation = AfterOauthResponse.class)))
             })
-    @Operation(summary = "kakao oauth 요청", description = "code를 서버로 요청보냅니다.")
+    @Operation(summary = "kakao oauth 요청", description = "code를 서버로 요청보냅니다." ,deprecated = true)
     @GetMapping("/oauth/kakao")
     public AfterOauthResponse kakaoAuth(OauthCodeRequest oauthCodeRequest) {
         // TODO : 사용자가 로그인 취소시에 code 안넘어옴 별도 처리 필요.
         return credentialService.oauthCodeToUser(OauthProvider.KAKAO, oauthCodeRequest.getCode());
     }
 
-    @Operation(summary = "google oauth 링크발급", description = "oauth 링크를 받아볼수 있습니다.")
+    @Operation(summary = "google oauth 링크발급", description = "oauth 링크를 받아볼수 있습니다." , deprecated = true)
     @GetMapping("/oauth/link/google")
     public OauthLoginLinkResponse getGoogleOauthLink() {
         return new OauthLoginLinkResponse(credentialService.getOauthLink(OauthProvider.GOOGLE));
@@ -95,7 +95,7 @@ public class CredentialController {
                                         schema =
                                                 @Schema(implementation = AfterOauthResponse.class)))
             })
-    @Operation(summary = "google oauth 요청", description = "code를 서버로 요청보냅니다.")
+    @Operation(summary = "google oauth 요청", description = "code를 서버로 요청보냅니다." ,deprecated = true)
     @GetMapping("/oauth/google")
     public AfterOauthResponse googleAuth(OauthCodeRequest oauthCodeRequest) {
         return credentialService.oauthCodeToUser(OauthProvider.GOOGLE, oauthCodeRequest.getCode());
