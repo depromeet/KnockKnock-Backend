@@ -1,8 +1,10 @@
 package io.github.depromeet.knockknockbackend.global.utils.api.client;
 
 
+import io.github.depromeet.knockknockbackend.global.utils.api.dto.response.OIDCPublicKeysResponse;
 import io.github.depromeet.knockknockbackend.global.utils.api.dto.response.OauthAccessTokenResponse;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
@@ -16,4 +18,7 @@ public interface KakaoOauthClient {
             @PathVariable("REDIRECT_URI") String redirectUri,
             @PathVariable("CODE") String code,
             @PathVariable("CLIENT_SECRET") String client_secret);
+
+    @GetMapping("/.well-known/jwks.json")
+    OIDCPublicKeysResponse getKakaoOIDCOpenKeys();
 }
