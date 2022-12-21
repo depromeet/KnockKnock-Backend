@@ -13,6 +13,7 @@ import io.github.depromeet.knockknockbackend.domain.user.domain.repository.UserR
 import io.github.depromeet.knockknockbackend.global.exception.InvalidTokenException;
 import io.github.depromeet.knockknockbackend.global.exception.UserNotFoundException;
 import io.github.depromeet.knockknockbackend.global.security.JwtTokenProvider;
+import io.github.depromeet.knockknockbackend.global.utils.user.UserUtils;
 import java.util.Date;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
@@ -29,6 +30,8 @@ public class CredentialService {
     private final JwtTokenProvider jwtTokenProvider;
 
     private final RefreshTokenRedisEntityRepository refreshTokenRedisEntityRepository;
+
+    private final UserUtils userUtils;
 
     public String getOauthLink(OauthProvider oauthProvider) {
         OauthStrategy oauthStrategy = oauthFactory.getOauthstrategy(oauthProvider);
@@ -178,5 +181,20 @@ public class CredentialService {
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
+    }
+
+    @Transactional
+    public void deleteUser(String oauthAccessToken) {
+        User user = userUtils.getUserFromSecurityContext();
+        OauthProvider provider = OauthProvider.valueOf(user.getOauthProvider().toUpperCase());
+        OauthStrategy oauthStrategy = oauthFactory.getOauthstrategy(provider);
+        OauthCommonUserInfoDto userInfo = oauthStrategy.getUserInfo(oauthAccessToken);
+        if (!userInfo.getOauthId().equals(user.getOauthId())) {
+            throw InvalidTokenException.EXCEPTION;
+        }
+
+        refreshTokenRedisEntityRepository.deleteById(user.getId().toString());
+        user.softDeleteUser();
+        oauthStrategy.unLink(oauthAccessToken);
     }
 }

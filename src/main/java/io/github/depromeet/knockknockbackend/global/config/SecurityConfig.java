@@ -31,6 +31,8 @@ public class SecurityConfig {
                 .permitAll()
                 .antMatchers("/actuator/**")
                 .permitAll()
+                .antMatchers("/api/v1/credentials/me")
+                .authenticated()
                 .antMatchers("/api/v1/credentials/**")
                 .permitAll()
                 .antMatchers("/api/v1/asset/version")
