@@ -14,9 +14,11 @@ import io.github.depromeet.knockknockbackend.domain.storage.domain.Storage;
 import io.github.depromeet.knockknockbackend.domain.storage.domain.repository.StorageRepository;
 import io.github.depromeet.knockknockbackend.domain.storage.exception.StorageForbiddenException;
 import io.github.depromeet.knockknockbackend.domain.storage.exception.StorageNotFoundException;
+import io.github.depromeet.knockknockbackend.domain.storage.presentation.dto.request.DeleteStorage;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.global.utils.security.SecurityUtils;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -41,12 +43,11 @@ public class StorageService {
     }
 
     @Transactional
-    public void deleteNotificationFromStorage(Long storageId) {
-        Storage storage = queryStorageById(storageId);
-        if (!SecurityUtils.getCurrentUserId().equals(storage.getUser().getId())) {
-            throw StorageForbiddenException.EXCEPTION;
-        }
-        storageRepository.delete(storage);
+    public void deleteNotificationFromStorage(DeleteStorage request) {
+        List<Storage> storages = queryStorageByIds(request.getStorageIds());
+        validateDeletePermission(storages);
+        storageRepository.deleteByIdIn(
+                storages.stream().map(Storage::getId).collect(Collectors.toList()));
     }
 
     @Transactional(readOnly = true)
@@ -81,9 +82,20 @@ public class StorageService {
         }
     }
 
-    private Storage queryStorageById(Long storageId) {
-        return storageRepository
-                .findById(storageId)
-                .orElseThrow(() -> StorageNotFoundException.EXCEPTION);
+    private List<Storage> queryStorageByIds(List<Long> storageIds) {
+        List<Storage> storages = storageRepository.findByIdIn(storageIds);
+        if (storageIds.size() != storages.size()) {
+            throw StorageNotFoundException.EXCEPTION;
+        }
+        return storages;
+    }
+
+    private void validateDeletePermission(List<Storage> storages) {
+        storages.forEach(
+                storage -> {
+                    if (!SecurityUtils.getCurrentUserId().equals(storage.getUser().getId())) {
+                        throw StorageForbiddenException.EXCEPTION;
+                    }
+                });
     }
 }
