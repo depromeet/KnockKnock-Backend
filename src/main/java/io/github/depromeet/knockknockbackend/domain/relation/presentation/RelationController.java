@@ -1,7 +1,7 @@
 package io.github.depromeet.knockknockbackend.domain.relation.presentation;
 
 
-import io.github.depromeet.knockknockbackend.domain.relation.presentation.dto.request.SendFriendRequest;
+import io.github.depromeet.knockknockbackend.domain.relation.presentation.dto.request.FriendRequest;
 import io.github.depromeet.knockknockbackend.domain.relation.presentation.dto.response.QueryFriendListResponse;
 import io.github.depromeet.knockknockbackend.domain.relation.service.RelationService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -9,11 +9,13 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "유저 관련 컨트롤러", description = "")
@@ -33,7 +35,22 @@ public class RelationController {
 
     @Operation(summary = "친구 요청을 보내는 Api입니다. - 친구목록")
     @PostMapping
-    public ResponseEntity<Void> sendUserRequest(@RequestBody @Valid SendFriendRequest request) {
+    public ResponseEntity<Void> sendUserRequest(@RequestBody @Valid FriendRequest request) {
         return new ResponseEntity<>(relationService.sendFriendRequest(request));
     }
+
+    @Operation(summary = "친구 요청을 수락하는 Api입니다. - 메인 알림")
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping("/requests")
+    public void acceptRequest(@RequestBody @Valid FriendRequest request) {
+        relationService.acceptRequest(request);
+    }
+
+    @Operation(summary = "친구 요청을 거절하는 Api입니다. - 메인 알림")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PostMapping("/requests")
+    public void refuseRequest(@RequestBody @Valid FriendRequest request) {
+        relationService.refuseRequest(request);
+    }
+
 }
