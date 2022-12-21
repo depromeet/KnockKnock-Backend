@@ -5,10 +5,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.depromeet.knockknockbackend.global.error.exception.ErrorCode;
 import io.github.depromeet.knockknockbackend.global.error.exception.KnockException;
+import io.github.depromeet.knockknockbackend.global.slack.SlackProvider;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,10 +19,14 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.util.ContentCachingRequestWrapper;
 
 @RestControllerAdvice
 @Slf4j
+@RequiredArgsConstructor
 public class GlobalExceptionHandler {
+
+    private final SlackProvider slackProvider;
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> methodArgumentNotValidExceptionHandler(
@@ -59,8 +66,10 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    protected ResponseEntity<ErrorResponse> handleException(
-            Exception e, HttpServletRequest request) {
+    protected ResponseEntity<ErrorResponse> handleException(Exception e, HttpServletRequest request)
+            throws IOException {
+        final ContentCachingRequestWrapper cachingRequest = (ContentCachingRequestWrapper) request;
+
         log.error("INTERNAL_SERVER_ERROR", e);
         ErrorCode internalServerError = ErrorCode.INTERNAL_SERVER_ERROR;
         ErrorResponse errorResponse =
@@ -69,6 +78,7 @@ public class GlobalExceptionHandler {
                         internalServerError.getCode(),
                         internalServerError.getReason(),
                         request.getRequestURL().toString());
+        slackProvider.sendError(cachingRequest, e);
         return ResponseEntity.status(HttpStatus.valueOf(internalServerError.getStatus()))
                 .body(errorResponse);
     }
