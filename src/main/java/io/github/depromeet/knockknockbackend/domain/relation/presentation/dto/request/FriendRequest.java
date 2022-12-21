@@ -7,7 +7,8 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class SendFriendRequest {
+public class FriendRequest {
 
     @NotNull private Long userId;
+
 }
