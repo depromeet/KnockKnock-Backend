@@ -11,10 +11,7 @@ import io.github.depromeet.knockknockbackend.domain.notification.domain.reposito
 import io.github.depromeet.knockknockbackend.domain.notification.domain.repository.NotificationRepository;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.repository.ReservationRepository;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.vo.NotificationReactionCountInfoVo;
-import io.github.depromeet.knockknockbackend.domain.notification.exception.FcmResponseException;
-import io.github.depromeet.knockknockbackend.domain.notification.exception.NotificationForbiddenException;
-import io.github.depromeet.knockknockbackend.domain.notification.exception.NotificationNotFoundException;
-import io.github.depromeet.knockknockbackend.domain.notification.exception.ReservationNotFoundException;
+import io.github.depromeet.knockknockbackend.domain.notification.exception.*;
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.request.*;
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.response.*;
 import io.github.depromeet.knockknockbackend.domain.reaction.domain.NotificationReaction;
@@ -246,6 +243,13 @@ public class NotificationService {
         reservationRepository.save(reservation);
     }
 
+    @Transactional
+    public void deleteReservation(Long reservationId) {
+        Reservation reservation = queryReservationById(reservationId);
+        validateDeletePermissionReservation(reservation);
+        reservationRepository.delete(reservation);
+    }
+
     private void logFcmMessagingException(BatchResponse batchResponse) {
         log.error(
                 "[**FCM notification sending Error] successCount : {}, failureCount : {} ",
@@ -319,5 +323,11 @@ public class NotificationService {
         return reservationRepository
                 .findById(reservationId)
                 .orElseThrow(() -> ReservationNotFoundException.EXCEPTION);
+    }
+
+    private void validateDeletePermissionReservation(Reservation reservation) {
+        if (!SecurityUtils.getCurrentUserId().equals(reservation.getSendUser().getId())) {
+            throw ReservationForbiddenException.EXCEPTION;
+        }
     }
 }

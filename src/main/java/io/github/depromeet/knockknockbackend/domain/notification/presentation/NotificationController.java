@@ -82,4 +82,11 @@ public class NotificationController {
     public void changeSendAtReservation(@RequestBody ChangeSendAtReservationRequest request) {
         notificationService.changeSendAtReservation(request);
     }
+
+    @Operation(summary = "예약 푸쉬알림 삭제")
+    @ResponseStatus(HttpStatus.OK)
+    @DeleteMapping("/reservation/{reservation_id}")
+    public void deleteReservation(@PathVariable("reservation_id") Long reservationId) {
+        notificationService.deleteReservation(reservationId);
+    }
 }

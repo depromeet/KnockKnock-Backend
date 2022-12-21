@@ -62,6 +62,10 @@ public enum ErrorCode {
 
     RESERVATION_NOT_FOUND(
             HttpStatus.NOT_FOUND.value(), "RESERVATION-404-1", "Reservation Not Found"),
+    RESERVATION_FORBIDDEN(
+            HttpStatus.FORBIDDEN.value(),
+            "RESERVATION-403-1",
+            "The user has no access to the reservation"),
 
     STORAGE_FORBIDDEN(
             HttpStatus.FORBIDDEN.value(), "STORAGE-403-1", "The user has no access to the storage"),
