@@ -17,9 +17,7 @@ public class UserUtilsImpl implements UserUtils {
 
     @Override
     public User getUserById(Long id) {
-        return userRepository
-                .findById(SecurityUtils.getCurrentUserId())
-                .orElseThrow(() -> UserNotFoundException.EXCEPTION);
+        return userRepository.findById(id).orElseThrow(() -> UserNotFoundException.EXCEPTION);
     }
 
     @Override

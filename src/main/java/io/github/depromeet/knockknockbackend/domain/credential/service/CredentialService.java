@@ -191,7 +191,7 @@ public class CredentialService {
     }
 
     private void validUserStatusNormal(User user) {
-        if(!AccountState.NORMAL.equals(user.getAccountState())){
+        if (!AccountState.NORMAL.equals(user.getAccountState())) {
             throw ForbiddenUserException.EXCEPTION;
         }
     }

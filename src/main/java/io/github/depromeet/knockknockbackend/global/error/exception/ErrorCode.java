@@ -80,7 +80,7 @@ public enum ErrorCode {
     THUMBNAIL_NOT_FOUND(404, "ASSET-404-3", "THUMBNAIL Not Found"),
     APP_VERSION_NOT_FOUND(404, "ASSET-404-4", "APP_VERSION Not Found"),
 
-    USER_CREDENTIAL_FORBIDDEN(403,"CREDENTIAL-403-1" , "user status is not normal");
+    USER_CREDENTIAL_FORBIDDEN(403, "CREDENTIAL-403-1", "user status is not normal");
 
     private int status;
     private String code;
