@@ -60,6 +60,13 @@ public enum ErrorCode {
     NOTIFICATION_FCM_FAIL_SEND(
             HttpStatus.INTERNAL_SERVER_ERROR.value(), "NOTIFICATION-500-1", "FCM ERROR"),
 
+    RESERVATION_NOT_FOUND(
+            HttpStatus.NOT_FOUND.value(), "RESERVATION-404-1", "Reservation Not Found"),
+    RESERVATION_FORBIDDEN(
+            HttpStatus.FORBIDDEN.value(),
+            "RESERVATION-403-1",
+            "The user has no access to the reservation"),
+
     STORAGE_FORBIDDEN(
             HttpStatus.FORBIDDEN.value(), "STORAGE-403-1", "The user has no access to the storage"),
     STORAGE_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "STORAGE-404-1", "Storage Not Found"),
@@ -71,7 +78,9 @@ public enum ErrorCode {
     PROFILE_IMAGE_NOT_FOUND(404, "ASSET-404-1", "PROFILE Not Found"),
     BACKGROUND_NOT_FOUND(404, "ASSET-404-2", "BACKGROUND Not Found"),
     THUMBNAIL_NOT_FOUND(404, "ASSET-404-3", "THUMBNAIL Not Found"),
-    APP_VERSION_NOT_FOUND(404, "ASSET-404-4", "APP_VERSION Not Found");
+    APP_VERSION_NOT_FOUND(404, "ASSET-404-4", "APP_VERSION Not Found"),
+
+    USER_CREDENTIAL_FORBIDDEN(403, "CREDENTIAL-403-1", "user status is not normal");
 
     private int status;
     private String code;

@@ -16,9 +16,11 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -135,6 +137,13 @@ public class CredentialController {
             @RequestParam("id_token") String token,
             @RequestParam("provider") OauthProvider oauthProvider) {
         return credentialService.loginUserByOCIDToken(token, oauthProvider);
+    }
+
+    @SecurityRequirement(name = "access-token")
+    @Operation(summary = "회원 탈퇴를 합니다. oauth 연결도 unlink 합니다. ")
+    @DeleteMapping("/me")
+    public void deleteUser(@RequestParam("oauth_access_token") String token) {
+        credentialService.deleteUser(token);
     }
 
     @Operation(summary = "토큰 리프레쉬", description = "토큰을 리프레쉬 합니다.")

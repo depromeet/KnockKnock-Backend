@@ -4,15 +4,18 @@ package io.github.depromeet.knockknockbackend.domain.credential.service;
 import io.github.depromeet.knockknockbackend.domain.credential.domain.RefreshTokenRedisEntity;
 import io.github.depromeet.knockknockbackend.domain.credential.domain.repository.RefreshTokenRedisEntityRepository;
 import io.github.depromeet.knockknockbackend.domain.credential.exception.AlreadySignUpUserException;
+import io.github.depromeet.knockknockbackend.domain.credential.exception.ForbiddenUserException;
 import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.request.RegisterRequest;
 import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.response.AfterOauthResponse;
 import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.response.AuthTokensResponse;
 import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.response.AvailableRegisterResponse;
+import io.github.depromeet.knockknockbackend.domain.user.domain.AccountState;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.domain.user.domain.repository.UserRepository;
 import io.github.depromeet.knockknockbackend.global.exception.InvalidTokenException;
 import io.github.depromeet.knockknockbackend.global.exception.UserNotFoundException;
 import io.github.depromeet.knockknockbackend.global.security.JwtTokenProvider;
+import io.github.depromeet.knockknockbackend.global.utils.user.UserUtils;
 import java.util.Date;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
@@ -29,6 +32,8 @@ public class CredentialService {
     private final JwtTokenProvider jwtTokenProvider;
 
     private final RefreshTokenRedisEntityRepository refreshTokenRedisEntityRepository;
+
+    private final UserUtils userUtils;
 
     public String getOauthLink(OauthProvider oauthProvider) {
         OauthStrategy oauthStrategy = oauthFactory.getOauthstrategy(oauthProvider);
@@ -63,7 +68,7 @@ public class CredentialService {
 
         Optional<String> nickname = Optional.ofNullable(user.getNickname());
 
-        String accessToken = jwtTokenProvider.generateAccessToken(userId);
+        String accessToken = jwtTokenProvider.generateAccessToken(userId, user.getAccountRole());
         String refreshToken = generateRefreshToken(userId);
 
         return AfterOauthResponse.builder()
@@ -103,7 +108,10 @@ public class CredentialService {
             throw InvalidTokenException.EXCEPTION;
         }
 
-        String accessToken = jwtTokenProvider.generateAccessToken(userId);
+        User user = userUtils.getUserById(userId);
+
+        validUserStatusNormal(user);
+        String accessToken = jwtTokenProvider.generateAccessToken(userId, user.getAccountRole());
         String refreshToken = generateRefreshToken(userId);
 
         return AuthTokensResponse.builder()
@@ -152,7 +160,8 @@ public class CredentialService {
                         .build();
         userRepository.save(newUser);
 
-        String accessToken = jwtTokenProvider.generateAccessToken(newUser.getId());
+        String accessToken =
+                jwtTokenProvider.generateAccessToken(newUser.getId(), newUser.getAccountRole());
         String refreshToken = generateRefreshToken(newUser.getId());
 
         return AuthTokensResponse.builder()
@@ -171,12 +180,36 @@ public class CredentialService {
                                 oidcDecodePayload.getSub(), oauthProvider.getValue())
                         .orElseThrow(() -> UserNotFoundException.EXCEPTION);
 
-        String accessToken = jwtTokenProvider.generateAccessToken(user.getId());
+        validUserStatusNormal(user);
+        String accessToken =
+                jwtTokenProvider.generateAccessToken(user.getId(), user.getAccountRole());
+
         String refreshToken = generateRefreshToken(user.getId());
 
         return AuthTokensResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
+    }
+
+    private void validUserStatusNormal(User user) {
+        if (!AccountState.NORMAL.equals(user.getAccountState())) {
+            throw ForbiddenUserException.EXCEPTION;
+        }
+    }
+
+    @Transactional
+    public void deleteUser(String oauthAccessToken) {
+        User user = userUtils.getUserFromSecurityContext();
+        OauthProvider provider = OauthProvider.valueOf(user.getOauthProvider().toUpperCase());
+        OauthStrategy oauthStrategy = oauthFactory.getOauthstrategy(provider);
+        OauthCommonUserInfoDto userInfo = oauthStrategy.getUserInfo(oauthAccessToken);
+        if (!userInfo.getOauthId().equals(user.getOauthId())) {
+            throw InvalidTokenException.EXCEPTION;
+        }
+
+        refreshTokenRedisEntityRepository.deleteById(user.getId().toString());
+        user.softDeleteUser();
+        oauthStrategy.unLink(oauthAccessToken);
     }
 }

@@ -5,6 +5,7 @@ import io.github.depromeet.knockknockbackend.domain.credential.service.OauthComm
 import io.github.depromeet.knockknockbackend.global.property.OauthProperties;
 import io.github.depromeet.knockknockbackend.global.utils.api.client.GoogleAuthClient;
 import io.github.depromeet.knockknockbackend.global.utils.api.client.GoogleInfoClient;
+import io.github.depromeet.knockknockbackend.global.utils.api.client.GoogleUnlinkClient;
 import io.github.depromeet.knockknockbackend.global.utils.api.dto.response.GoogleInformationResponse;
 import io.github.depromeet.knockknockbackend.global.utils.api.dto.response.OIDCPublicKeysResponse;
 import java.net.URLDecoder;
@@ -23,6 +24,7 @@ public class GoogleOauthStrategy implements OauthStrategy {
     private final OauthProperties oauthProperties;
     private final GoogleAuthClient googleAuthClient;
     private final GoogleInfoClient googleInfoClient;
+    private final GoogleUnlinkClient googleUnlinkClient;
 
     private final OauthOIDCProvider oauthOIDCProvider;
 
@@ -56,8 +58,14 @@ public class GoogleOauthStrategy implements OauthStrategy {
     public OIDCDecodePayload getOIDCDecodePayload(String token) {
         OIDCPublicKeysResponse oidcPublicKeysResponse = googleAuthClient.getGoogleOIDCOpenKeys();
         return oauthOIDCProvider.getPayloadFromIdToken(
-                token, ISSUER, oauthProperties.getGoogleClientId(), oidcPublicKeysResponse);
+                token, ISSUER, oauthProperties.getGoogleAppId(), oidcPublicKeysResponse);
     }
+
+    @Override
+    public void unLink(String oauthAccessToken) {
+        googleUnlinkClient.unlink(oauthAccessToken);
+    }
+
     // 발급된 어세스 토큰으로 유저정보 조회
     public OauthCommonUserInfoDto getUserInfo(String oauthAccessToken) {
 
