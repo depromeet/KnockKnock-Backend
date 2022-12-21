@@ -73,4 +73,9 @@ public class KakaoOauthStrategy implements OauthStrategy {
         return oauthOIDCProvider.getPayloadFromIdToken(
                 token, ISSUER, oauthProperties.getKakaoClientId(), oidcPublicKeysResponse);
     }
+
+    @Override
+    public void unLink(String oauthAccessToken) {
+        kakaoInfoClient.unlinkUser(PREFIX + oauthAccessToken);
+    }
 }
