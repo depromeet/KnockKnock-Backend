@@ -46,11 +46,13 @@ oauth:
     client-id: ${KAKAO_CLIENT}
     client-secret: ${KAKAO_SECRET}
     redirect-url: ${KAKAO_REDIRECT}
+    app-id : ${KAKAO_APP_ID}
   google:
     base-url: ${GOOGLE_BASE_URL}
     client-id: ${GOOGLE_CLIENT}
     client-secret: ${GOOGLE_SECRET}
     redirect-url: ${GOOGLE_REDIRECT}
+    app-id: ${GOOGLE_APP_ID}
 
 fcm:
   value: ${FCM_VALUE:empty}
