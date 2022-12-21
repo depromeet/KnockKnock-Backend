@@ -22,6 +22,6 @@ public class AuthDetailsService implements UserDetailsService {
                 userRepository
                         .findById(Long.valueOf(id))
                         .orElseThrow(() -> UserNotFoundException.EXCEPTION);
-        return new AuthDetails(user.getId().toString(), ""); // user.getRole()
+        return new AuthDetails(user.getId().toString(), user.getAccountRole().getValue());
     }
 }

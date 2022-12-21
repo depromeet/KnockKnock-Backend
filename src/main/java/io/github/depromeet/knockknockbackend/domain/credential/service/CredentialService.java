@@ -68,7 +68,7 @@ public class CredentialService {
 
         Optional<String> nickname = Optional.ofNullable(user.getNickname());
 
-        String accessToken = jwtTokenProvider.generateAccessToken(userId);
+        String accessToken = jwtTokenProvider.generateAccessToken(userId, user.getAccountRole());
         String refreshToken = generateRefreshToken(userId);
 
         return AfterOauthResponse.builder()
@@ -109,9 +109,9 @@ public class CredentialService {
         }
 
         User user = userUtils.getUserById(userId);
-        validUserStatusNormal(user);
 
-        String accessToken = jwtTokenProvider.generateAccessToken(userId);
+        validUserStatusNormal(user);
+        String accessToken = jwtTokenProvider.generateAccessToken(userId, user.getAccountRole());
         String refreshToken = generateRefreshToken(userId);
 
         return AuthTokensResponse.builder()
@@ -160,7 +160,8 @@ public class CredentialService {
                         .build();
         userRepository.save(newUser);
 
-        String accessToken = jwtTokenProvider.generateAccessToken(newUser.getId());
+        String accessToken =
+                jwtTokenProvider.generateAccessToken(newUser.getId(), newUser.getAccountRole());
         String refreshToken = generateRefreshToken(newUser.getId());
 
         return AuthTokensResponse.builder()
@@ -180,8 +181,9 @@ public class CredentialService {
                         .orElseThrow(() -> UserNotFoundException.EXCEPTION);
 
         validUserStatusNormal(user);
+        String accessToken =
+                jwtTokenProvider.generateAccessToken(user.getId(), user.getAccountRole());
 
-        String accessToken = jwtTokenProvider.generateAccessToken(user.getId());
         String refreshToken = generateRefreshToken(user.getId());
 
         return AuthTokensResponse.builder()
