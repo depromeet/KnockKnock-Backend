@@ -41,6 +41,9 @@ public class User {
     @Enumerated(EnumType.STRING)
     private AccountState accountState = AccountState.NORMAL;
 
+    @Enumerated(EnumType.STRING)
+    private AccountRole accountRole = AccountRole.USER;
+
     @Builder
     public User(
             Long id,
