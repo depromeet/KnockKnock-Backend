@@ -2,6 +2,7 @@ package io.github.depromeet.knockknockbackend.domain.storage.presentation;
 
 
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.response.QueryNotificationListInStorageResponse;
+import io.github.depromeet.knockknockbackend.domain.storage.presentation.dto.request.DeleteStorage;
 import io.github.depromeet.knockknockbackend.domain.storage.service.StorageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -11,14 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @SecurityRequirement(name = "access-token")
 @Tag(name = "보관함 관련 컨트롤러", description = "")
@@ -48,8 +42,8 @@ public class StorageController {
 
     @Operation(summary = "보관함에 저장한 푸쉬알림 삭제")
     @ResponseStatus(HttpStatus.OK)
-    @DeleteMapping("/{storage_id}")
-    public void deleteNotificationFromStorage(@PathVariable("storage_id") Long storageId) {
-        storageService.deleteNotificationFromStorage(storageId);
+    @DeleteMapping
+    public void deleteNotificationFromStorage(@RequestBody DeleteStorage request) {
+        storageService.deleteNotificationFromStorage(request);
     }
 }
