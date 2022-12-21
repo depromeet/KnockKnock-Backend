@@ -58,7 +58,7 @@ public class GoogleOauthStrategy implements OauthStrategy {
     public OIDCDecodePayload getOIDCDecodePayload(String token) {
         OIDCPublicKeysResponse oidcPublicKeysResponse = googleAuthClient.getGoogleOIDCOpenKeys();
         return oauthOIDCProvider.getPayloadFromIdToken(
-                token, ISSUER, oauthProperties.getGoogleClientId(), oidcPublicKeysResponse);
+                token, ISSUER, oauthProperties.getGoogleAppId(), oidcPublicKeysResponse);
     }
 
     @Override
