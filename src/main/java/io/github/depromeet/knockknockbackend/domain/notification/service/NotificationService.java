@@ -11,12 +11,8 @@ import io.github.depromeet.knockknockbackend.domain.notification.domain.reposito
 import io.github.depromeet.knockknockbackend.domain.notification.domain.repository.NotificationRepository;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.repository.ReservationRepository;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.vo.NotificationReactionCountInfoVo;
-import io.github.depromeet.knockknockbackend.domain.notification.exception.FcmResponseException;
-import io.github.depromeet.knockknockbackend.domain.notification.exception.NotificationForbiddenException;
-import io.github.depromeet.knockknockbackend.domain.notification.exception.NotificationNotFoundException;
-import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.request.RegisterFcmTokenRequest;
-import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.request.SendInstanceRequest;
-import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.request.SendInstanceToMeBeforeSignUpRequest;
+import io.github.depromeet.knockknockbackend.domain.notification.exception.*;
+import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.request.*;
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.response.*;
 import io.github.depromeet.knockknockbackend.domain.reaction.domain.NotificationReaction;
 import io.github.depromeet.knockknockbackend.domain.reaction.domain.repository.NotificationReactionRepository;
@@ -209,6 +205,19 @@ public class NotificationService {
         notificationRepository.save(notification);
     }
 
+    public void sendReservation(SendReservationRequest request) {
+        Long currentUserId = SecurityUtils.getCurrentUserId();
+
+        reservationRepository.save(
+                Reservation.of(
+                        request.getSendAt(),
+                        request.getTitle(),
+                        request.getContent(),
+                        request.getImageUrl(),
+                        Group.of(request.getGroupId()),
+                        User.of(currentUserId)));
+    }
+
     public void sendInstanceToMeBeforeSignUp(SendInstanceToMeBeforeSignUpRequest request) {
         Message message = makeMessageForFcm(request, request.getToken());
         try {
@@ -226,6 +235,19 @@ public class NotificationService {
         validateDeletePermission(notification);
         notification.deleteNotification();
         notificationRepository.save(notification);
+    }
+
+    public void changeSendAtReservation(ChangeSendAtReservationRequest request) {
+        Reservation reservation = queryReservationById(request.getReservationId());
+        reservation.changeSendAt(request.getSendAt());
+        reservationRepository.save(reservation);
+    }
+
+    @Transactional
+    public void deleteReservation(Long reservationId) {
+        Reservation reservation = queryReservationById(reservationId);
+        validateDeletePermissionReservation(reservation);
+        reservationRepository.delete(reservation);
     }
 
     private void logFcmMessagingException(BatchResponse batchResponse) {
@@ -295,5 +317,17 @@ public class NotificationService {
         return notificationRepository
                 .findById(notificationId)
                 .orElseThrow(() -> NotificationNotFoundException.EXCEPTION);
+    }
+
+    private Reservation queryReservationById(Long reservationId) {
+        return reservationRepository
+                .findById(reservationId)
+                .orElseThrow(() -> ReservationNotFoundException.EXCEPTION);
+    }
+
+    private void validateDeletePermissionReservation(Reservation reservation) {
+        if (!SecurityUtils.getCurrentUserId().equals(reservation.getSendUser().getId())) {
+            throw ReservationForbiddenException.EXCEPTION;
+        }
     }
 }

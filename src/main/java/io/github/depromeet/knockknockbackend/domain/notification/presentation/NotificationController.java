@@ -1,9 +1,7 @@
 package io.github.depromeet.knockknockbackend.domain.notification.presentation;
 
 
-import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.request.RegisterFcmTokenRequest;
-import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.request.SendInstanceRequest;
-import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.request.SendInstanceToMeBeforeSignUpRequest;
+import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.request.*;
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.response.QueryNotificationListLatestResponse;
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.response.QueryNotificationListResponse;
 import io.github.depromeet.knockknockbackend.domain.notification.service.NotificationService;
@@ -46,6 +44,13 @@ public class NotificationController {
         notificationService.sendInstance(request);
     }
 
+    @Operation(summary = "예약 푸쉬알림 발송")
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping("/reservation")
+    public void sendReservation(@RequestBody SendReservationRequest request) {
+        notificationService.sendReservation(request);
+    }
+
     @Operation(summary = "알림방 푸쉬알림 리스트")
     @GetMapping("/{group_id}")
     public QueryNotificationListResponse queryListByGroupId(
@@ -69,5 +74,19 @@ public class NotificationController {
     public void sendInstanceToMeBeforeSignUp(
             @RequestBody SendInstanceToMeBeforeSignUpRequest request) {
         notificationService.sendInstanceToMeBeforeSignUp(request);
+    }
+
+    @Operation(summary = "예약 푸쉬알림 시간수정")
+    @ResponseStatus(HttpStatus.OK)
+    @PatchMapping("/reservation")
+    public void changeSendAtReservation(@RequestBody ChangeSendAtReservationRequest request) {
+        notificationService.changeSendAtReservation(request);
+    }
+
+    @Operation(summary = "예약 푸쉬알림 삭제")
+    @ResponseStatus(HttpStatus.OK)
+    @DeleteMapping("/reservation/{reservation_id}")
+    public void deleteReservation(@PathVariable("reservation_id") Long reservationId) {
+        notificationService.deleteReservation(reservationId);
     }
 }
