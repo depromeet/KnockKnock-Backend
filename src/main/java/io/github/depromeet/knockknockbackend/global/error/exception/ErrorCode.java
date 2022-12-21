@@ -60,6 +60,9 @@ public enum ErrorCode {
     NOTIFICATION_FCM_FAIL_SEND(
             HttpStatus.INTERNAL_SERVER_ERROR.value(), "NOTIFICATION-500-1", "FCM ERROR"),
 
+    RESERVATION_NOT_FOUND(
+            HttpStatus.NOT_FOUND.value(), "RESERVATION-404-1", "Reservation Not Found"),
+
     STORAGE_FORBIDDEN(
             HttpStatus.FORBIDDEN.value(), "STORAGE-403-1", "The user has no access to the storage"),
     STORAGE_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "STORAGE-404-1", "Storage Not Found"),

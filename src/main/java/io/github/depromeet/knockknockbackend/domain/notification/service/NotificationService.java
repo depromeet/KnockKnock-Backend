@@ -14,10 +14,8 @@ import io.github.depromeet.knockknockbackend.domain.notification.domain.vo.Notif
 import io.github.depromeet.knockknockbackend.domain.notification.exception.FcmResponseException;
 import io.github.depromeet.knockknockbackend.domain.notification.exception.NotificationForbiddenException;
 import io.github.depromeet.knockknockbackend.domain.notification.exception.NotificationNotFoundException;
-import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.request.RegisterFcmTokenRequest;
-import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.request.SendInstanceRequest;
-import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.request.SendInstanceToMeBeforeSignUpRequest;
-import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.request.SendReservationRequest;
+import io.github.depromeet.knockknockbackend.domain.notification.exception.ReservationNotFoundException;
+import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.request.*;
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.response.*;
 import io.github.depromeet.knockknockbackend.domain.reaction.domain.NotificationReaction;
 import io.github.depromeet.knockknockbackend.domain.reaction.domain.repository.NotificationReactionRepository;
@@ -242,6 +240,12 @@ public class NotificationService {
         notificationRepository.save(notification);
     }
 
+    public void changeSendAtReservation(ChangeSendAtReservationRequest request) {
+        Reservation reservation = queryReservationById(request.getReservationId());
+        reservation.changeSendAt(request.getSendAt());
+        reservationRepository.save(reservation);
+    }
+
     private void logFcmMessagingException(BatchResponse batchResponse) {
         log.error(
                 "[**FCM notification sending Error] successCount : {}, failureCount : {} ",
@@ -309,5 +313,11 @@ public class NotificationService {
         return notificationRepository
                 .findById(notificationId)
                 .orElseThrow(() -> NotificationNotFoundException.EXCEPTION);
+    }
+
+    private Reservation queryReservationById(Long reservationId) {
+        return reservationRepository
+                .findById(reservationId)
+                .orElseThrow(() -> ReservationNotFoundException.EXCEPTION);
     }
 }

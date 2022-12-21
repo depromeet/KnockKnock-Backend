@@ -1,10 +1,7 @@
 package io.github.depromeet.knockknockbackend.domain.notification.presentation;
 
 
-import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.request.RegisterFcmTokenRequest;
-import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.request.SendInstanceRequest;
-import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.request.SendInstanceToMeBeforeSignUpRequest;
-import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.request.SendReservationRequest;
+import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.request.*;
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.response.QueryNotificationListLatestResponse;
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.response.QueryNotificationListResponse;
 import io.github.depromeet.knockknockbackend.domain.notification.service.NotificationService;
@@ -77,5 +74,12 @@ public class NotificationController {
     public void sendInstanceToMeBeforeSignUp(
             @RequestBody SendInstanceToMeBeforeSignUpRequest request) {
         notificationService.sendInstanceToMeBeforeSignUp(request);
+    }
+
+    @Operation(summary = "예약 푸쉬알림 시간수정")
+    @ResponseStatus(HttpStatus.OK)
+    @PatchMapping("/reservation")
+    public void changeSendAtReservation(@RequestBody ChangeSendAtReservationRequest request) {
+        notificationService.changeSendAtReservation(request);
     }
 }
