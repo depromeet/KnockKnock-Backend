@@ -1,8 +1,12 @@
 package io.github.depromeet.knockknockbackend.domain.user.domain;
 
 
+import io.github.depromeet.knockknockbackend.domain.credential.event.DeleteUserEvent;
 import io.github.depromeet.knockknockbackend.domain.user.domain.vo.UserInfoVO;
+import io.github.depromeet.knockknockbackend.global.event.Events;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -33,6 +37,9 @@ public class User {
     private String email;
 
     private String profilePath;
+
+    @Enumerated(EnumType.STRING)
+    private AccountState accountState = AccountState.NORMAL;
 
     @Builder
     public User(
@@ -65,5 +72,15 @@ public class User {
     public void changeProfile(String nickname, String profilePath) {
         this.nickname = nickname;
         this.profilePath = profilePath;
+    }
+
+    public void softDeleteUser() {
+        String deletedPrefix = "Deleted:";
+        this.nickname = "탈퇴한 유저";
+        this.oauthId = deletedPrefix + this.oauthId;
+        this.email = deletedPrefix + this.email;
+        this.accountState = AccountState.DELETED;
+        DeleteUserEvent deleteUserEvent = DeleteUserEvent.builder().userId(this.id).build();
+        Events.raise(deleteUserEvent);
     }
 }
