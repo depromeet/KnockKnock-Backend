@@ -1,7 +1,8 @@
 package io.github.depromeet.knockknockbackend.domain.alarm.presentation;
 
-import io.github.depromeet.knockknockbackend.domain.alarm.presentation.dto.response.QueryAlarmListResponse;
+
 import io.github.depromeet.knockknockbackend.domain.alarm.presentation.dto.response.QueryAlarmCountResponse;
+import io.github.depromeet.knockknockbackend.domain.alarm.presentation.dto.response.QueryAlarmListResponse;
 import io.github.depromeet.knockknockbackend.domain.alarm.service.AlarmService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,5 +25,4 @@ public class AlarmController {
     public QueryAlarmListResponse queryList() {
         return alarmService.queryList();
     }
-
 }

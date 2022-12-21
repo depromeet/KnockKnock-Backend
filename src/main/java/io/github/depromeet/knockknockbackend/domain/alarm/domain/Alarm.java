@@ -1,10 +1,9 @@
 package io.github.depromeet.knockknockbackend.domain.alarm.domain;
 
+
 import io.github.depromeet.knockknockbackend.domain.alarm.domain.types.AlarmType;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
-import lombok.Getter;
-import org.springframework.data.annotation.CreatedDate;
-
+import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -16,7 +15,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import java.time.LocalDateTime;
+import lombok.Getter;
+import org.springframework.data.annotation.CreatedDate;
 
 @Getter
 @Table(name = "tbl_alarm")
@@ -45,8 +45,7 @@ public class Alarm {
 
     private boolean isActivate;
 
-    @CreatedDate
-    private LocalDateTime createdAt;
+    @CreatedDate private LocalDateTime createdAt;
 
     public Long getSendUserId() {
         return this.sendUser.getId();
@@ -55,5 +54,4 @@ public class Alarm {
     public String getSendUserProfile() {
         return this.sendUser.getProfilePath();
     }
-
 }
