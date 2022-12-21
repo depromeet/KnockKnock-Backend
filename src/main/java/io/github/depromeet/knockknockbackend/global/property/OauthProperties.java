@@ -23,6 +23,7 @@ public class OauthProperties {
         private String clientId;
         private String clientSecret;
         private String redirectUrl;
+        private String appId;
     }
 
     public String getKakaoBaseUrl() {
@@ -41,6 +42,10 @@ public class OauthProperties {
         return kakao.getClientSecret();
     }
 
+    public String getKakaoAppId() {
+        return kakao.getAppId();
+    }
+
     public String getGoogleBaseUrl() {
         return google.getBaseUrl();
     }
@@ -55,5 +60,9 @@ public class OauthProperties {
 
     public String getGoogleClientSecret() {
         return google.getClientSecret();
+    }
+
+    public String getGoogleAppId() {
+        return google.getAppId();
     }
 }
