@@ -96,13 +96,11 @@ public class RelationService implements UserRelationService {
             throw AlreadyFriendException.EXCEPTION;
         }
 
-        if (relationRepository
+        relationRepository
                 .findRelationBySendUserIdAndReceiveUserId(
                         SecurityUtils.getCurrentUserId(),
                         request.getUserId()
-                ).isEmpty()) {
-            throw FriendRequestNotFoundException.EXCEPTION;
-        }
+                ).orElseThrow(() -> FriendRequestNotFoundException.EXCEPTION);
 
         Relation relation = relationRepository
                 .findRelationBySendUserIdAndReceiveUserId(
