@@ -3,8 +3,10 @@ package io.github.depromeet.knockknockbackend.domain.relation.service;
 
 import io.github.depromeet.knockknockbackend.domain.relation.domain.Relation;
 import io.github.depromeet.knockknockbackend.domain.relation.domain.repository.RelationRepository;
+import io.github.depromeet.knockknockbackend.domain.relation.exception.AlreadyFriendException;
 import io.github.depromeet.knockknockbackend.domain.relation.exception.AlreadySendRequestException;
-import io.github.depromeet.knockknockbackend.domain.relation.presentation.dto.request.SendFriendRequest;
+import io.github.depromeet.knockknockbackend.domain.relation.exception.FriendRequestNotFoundException;
+import io.github.depromeet.knockknockbackend.domain.relation.presentation.dto.request.FriendRequest;
 import io.github.depromeet.knockknockbackend.domain.relation.presentation.dto.response.QueryFriendListResponse;
 import io.github.depromeet.knockknockbackend.domain.relation.presentation.dto.response.QueryFriendListResponseElement;
 import io.github.depromeet.knockknockbackend.domain.user.UserRelationService;
@@ -46,7 +48,7 @@ public class RelationService implements UserRelationService {
         return new QueryFriendListResponse(result);
     }
 
-    public HttpStatus sendFriendRequest(SendFriendRequest request) {
+    public HttpStatus sendFriendRequest(FriendRequest request) {
         if (relationRepository
                 .findRelationBySendUserIdAndReceiveUserId(
                         SecurityUtils.getCurrentUserId(), request.getUserId())
@@ -75,7 +77,35 @@ public class RelationService implements UserRelationService {
         return HttpStatus.CREATED;
     }
 
+    public void acceptRequest(FriendRequest request) {
+        updateIsFriendWithValidate(request, true);
+    }
+
+    public void refuseRequest(FriendRequest request) {
+        updateIsFriendWithValidate(request, false);
+    }
+
     public boolean getIsFriend(Long userId) {
         return relationRepository.isFriend(SecurityUtils.getCurrentUserId(), userId);
+    }
+
+    private void updateIsFriendWithValidate(FriendRequest request, boolean isFriend) {
+        if (!getIsFriend(request.getUserId())) {
+            throw AlreadyFriendException.EXCEPTION;
+        }
+
+        relationRepository
+                .findRelationBySendUserIdAndReceiveUserId(
+                        SecurityUtils.getCurrentUserId(), request.getUserId())
+                .orElseThrow(() -> FriendRequestNotFoundException.EXCEPTION);
+
+        Relation relation =
+                relationRepository
+                        .findRelationBySendUserIdAndReceiveUserId(
+                                SecurityUtils.getCurrentUserId(), request.getUserId())
+                        .get();
+
+        relation.updateFriend(isFriend);
+        relationRepository.save(relation);
     }
 }

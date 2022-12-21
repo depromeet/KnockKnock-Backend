@@ -24,6 +24,8 @@ public enum ErrorCode {
     ALREADY_SIGNUP_USER(400, "CREDENTIAL-400-1", "user is already signup"),
 
     ALREADY_SEND_REQUEST(400, "RELATION-400-1", "Already Send Request."),
+    ALREADY_FRIEND_REQUEST(400, "RELATION-400-1", "Already Friend Request."),
+    FRIEND_REQUEST_NOT_FOUND(404, "RELATION-404-1", "Friend Request Not Found."),
 
     OPTION_NOT_FOUND(404, "OPTION-404-1", "Option Not Found."),
 
