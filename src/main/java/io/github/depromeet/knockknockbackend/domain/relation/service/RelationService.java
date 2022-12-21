@@ -12,12 +12,11 @@ import io.github.depromeet.knockknockbackend.domain.relation.presentation.dto.re
 import io.github.depromeet.knockknockbackend.domain.user.UserRelationService;
 import io.github.depromeet.knockknockbackend.global.utils.security.SecurityUtils;
 import io.github.depromeet.knockknockbackend.global.utils.user.UserUtils;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -86,7 +85,6 @@ public class RelationService implements UserRelationService {
         updateIsFriendWithValidate(request, false);
     }
 
-
     public boolean getIsFriend(Long userId) {
         return relationRepository.isFriend(SecurityUtils.getCurrentUserId(), userId);
     }
@@ -98,18 +96,16 @@ public class RelationService implements UserRelationService {
 
         relationRepository
                 .findRelationBySendUserIdAndReceiveUserId(
-                        SecurityUtils.getCurrentUserId(),
-                        request.getUserId()
-                ).orElseThrow(() -> FriendRequestNotFoundException.EXCEPTION);
+                        SecurityUtils.getCurrentUserId(), request.getUserId())
+                .orElseThrow(() -> FriendRequestNotFoundException.EXCEPTION);
 
-        Relation relation = relationRepository
-                .findRelationBySendUserIdAndReceiveUserId(
-                        SecurityUtils.getCurrentUserId(),
-                        request.getUserId()
-                ).get();
+        Relation relation =
+                relationRepository
+                        .findRelationBySendUserIdAndReceiveUserId(
+                                SecurityUtils.getCurrentUserId(), request.getUserId())
+                        .get();
 
         relation.updateFriend(isFriend);
         relationRepository.save(relation);
     }
-
 }

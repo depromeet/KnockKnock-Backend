@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.domain.relation.exception;
 
+
 import io.github.depromeet.knockknockbackend.global.error.exception.ErrorCode;
 import io.github.depromeet.knockknockbackend.global.error.exception.KnockException;
 
@@ -10,5 +11,4 @@ public class FriendRequestNotFoundException extends KnockException {
     private FriendRequestNotFoundException() {
         super(ErrorCode.FRIEND_REQUEST_NOT_FOUND);
     }
-
 }

@@ -10,5 +10,4 @@ import lombok.NoArgsConstructor;
 public class FriendRequest {
 
     @NotNull private Long userId;
-
 }

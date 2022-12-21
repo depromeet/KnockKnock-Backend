@@ -52,5 +52,4 @@ public class RelationController {
     public void refuseRequest(@RequestBody @Valid FriendRequest request) {
         relationService.refuseRequest(request);
     }
-
 }
