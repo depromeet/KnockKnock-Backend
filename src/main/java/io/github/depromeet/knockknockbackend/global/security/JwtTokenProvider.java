@@ -1,10 +1,11 @@
 package io.github.depromeet.knockknockbackend.global.security;
 
 
+import io.github.depromeet.knockknockbackend.domain.user.domain.AccountRole;
 import io.github.depromeet.knockknockbackend.global.exception.ExpiredTokenException;
 import io.github.depromeet.knockknockbackend.global.exception.InvalidTokenException;
 import io.github.depromeet.knockknockbackend.global.property.JwtProperties;
-import io.github.depromeet.knockknockbackend.global.security.auth.AuthDetailsService;
+import io.github.depromeet.knockknockbackend.global.security.auth.AuthDetails;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
@@ -25,7 +26,13 @@ import org.springframework.stereotype.Component;
 public class JwtTokenProvider {
 
     private final JwtProperties jwtProperties;
-    private final AuthDetailsService authDetailsService;
+    private final String ACCESS_TOKEN = "access_token";
+    private final String REFRESH_TOKEN = "refresh_token";
+
+    private final String ROLE = "role";
+    private final String TYPE = "type";
+
+    private final String ISSUER = "knockknock";
 
     public String resolveToken(HttpServletRequest request) {
         String rawHeader = request.getHeader(jwtProperties.getHeader());
@@ -40,7 +47,8 @@ public class JwtTokenProvider {
 
     public Authentication getAuthentication(String token) {
         String id = getJws(token).getBody().getSubject();
-        UserDetails userDetails = authDetailsService.loadUserByUsername(id);
+        String role = (String) getJws(token).getBody().get(ROLE);
+        UserDetails userDetails = new AuthDetails(id, role);
         return new UsernamePasswordAuthenticationToken(
                 userDetails, "", userDetails.getAuthorities());
     }
@@ -59,40 +67,53 @@ public class JwtTokenProvider {
         return Keys.hmacShaKeyFor(jwtProperties.getSecretKey().getBytes(StandardCharsets.UTF_8));
     }
 
-    private String buildToken(
-            Long id, Date issuedAt, Date accessTokenExpiresIn, String claimValue) {
+    private String buildAccessToken(
+            Long id, Date issuedAt, Date accessTokenExpiresIn, AccountRole accountRole) {
         final Key encodedKey = getSecretKey();
         return Jwts.builder()
-                .setIssuer("knockknock")
+                .setIssuer(ISSUER)
                 .setIssuedAt(issuedAt)
                 .setSubject(id.toString())
-                .claim("type", claimValue)
+                .claim(TYPE, ACCESS_TOKEN)
+                .claim(ROLE, accountRole.getValue())
                 .setExpiration(accessTokenExpiresIn)
                 .signWith(encodedKey)
                 .compact();
     }
 
-    public String generateAccessToken(Long id) {
+    private String buildRefreshToken(Long id, Date issuedAt, Date accessTokenExpiresIn) {
+        final Key encodedKey = getSecretKey();
+        return Jwts.builder()
+                .setIssuer(ISSUER)
+                .setIssuedAt(issuedAt)
+                .setSubject(id.toString())
+                .claim(TYPE, REFRESH_TOKEN)
+                .setExpiration(accessTokenExpiresIn)
+                .signWith(encodedKey)
+                .compact();
+    }
+
+    public String generateAccessToken(Long id, AccountRole accountRole) {
         final Date issuedAt = new Date();
         final Date accessTokenExpiresIn =
                 new Date(issuedAt.getTime() + jwtProperties.getAccessExp() * 1000);
 
-        return buildToken(id, issuedAt, accessTokenExpiresIn, "access_token");
+        return buildAccessToken(id, issuedAt, accessTokenExpiresIn, accountRole);
     }
 
     public String generateRefreshToken(Long id) {
         final Date issuedAt = new Date();
         final Date refreshTokenExpiresIn =
                 new Date(issuedAt.getTime() + jwtProperties.getAccessExp() * 1000);
-        return buildToken(id, issuedAt, refreshTokenExpiresIn, "refresh_token");
+        return buildRefreshToken(id, issuedAt, refreshTokenExpiresIn);
     }
 
     public boolean isAccessToken(String token) {
-        return getJws(token).getBody().get("type").equals("access_token");
+        return getJws(token).getBody().get(TYPE).equals(ACCESS_TOKEN);
     }
 
     public boolean isRefreshToken(String token) {
-        return getJws(token).getBody().get("type").equals("refresh_token");
+        return getJws(token).getBody().get(TYPE).equals(REFRESH_TOKEN);
     }
 
     public Long parseAccessToken(String token) {
