@@ -4,6 +4,7 @@ package io.github.depromeet.knockknockbackend.domain.notification.presentation;
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.request.RegisterFcmTokenRequest;
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.request.SendInstanceRequest;
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.request.SendInstanceToMeBeforeSignUpRequest;
+import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.request.SendReservationRequest;
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.response.QueryNotificationListLatestResponse;
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.response.QueryNotificationListResponse;
 import io.github.depromeet.knockknockbackend.domain.notification.service.NotificationService;
@@ -44,6 +45,13 @@ public class NotificationController {
     @PostMapping
     public void sendInstance(@RequestBody SendInstanceRequest request) {
         notificationService.sendInstance(request);
+    }
+
+    @Operation(summary = "예약 푸쉬알림 발송")
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping("/reservation")
+    public void sendReservation(@RequestBody SendReservationRequest request) {
+        notificationService.sendReservation(request);
     }
 
     @Operation(summary = "알림방 푸쉬알림 리스트")

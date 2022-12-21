@@ -35,4 +35,21 @@ public class Reservation extends BaseTimeEntity {
     @JoinColumn(name = "send_user_id")
     @OneToOne(fetch = FetchType.LAZY)
     private User sendUser;
+
+    public static Reservation of(
+            LocalDateTime sendAt,
+            String title,
+            String content,
+            String imageUrl,
+            Group group,
+            User sendUser) {
+        return Reservation.builder()
+                .sendAt(sendAt)
+                .title(title)
+                .content(content)
+                .imageUrl(imageUrl)
+                .group(group)
+                .sendUser(sendUser)
+                .build();
+    }
 }

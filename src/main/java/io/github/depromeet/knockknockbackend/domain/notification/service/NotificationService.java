@@ -17,6 +17,7 @@ import io.github.depromeet.knockknockbackend.domain.notification.exception.Notif
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.request.RegisterFcmTokenRequest;
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.request.SendInstanceRequest;
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.request.SendInstanceToMeBeforeSignUpRequest;
+import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.request.SendReservationRequest;
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.response.*;
 import io.github.depromeet.knockknockbackend.domain.reaction.domain.NotificationReaction;
 import io.github.depromeet.knockknockbackend.domain.reaction.domain.repository.NotificationReactionRepository;
@@ -207,6 +208,19 @@ public class NotificationService {
                                                 deviceToken.getToken()))
                         .collect(Collectors.toList()));
         notificationRepository.save(notification);
+    }
+
+    public void sendReservation(SendReservationRequest request) {
+        Long currentUserId = SecurityUtils.getCurrentUserId();
+
+        reservationRepository.save(
+                Reservation.of(
+                        request.getSendAt(),
+                        request.getTitle(),
+                        request.getContent(),
+                        request.getImageUrl(),
+                        Group.of(request.getGroupId()),
+                        User.of(currentUserId)));
     }
 
     public void sendInstanceToMeBeforeSignUp(SendInstanceToMeBeforeSignUpRequest request) {
