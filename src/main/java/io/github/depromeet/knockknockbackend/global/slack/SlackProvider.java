@@ -34,10 +34,9 @@ public class SlackProvider {
     private final int MaxLength = 500;
 
     @Async
-    public void sendError(ContentCachingRequestWrapper cachingRequest, Exception e)
+    public void sendError(String url, ContentCachingRequestWrapper cachingRequest, Exception e)
             throws IOException {
         String method = cachingRequest.getMethod();
-        String url = cachingRequest.getRequestURL().toString();
         String body = objectMapper.readTree(cachingRequest.getContentAsByteArray()).toString();
         String exceptionAsString = Throwables.getStackTraceAsString(e);
         int cutLength = Math.min(exceptionAsString.length(), MaxLength);
