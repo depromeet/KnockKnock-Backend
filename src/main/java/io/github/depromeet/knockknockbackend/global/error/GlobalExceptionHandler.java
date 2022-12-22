@@ -15,11 +15,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.util.ContentCachingRequestWrapper;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @RestControllerAdvice
 @Slf4j
@@ -69,6 +71,10 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<ErrorResponse> handleException(Exception e, HttpServletRequest request)
             throws IOException {
         final ContentCachingRequestWrapper cachingRequest = (ContentCachingRequestWrapper) request;
+        String url =
+                UriComponentsBuilder.fromHttpRequest(new ServletServerHttpRequest(request))
+                        .build()
+                        .toUriString();
 
         log.error("INTERNAL_SERVER_ERROR", e);
         ErrorCode internalServerError = ErrorCode.INTERNAL_SERVER_ERROR;
@@ -77,8 +83,8 @@ public class GlobalExceptionHandler {
                         internalServerError.getStatus(),
                         internalServerError.getCode(),
                         internalServerError.getReason(),
-                        request.getRequestURL().toString());
-        slackProvider.sendError(cachingRequest, e);
+                        url);
+        slackProvider.sendError(url, cachingRequest, e);
         return ResponseEntity.status(HttpStatus.valueOf(internalServerError.getStatus()))
                 .body(errorResponse);
     }
