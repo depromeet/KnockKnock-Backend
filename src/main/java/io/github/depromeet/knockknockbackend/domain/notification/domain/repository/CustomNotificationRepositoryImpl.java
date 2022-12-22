@@ -73,6 +73,7 @@ public class CustomNotificationRepositoryImpl implements CustomNotificationRepos
                 .on(groupUser.user.id.eq(option.userId))
                 .where(
                         groupUser.group.id.eq(groupId),
+                        deviceToken.user.id.ne(userId),
                         option.newOption.eq(true),
                         eqNightOption(nightOption),
                         JPAExpressions.selectFrom(blockUser)
