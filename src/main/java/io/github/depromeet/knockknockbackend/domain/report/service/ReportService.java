@@ -18,13 +18,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
-@Transactional
+@Transactional(readOnly = true)
 public class ReportService implements ReportUtils {
     private final ReportRepository reportRepository;
 
     private final UserUtils userUtils;
     private final NotificationUtils notificationUtils;
 
+    @Transactional
     public ReportNotificationResponse createReport(
             Long notificationId, ReportNotificationRequest reportRequest) {
         Notification notification = notificationUtils.queryNotificationById(notificationId);

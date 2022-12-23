@@ -17,7 +17,7 @@ public class ReportNotificationResponse {
 
     public static ReportNotificationResponse from(Report report) {
         return new ReportNotificationResponse(
-                report.getNotificationId(),
+                report.getId(),
                 report.getNotificationId(),
                 report.getReportReason(),
                 report.getDescription(),
