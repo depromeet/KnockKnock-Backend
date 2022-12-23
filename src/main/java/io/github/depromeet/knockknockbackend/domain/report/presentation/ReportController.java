@@ -25,7 +25,7 @@ public class ReportController {
 
     private final ReportService reportService;
 
-    @Operation(summary = "알림 신고하기")
+    @Operation(summary = "알림 신고하기", description = "신고타입이 OTHER 일경우, description 을 적어서 보내주세요!")
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/notifications/{notification_id}")
     public ReportNotificationResponse reportNotification(
