@@ -5,11 +5,13 @@ import io.github.depromeet.knockknockbackend.domain.group.domain.Group;
 import io.github.depromeet.knockknockbackend.domain.reaction.domain.NotificationReaction;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.global.database.BaseTimeEntity;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -61,10 +63,20 @@ public class Notification extends BaseTimeEntity {
     @OneToMany(mappedBy = "notification", fetch = FetchType.LAZY)
     private Set<NotificationReaction> notificationReactions = new HashSet<>();
 
+    private LocalDateTime reservedAt;
+
     private boolean deleted;
 
-    public void addReceivers(List<NotificationReceiver> receivers) {
-        this.receivers.addAll(receivers);
+    private void addReceivers(List<DeviceToken> deviceTokens) {
+        this.receivers.addAll(
+                deviceTokens.stream()
+                        .map(
+                                deviceToken ->
+                                        new NotificationReceiver(
+                                                this,
+                                                User.of(deviceToken.getUserId()),
+                                                deviceToken.getToken()))
+                        .collect(Collectors.toList()));
     }
 
     public void deleteNotification() {
@@ -75,15 +87,25 @@ public class Notification extends BaseTimeEntity {
         return Notification.builder().id(notificationId).build();
     }
 
-    public static Notification of(
-            String title, String content, String imageUrl, Group group, User sendUser) {
-        return Notification.builder()
-                .title(title)
-                .content(content)
-                .imageUrl(imageUrl)
-                .group(group)
-                .sendUser(sendUser)
-                .build();
+    public static Notification makeNotificationWithReceivers(
+            List<DeviceToken> deviceTokens,
+            String title,
+            String content,
+            String imageUrl,
+            Group group,
+            User sendUser,
+            LocalDateTime reservedAt) {
+        Notification notification =
+                Notification.builder()
+                        .title(title)
+                        .content(content)
+                        .imageUrl(imageUrl)
+                        .group(group)
+                        .sendUser(sendUser)
+                        .reservedAt(reservedAt)
+                        .build();
+        notification.addReceivers(deviceTokens);
+        return notification;
     }
 
     @Override
