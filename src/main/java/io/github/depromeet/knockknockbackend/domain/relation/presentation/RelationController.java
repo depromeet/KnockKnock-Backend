@@ -11,6 +11,7 @@ import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -48,7 +49,7 @@ public class RelationController {
 
     @Operation(summary = "친구 요청을 거절하는 Api입니다. - 메인 알림")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PostMapping("/requests")
+    @DeleteMapping("/requests")
     public void refuseRequest(@RequestBody @Valid FriendRequest request) {
         relationService.refuseRequest(request);
     }
