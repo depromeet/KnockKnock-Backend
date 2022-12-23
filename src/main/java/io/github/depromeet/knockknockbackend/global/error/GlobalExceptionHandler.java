@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.ServletServerHttpRequest;
@@ -20,16 +21,34 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.ServletWebRequest;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @RestControllerAdvice
 @Slf4j
 @RequiredArgsConstructor
-public class GlobalExceptionHandler {
+public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     private final SlackProvider slackProvider;
 
+    @Override
+    protected ResponseEntity<Object> handleExceptionInternal(
+        Exception ex, Object body, HttpHeaders headers, HttpStatus status, WebRequest request) {
+        ServletWebRequest servletWebRequest = (ServletWebRequest) request;
+
+        String url =
+            UriComponentsBuilder.fromHttpRequest(
+                    new ServletServerHttpRequest(servletWebRequest.getRequest()))
+                .build()
+                .toUriString();
+
+        ErrorResponse errorResponse =
+            new ErrorResponse(status.value(), status.name(), ex.getMessage(), url);
+        return super.handleExceptionInternal(ex, errorResponse, headers, status, request);
+    }
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> methodArgumentNotValidExceptionHandler(
             MethodArgumentNotValidException e, HttpServletRequest request)
