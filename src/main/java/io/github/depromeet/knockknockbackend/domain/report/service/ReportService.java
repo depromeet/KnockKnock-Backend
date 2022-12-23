@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Service
 @Transactional
-public class ReportService {
+public class ReportService implements ReportUtils {
     private final ReportRepository reportRepository;
 
     private final UserUtils userUtils;
