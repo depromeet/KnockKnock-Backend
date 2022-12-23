@@ -2,6 +2,7 @@ package io.github.depromeet.knockknockbackend.domain.user.domain;
 
 
 import io.github.depromeet.knockknockbackend.domain.credential.event.DeleteUserEvent;
+import io.github.depromeet.knockknockbackend.domain.credential.event.LogoutUserEvent;
 import io.github.depromeet.knockknockbackend.domain.user.domain.vo.UserInfoVO;
 import io.github.depromeet.knockknockbackend.global.event.Events;
 import javax.persistence.Entity;
@@ -85,5 +86,10 @@ public class User {
         this.accountState = AccountState.DELETED;
         DeleteUserEvent deleteUserEvent = DeleteUserEvent.builder().userId(this.id).build();
         Events.raise(deleteUserEvent);
+    }
+
+    public void logout() {
+        LogoutUserEvent logoutUserEvent = LogoutUserEvent.builder().userId(this.id).build();
+        Events.raise(logoutUserEvent);
     }
 }
