@@ -83,7 +83,8 @@ public enum ErrorCode {
     APP_VERSION_NOT_FOUND(404, "ASSET-404-4", "APP_VERSION Not Found"),
 
     USER_CREDENTIAL_FORBIDDEN(403, "CREDENTIAL-403-1", "user status is not normal"),
-    CANNOT_REPORT_ME(400, "REPORT-400-1", "cannot report me");
+    CANNOT_REPORT_ME(400, "REPORT-400-1", "cannot report me"),
+    REPORT_NOT_FOUND(404, "REPORT-404-1", "REPORT_NOT_FOUND");
 
     private int status;
     private String code;

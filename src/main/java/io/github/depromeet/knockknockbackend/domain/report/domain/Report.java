@@ -2,8 +2,10 @@ package io.github.depromeet.knockknockbackend.domain.report.domain;
 
 
 import io.github.depromeet.knockknockbackend.domain.notification.domain.Notification;
+import io.github.depromeet.knockknockbackend.domain.report.event.NewReportEvent;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.global.database.BaseTimeEntity;
+import io.github.depromeet.knockknockbackend.global.event.Events;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -11,6 +13,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
+import javax.persistence.PostPersist;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import lombok.AccessLevel;
@@ -73,5 +76,12 @@ public class Report extends BaseTimeEntity {
                 .notificationId(notification.getId())
                 .imageUrl(notification.getImageUrl())
                 .build();
+    }
+
+    @PostPersist
+    private void newReportEvent() {
+
+        NewReportEvent newReportEvent = new NewReportEvent(this.id);
+        Events.raise(newReportEvent);
     }
 }

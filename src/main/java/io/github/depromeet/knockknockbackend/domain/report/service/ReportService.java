@@ -7,9 +7,11 @@ import io.github.depromeet.knockknockbackend.domain.report.domain.Report;
 import io.github.depromeet.knockknockbackend.domain.report.domain.ReportReason;
 import io.github.depromeet.knockknockbackend.domain.report.domain.repository.ReportRepository;
 import io.github.depromeet.knockknockbackend.domain.report.exception.CannotReportMeException;
+import io.github.depromeet.knockknockbackend.domain.report.exception.ReportNotFoundException;
 import io.github.depromeet.knockknockbackend.domain.report.presentation.dto.request.ReportNotificationRequest;
 import io.github.depromeet.knockknockbackend.domain.report.presentation.dto.response.ReportNotificationResponse;
-import io.github.depromeet.knockknockbackend.global.utils.security.SecurityUtils;
+import io.github.depromeet.knockknockbackend.domain.user.domain.User;
+import io.github.depromeet.knockknockbackend.global.utils.user.UserUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,12 +21,15 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class ReportService {
     private final ReportRepository reportRepository;
+
+    private final UserUtils userUtils;
     private final NotificationUtils notificationUtils;
 
     public ReportNotificationResponse createReport(
             Long notificationId, ReportNotificationRequest reportRequest) {
         Notification notification = notificationUtils.queryNotificationById(notificationId);
-        Long reporterId = SecurityUtils.getCurrentUserId();
+        User reporter = userUtils.getUserFromSecurityContext();
+        Long reporterId = reporter.getId();
 
         if (notification.getSendUser().getId().equals(reporterId)) {
             throw CannotReportMeException.EXCEPTION;
@@ -57,5 +62,11 @@ public class ReportService {
             description = reportRequest.getDescription();
         }
         return description;
+    }
+
+    public Report queryReport(Long reportId) {
+        return reportRepository
+                .findById(reportId)
+                .orElseThrow(() -> ReportNotFoundException.EXCEPTION);
     }
 }
