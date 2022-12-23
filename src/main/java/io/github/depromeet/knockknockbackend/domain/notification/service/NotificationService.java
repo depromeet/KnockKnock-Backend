@@ -67,13 +67,14 @@ public class NotificationService {
                 notificationRepository.findAllByGroupIdAndDeleted(
                         groupId, CREATED_DELETED_STATUS, pageable);
 
-        Optional<GroupBriefInfoDto> groupBriefInfoDto =
+        GroupBriefInfoDto groupBriefInfoDto =
                 notifications.stream()
                         .findFirst()
                         .map(
                                 notification ->
                                         new GroupBriefInfoDto(
-                                                notification.getGroup().getGroupBaseInfoVo()));
+                                                notification.getGroup().getGroupBaseInfoVo()))
+                        .orElse(null);
 
         List<NotificationReaction> myNotificationReactions =
                 retrieveMyReactions(notifications.getContent());
@@ -100,7 +101,7 @@ public class NotificationService {
                         .collect(Collectors.toList());
 
         return new QueryNotificationListResponse(
-                groupBriefInfoDto.orElse(null),
+                groupBriefInfoDto,
                 queryReservationListResponseElements,
                 queryNotificationListResponseElements);
     }
