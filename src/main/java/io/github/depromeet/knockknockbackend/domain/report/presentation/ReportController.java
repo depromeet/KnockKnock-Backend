@@ -1,6 +1,7 @@
 package io.github.depromeet.knockknockbackend.domain.report.presentation;
 
 import io.github.depromeet.knockknockbackend.domain.report.presentation.dto.request.ReportNotificationRequest;
+import io.github.depromeet.knockknockbackend.domain.report.service.ReportService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
