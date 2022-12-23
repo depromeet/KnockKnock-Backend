@@ -212,4 +212,10 @@ public class CredentialService {
         user.softDeleteUser();
         oauthStrategy.unLink(oauthAccessToken);
     }
+
+    public void logoutUser() {
+        User user = userUtils.getUserFromSecurityContext();
+        refreshTokenRedisEntityRepository.deleteById(user.getId().toString());
+        user.logout();
+    }
 }
