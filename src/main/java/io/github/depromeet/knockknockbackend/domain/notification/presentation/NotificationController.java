@@ -5,6 +5,7 @@ import io.github.depromeet.knockknockbackend.domain.notification.presentation.dt
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.response.QueryNotificationListLatestResponse;
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.response.QueryNotificationListResponse;
 import io.github.depromeet.knockknockbackend.domain.notification.service.NotificationService;
+import io.github.depromeet.knockknockbackend.domain.notification.service.ReservationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 public class NotificationController {
 
     private final NotificationService notificationService;
+    private final ReservationService reservationService;
 
     @Operation(summary = "최신 푸쉬알림 리스트")
     @GetMapping
@@ -42,13 +44,6 @@ public class NotificationController {
     @PostMapping
     public void sendInstance(@RequestBody SendInstanceRequest request) {
         notificationService.sendInstance(request);
-    }
-
-    @Operation(summary = "예약 푸쉬알림 발송")
-    @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping("/reservation")
-    public void sendReservation(@RequestBody SendReservationRequest request) {
-        notificationService.sendReservation(request);
     }
 
     @Operation(summary = "알림방 푸쉬알림 리스트")
@@ -76,17 +71,24 @@ public class NotificationController {
         notificationService.sendInstanceToMeBeforeSignUp(request);
     }
 
+    @Operation(summary = "예약 푸쉬알림 발송")
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping("/reservation")
+    public void sendReservation(@RequestBody SendReservationRequest request) {
+        reservationService.sendReservation(request);
+    }
+
     @Operation(summary = "예약 푸쉬알림 시간수정")
     @ResponseStatus(HttpStatus.OK)
     @PatchMapping("/reservation")
     public void changeSendAtReservation(@RequestBody ChangeSendAtReservationRequest request) {
-        notificationService.changeSendAtReservation(request);
+        reservationService.changeSendAtReservation(request);
     }
 
     @Operation(summary = "예약 푸쉬알림 삭제")
     @ResponseStatus(HttpStatus.OK)
     @DeleteMapping("/reservation/{reservation_id}")
     public void deleteReservation(@PathVariable("reservation_id") Long reservationId) {
-        notificationService.deleteReservation(reservationId);
+        reservationService.deleteReservation(reservationId);
     }
 }

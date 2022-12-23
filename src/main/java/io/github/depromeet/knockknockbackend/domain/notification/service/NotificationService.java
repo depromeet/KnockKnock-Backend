@@ -36,13 +36,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class NotificationService {
 
     private static final boolean CREATED_DELETED_STATUS = false;
-    private final NotificationRepository notificationRepository;
-    private final ReservationRepository reservationRepository;
-    private final NotificationExperienceRepository notificationExperienceRepository;
-    private final DeviceTokenRepository deviceTokenRepository;
-    private final NotificationReactionRepository notificationReactionRepository;
     private final EntityManager entityManager;
     private final FcmService fcmService;
+    private final NotificationRepository notificationRepository;
+    private final DeviceTokenRepository deviceTokenRepository;
+    private final NotificationReactionRepository notificationReactionRepository;
+    private final ReservationRepository reservationRepository;
+    private final NotificationExperienceRepository notificationExperienceRepository;
 
     @Transactional(readOnly = true)
     public QueryNotificationListLatestResponse queryListLatest() {
@@ -189,19 +189,6 @@ public class NotificationService {
                 null);
     }
 
-    public void sendReservation(SendReservationRequest request) {
-        Long currentUserId = SecurityUtils.getCurrentUserId();
-
-        reservationRepository.save(
-                Reservation.of(
-                        request.getSendAt(),
-                        request.getTitle(),
-                        request.getContent(),
-                        request.getImageUrl(),
-                        Group.of(request.getGroupId()),
-                        User.of(currentUserId)));
-    }
-
     public void sendInstanceToMeBeforeSignUp(SendInstanceToMeBeforeSignUpRequest request) {
         fcmService.sendMessage(request.getToken(), request.getContent());
         notificationExperienceRepository.save(
@@ -213,19 +200,6 @@ public class NotificationService {
         validateDeletePermission(notification);
         notification.deleteNotification();
         notificationRepository.save(notification);
-    }
-
-    public void changeSendAtReservation(ChangeSendAtReservationRequest request) {
-        Reservation reservation = queryReservationById(request.getReservationId());
-        reservation.changeSendAt(request.getSendAt());
-        reservationRepository.save(reservation);
-    }
-
-    @Transactional
-    public void deleteReservation(Long reservationId) {
-        Reservation reservation = queryReservationById(reservationId);
-        validateDeletePermissionReservation(reservation);
-        reservationRepository.delete(reservation);
     }
 
     public List<DeviceToken> getDeviceTokens(Long groupId, Long sendUserId) {
@@ -271,17 +245,5 @@ public class NotificationService {
         return notificationRepository
                 .findById(notificationId)
                 .orElseThrow(() -> NotificationNotFoundException.EXCEPTION);
-    }
-
-    private Reservation queryReservationById(Long reservationId) {
-        return reservationRepository
-                .findById(reservationId)
-                .orElseThrow(() -> ReservationNotFoundException.EXCEPTION);
-    }
-
-    private void validateDeletePermissionReservation(Reservation reservation) {
-        if (!SecurityUtils.getCurrentUserId().equals(reservation.getSendUser().getId())) {
-            throw ReservationForbiddenException.EXCEPTION;
-        }
     }
 }
