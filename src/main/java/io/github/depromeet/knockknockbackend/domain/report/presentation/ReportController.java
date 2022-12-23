@@ -1,12 +1,15 @@
 package io.github.depromeet.knockknockbackend.domain.report.presentation;
 
+
 import io.github.depromeet.knockknockbackend.domain.report.presentation.dto.request.ReportNotificationRequest;
+import io.github.depromeet.knockknockbackend.domain.report.presentation.dto.response.ReportNotificationResponse;
 import io.github.depromeet.knockknockbackend.domain.report.service.ReportService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,9 +28,9 @@ public class ReportController {
     @Operation(summary = "알림 신고하기")
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/notifications/{notification_id}")
-    public void reportNotification(
-    @RequestBody ReportNotificationRequest reportRequest) {
-        reportService.createReport(reportRequest);
+    public ReportNotificationResponse reportNotification(
+            @RequestBody ReportNotificationRequest reportRequest,
+            @PathVariable("notification_id") Long notificationId) {
+        return reportService.createReport(notificationId, reportRequest);
     }
-
 }
