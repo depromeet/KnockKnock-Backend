@@ -35,12 +35,11 @@ public class FcmService {
         FirebaseMessaging.getInstance().sendMulticastAsync(multicast);
     }
 
-    public void sendMessage(String token, String title, String content) {
+    public void sendMessage(String token, String content) {
         Message message =
                 Message.builder()
                         .setToken(token)
-                        .setNotification(
-                                Notification.builder().setTitle(title).setBody(content).build())
+                        .setNotification(Notification.builder().setBody(content).build())
                         .setApnsConfig(
                                 ApnsConfig.builder()
                                         .setAps(Aps.builder().setSound("default").build())
