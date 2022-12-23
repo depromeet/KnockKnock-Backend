@@ -1,7 +1,6 @@
 package io.github.depromeet.knockknockbackend.global.error;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.depromeet.knockknockbackend.global.error.exception.ErrorCode;
 import io.github.depromeet.knockknockbackend.global.error.exception.KnockException;
@@ -12,6 +11,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -36,26 +36,35 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Override
     protected ResponseEntity<Object> handleExceptionInternal(
-        Exception ex, Object body, HttpHeaders headers, HttpStatus status, WebRequest request) {
+            Exception ex, Object body, HttpHeaders headers, HttpStatus status, WebRequest request) {
         ServletWebRequest servletWebRequest = (ServletWebRequest) request;
 
         String url =
-            UriComponentsBuilder.fromHttpRequest(
-                    new ServletServerHttpRequest(servletWebRequest.getRequest()))
-                .build()
-                .toUriString();
+                UriComponentsBuilder.fromHttpRequest(
+                                new ServletServerHttpRequest(servletWebRequest.getRequest()))
+                        .build()
+                        .toUriString();
 
         ErrorResponse errorResponse =
-            new ErrorResponse(status.value(), status.name(), ex.getMessage(), url);
+                new ErrorResponse(status.value(), status.name(), ex.getMessage(), url);
         return super.handleExceptionInternal(ex, errorResponse, headers, status, request);
     }
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> methodArgumentNotValidExceptionHandler(
-            MethodArgumentNotValidException e, HttpServletRequest request)
-            throws JsonProcessingException {
-        ErrorCode validationError = ErrorCode.ARGUMENT_NOT_VALID_ERROR;
-        List<FieldError> errors = e.getBindingResult().getFieldErrors();
 
+    @SneakyThrows
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(
+            MethodArgumentNotValidException ex,
+            HttpHeaders headers,
+            HttpStatus status,
+            WebRequest request) {
+
+        List<FieldError> errors = ex.getBindingResult().getFieldErrors();
+        ServletWebRequest servletWebRequest = (ServletWebRequest) request;
+        String url =
+                UriComponentsBuilder.fromHttpRequest(
+                                new ServletServerHttpRequest(servletWebRequest.getRequest()))
+                        .build()
+                        .toUriString();
         Map<String, Object> fieldAndErrorMessages =
                 errors.stream()
                         .collect(
@@ -64,11 +73,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         String errorsToJsonString = new ObjectMapper().writeValueAsString(fieldAndErrorMessages);
         ErrorResponse errorResponse =
-                new ErrorResponse(
-                        validationError.getStatus(),
-                        validationError.getCode(),
-                        errorsToJsonString,
-                        request.getRequestURL().toString());
+                new ErrorResponse(status.value(), status.name(), errorsToJsonString, url);
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
