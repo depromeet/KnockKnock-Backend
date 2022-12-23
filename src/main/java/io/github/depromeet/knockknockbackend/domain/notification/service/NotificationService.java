@@ -1,7 +1,6 @@
 package io.github.depromeet.knockknockbackend.domain.notification.service;
 
 
-import com.google.firebase.messaging.*;
 import io.github.depromeet.knockknockbackend.domain.group.domain.Group;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupBriefInfoDto;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.*;
@@ -18,6 +17,8 @@ import io.github.depromeet.knockknockbackend.domain.reaction.domain.Notification
 import io.github.depromeet.knockknockbackend.domain.reaction.domain.repository.NotificationReactionRepository;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.global.utils.security.SecurityUtils;
+import io.github.depromeet.knockknockbackend.infrastructor.fcm.FcmService;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -41,6 +42,7 @@ public class NotificationService {
     private final DeviceTokenRepository deviceTokenRepository;
     private final NotificationReactionRepository notificationReactionRepository;
     private final EntityManager entityManager;
+    private final FcmService fcmService;
 
     @Transactional(readOnly = true)
     public QueryNotificationListLatestResponse queryListLatest() {
@@ -171,38 +173,20 @@ public class NotificationService {
     public void sendInstance(SendInstanceRequest request) {
         Long sendUserId = SecurityUtils.getCurrentUserId();
 
-        List<DeviceToken> deviceTokens = getDeviceTokens(request, sendUserId);
-        List<String> tokens = getTokens(deviceTokens);
-        MulticastMessage multicastMessage = makeMulticastMessageForFcm(request, tokens);
+        List<DeviceToken> deviceTokens = getDeviceTokens(request.getGroupId(), sendUserId);
+        List<String> tokens = getFcmTokens(deviceTokens);
 
-        try {
-            BatchResponse batchResponse =
-                    FirebaseMessaging.getInstance().sendMulticast(multicastMessage);
-            if (batchResponse.getFailureCount() >= 1) {
-                logFcmMessagingException(batchResponse);
-            }
-        } catch (FirebaseMessagingException e) {
-            log.error("[**FCM notification sending Error] {} ", e.getMessage());
-            throw FcmResponseException.EXCEPTION;
-        }
+        fcmService.sendGroupMessage(
+                tokens, request.getTitle(), request.getContent(), request.getImageUrl());
 
-        Notification notification =
-                Notification.of(
-                        request.getTitle(),
-                        request.getContent(),
-                        request.getImageUrl(),
-                        Group.of(request.getGroupId()),
-                        User.of(sendUserId));
-        notification.addReceivers(
-                deviceTokens.stream()
-                        .map(
-                                deviceToken ->
-                                        new NotificationReceiver(
-                                                notification,
-                                                User.of(deviceToken.getUserId()),
-                                                deviceToken.getToken()))
-                        .collect(Collectors.toList()));
-        notificationRepository.save(notification);
+        recordNotification(
+                deviceTokens,
+                request.getTitle(),
+                request.getContent(),
+                request.getImageUrl(),
+                Group.of(request.getGroupId()),
+                User.of(sendUserId),
+                null);
     }
 
     public void sendReservation(SendReservationRequest request) {
@@ -219,15 +203,9 @@ public class NotificationService {
     }
 
     public void sendInstanceToMeBeforeSignUp(SendInstanceToMeBeforeSignUpRequest request) {
-        Message message = makeMessageForFcm(request, request.getToken());
-        try {
-            FirebaseMessaging.getInstance().send(message);
-            notificationExperienceRepository.save(
-                    NotificationExperience.of(request.getToken(), request.getContent()));
-        } catch (FirebaseMessagingException e) {
-            log.error("[**FCM notification Experience sending Error] {} ", e.getMessage());
-            throw FcmResponseException.EXCEPTION;
-        }
+        fcmService.sendMessage(request.getToken(), request.getContent());
+        notificationExperienceRepository.save(
+                NotificationExperience.of(request.getToken(), request.getContent()));
     }
 
     public void deleteByNotificationId(Long notificationId) {
@@ -250,56 +228,32 @@ public class NotificationService {
         reservationRepository.delete(reservation);
     }
 
-    private void logFcmMessagingException(BatchResponse batchResponse) {
-        log.error(
-                "[**FCM notification sending Error] successCount : {}, failureCount : {} ",
-                batchResponse.getSuccessCount(),
-                batchResponse.getFailureCount());
-        batchResponse.getResponses().stream()
-                .filter(sendResponse -> sendResponse.getException() != null)
-                .forEach(
-                        sendResponse ->
-                                log.error(
-                                        "[**FCM notification sending Error] errorCode: {}, errorMessage : {}",
-                                        sendResponse.getException().getErrorCode(),
-                                        sendResponse.getException().getMessage()));
-    }
-
-    private MulticastMessage makeMulticastMessageForFcm(
-            SendInstanceRequest request, List<String> tokens) {
-        return MulticastMessage.builder()
-                .setNotification(
-                        com.google.firebase.messaging.Notification.builder()
-                                .setTitle(request.getTitle())
-                                .setBody(request.getContent())
-                                .setImage(request.getImageUrl())
-                                .build())
-                .addAllTokens(tokens)
-                .build();
-    }
-
-    private Message makeMessageForFcm(SendInstanceToMeBeforeSignUpRequest request, String token) {
-        return Message.builder()
-                .setNotification(
-                        com.google.firebase.messaging.Notification.builder()
-                                .setBody(request.getContent())
-                                .build())
-                .setToken(token)
-                .build();
-    }
-
-    private List<DeviceToken> getDeviceTokens(SendInstanceRequest request, Long sendUserId) {
+    public List<DeviceToken> getDeviceTokens(Long groupId, Long sendUserId) {
         Boolean nightOption = null;
         if (NightCondition.isNight()) {
             nightOption = true;
         }
 
         return notificationRepository.findTokenByGroupAndOptionAndNonBlock(
-                sendUserId, request.getGroupId(), nightOption);
+                sendUserId, groupId, nightOption);
     }
 
-    private List<String> getTokens(List<DeviceToken> deviceTokens) {
+    public List<String> getFcmTokens(List<DeviceToken> deviceTokens) {
         return deviceTokens.stream().map(DeviceToken::getToken).collect(Collectors.toList());
+    }
+
+    public void recordNotification(
+            List<DeviceToken> deviceTokens,
+            String title,
+            String content,
+            String imageUrl,
+            Group group,
+            User sendUser,
+            LocalDateTime createdDate) {
+        Notification notification =
+                Notification.makeNotificationWithReceivers(
+                        deviceTokens, title, content, imageUrl, group, sendUser, createdDate);
+        notificationRepository.save(notification);
     }
 
     public List<NotificationReaction> retrieveMyReactions(List<Notification> notifications) {
