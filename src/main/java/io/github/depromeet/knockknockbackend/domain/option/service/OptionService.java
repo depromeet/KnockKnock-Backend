@@ -1,16 +1,18 @@
 package io.github.depromeet.knockknockbackend.domain.option.service;
 
 
+import io.github.depromeet.knockknockbackend.domain.credential.service.UserOptionService;
 import io.github.depromeet.knockknockbackend.domain.option.domain.Option;
 import io.github.depromeet.knockknockbackend.domain.option.domain.repository.OptionRepository;
 import io.github.depromeet.knockknockbackend.domain.option.exception.OptionNotFoundException;
+import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.global.utils.security.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
-public class OptionService {
+public class OptionService implements UserOptionService {
 
     private final OptionRepository optionRepository;
 
@@ -36,6 +38,14 @@ public class OptionService {
         option.setNightOption(value);
 
         optionRepository.save(option);
+    }
+
+    public void initializeOption(User user) {
+        optionRepository.save(
+                Option.builder()
+                        .user(user)
+                        .build()
+        );
     }
 
     private Option queryOption() {
