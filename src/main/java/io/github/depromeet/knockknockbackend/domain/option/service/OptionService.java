@@ -4,6 +4,7 @@ package io.github.depromeet.knockknockbackend.domain.option.service;
 import io.github.depromeet.knockknockbackend.domain.option.domain.Option;
 import io.github.depromeet.knockknockbackend.domain.option.domain.repository.OptionRepository;
 import io.github.depromeet.knockknockbackend.domain.option.exception.OptionNotFoundException;
+import io.github.depromeet.knockknockbackend.domain.option.presentation.dto.response.QueryOptionsResponse;
 import io.github.depromeet.knockknockbackend.global.utils.security.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,13 @@ import org.springframework.stereotype.Service;
 public class OptionService {
 
     private final OptionRepository optionRepository;
+
+    public QueryOptionsResponse queryOptions() {
+        Option option = queryOption();
+
+        return new QueryOptionsResponse(
+                option.isNewOption(), option.isReactionOption(), option.isNightOption());
+    }
 
     public void changeNewOption(boolean value) {
         Option option = queryOption();
