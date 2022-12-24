@@ -41,11 +41,7 @@ public class OptionService implements UserOptionService {
     }
 
     public void initializeOption(User user) {
-        optionRepository.save(
-                Option.builder()
-                        .user(user)
-                        .build()
-        );
+        optionRepository.save(Option.builder().user(user).build());
     }
 
     private Option queryOption() {
