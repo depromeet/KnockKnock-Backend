@@ -4,6 +4,7 @@ package io.github.depromeet.knockknockbackend.domain.user.domain;
 import io.github.depromeet.knockknockbackend.domain.credential.event.DeleteUserEvent;
 import io.github.depromeet.knockknockbackend.domain.credential.event.LogoutUserEvent;
 import io.github.depromeet.knockknockbackend.domain.user.domain.vo.UserInfoVO;
+import io.github.depromeet.knockknockbackend.domain.user.event.RegisterUserEvent;
 import io.github.depromeet.knockknockbackend.global.event.Events;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -11,6 +12,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.PostPersist;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
 import lombok.AccessLevel;
@@ -86,6 +88,16 @@ public class User {
         this.accountState = AccountState.DELETED;
         DeleteUserEvent deleteUserEvent = DeleteUserEvent.builder().userId(this.id).build();
         Events.raise(deleteUserEvent);
+    }
+
+    @PostPersist
+    public void registerEvent() {
+        RegisterUserEvent registerUserEvent =
+                RegisterUserEvent.builder()
+                        .userInfoVO(getUserInfo())
+                        .provider(this.oauthProvider)
+                        .build();
+        Events.raise(registerUserEvent);
     }
 
     public void logout() {
