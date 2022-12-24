@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.domain.option.presentation.dto.response;
 
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -12,5 +13,4 @@ public class QueryOptionsResponse {
     private final boolean reactionOption;
 
     private final boolean nightOption;
-
 }
