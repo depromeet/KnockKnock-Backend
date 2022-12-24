@@ -40,6 +40,7 @@ public class CredentialService {
         return oauthStrategy.getOauthLink();
     }
 
+    @Transactional
     public AfterOauthResponse oauthCodeToUser(OauthProvider oauthProvider, String code) {
         OauthStrategy oauthStrategy = oauthFactory.getOauthstrategy(oauthProvider);
         String oauthAccessToken = oauthStrategy.getAccessToken(code);
@@ -143,6 +144,7 @@ public class CredentialService {
         return new AvailableRegisterResponse(isRegistered);
     }
 
+    @Transactional
     public AuthTokensResponse registerUserByOCIDToken(
             String token, RegisterRequest registerUserRequest, OauthProvider oauthProvider) {
         OauthStrategy oauthStrategy = oauthFactory.getOauthstrategy(oauthProvider);

@@ -7,10 +7,13 @@ import static com.slack.api.model.block.composition.BlockCompositions.plainText;
 import com.slack.api.methods.MethodsClient;
 import com.slack.api.methods.SlackApiException;
 import com.slack.api.methods.request.chat.ChatPostMessageRequest;
+import com.slack.api.methods.response.chat.ChatPostMessageResponse;
 import com.slack.api.model.block.Blocks;
 import com.slack.api.model.block.ContextBlock;
 import com.slack.api.model.block.HeaderBlock;
 import com.slack.api.model.block.LayoutBlock;
+import com.slack.api.model.block.SectionBlock;
+import com.slack.api.model.block.SectionBlock.SectionBlockBuilder;
 import com.slack.api.model.block.composition.MarkdownTextObject;
 import com.slack.api.model.block.element.ImageElement;
 import io.github.depromeet.knockknockbackend.domain.report.domain.Report;
@@ -23,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.lang.Nullable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -92,11 +96,23 @@ public class SlackEventHandler {
                                         + "\n*내용:* "
                                         + content)
                         .build();
-        ImageElement imageElement = getImageElement(imageUrl);
-        layoutBlocks.add(
-                section(section -> section.fields(List.of(reason)).accessory(imageElement)));
+
+        layoutBlocks.add(getSectionWithImage(reason, imageUrl));
 
         sendMessage(SERVICE_CHANNEL, layoutBlocks);
+    }
+
+    private static SectionBlock getSectionWithImage(
+            MarkdownTextObject reason, @Nullable String imageUrl) {
+        return section(
+                section -> {
+                    SectionBlockBuilder fields = section.fields(List.of(reason));
+                    if (imageUrl != null) {
+                        ImageElement imageElement = getImageElement(imageUrl);
+                        fields.accessory(imageElement);
+                    }
+                    return fields;
+                });
     }
 
     @Async
@@ -127,8 +143,7 @@ public class SlackEventHandler {
                                         + "\n*가입경로:* "
                                         + provider)
                         .build();
-        ImageElement image = getImageElement(profilePath);
-        layoutBlocks.add(section(section -> section.fields(List.of(registerMD)).accessory(image)));
+        layoutBlocks.add(getSectionWithImage(registerMD, profilePath));
 
         sendMessage(SERVICE_CHANNEL, layoutBlocks);
     }
@@ -146,7 +161,9 @@ public class SlackEventHandler {
                         .build();
 
         try {
-            methodsClient.chatPostMessage(chatPostMessageRequest);
+            ChatPostMessageResponse chatPostMessageResponse =
+                    methodsClient.chatPostMessage(chatPostMessageRequest);
+            chatPostMessageResponse.getError();
         } catch (SlackApiException | IOException slackApiException) {
             log.error(slackApiException.toString());
         }
