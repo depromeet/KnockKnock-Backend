@@ -92,7 +92,11 @@ public class User {
 
     @PostPersist
     public void registerEvent() {
-        RegisterUserEvent registerUserEvent = RegisterUserEvent.builder().userId(this.id).build();
+        RegisterUserEvent registerUserEvent =
+                RegisterUserEvent.builder()
+                        .userInfoVO(getUserInfo())
+                        .provider(this.oauthProvider)
+                        .build();
         Events.raise(registerUserEvent);
     }
 
