@@ -5,8 +5,8 @@ import io.github.depromeet.knockknockbackend.domain.credential.service.UserOptio
 import io.github.depromeet.knockknockbackend.domain.option.domain.Option;
 import io.github.depromeet.knockknockbackend.domain.option.domain.repository.OptionRepository;
 import io.github.depromeet.knockknockbackend.domain.option.exception.OptionNotFoundException;
-import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.domain.option.presentation.dto.response.QueryOptionsResponse;
+import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.global.utils.security.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
