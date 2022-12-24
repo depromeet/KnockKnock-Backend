@@ -35,6 +35,8 @@ public class CredentialService {
 
     private final UserUtils userUtils;
 
+    private final UserOptionService userOptionService;
+
     public String getOauthLink(OauthProvider oauthProvider) {
         OauthStrategy oauthStrategy = oauthFactory.getOauthstrategy(oauthProvider);
         return oauthStrategy.getOauthLink();
@@ -161,6 +163,8 @@ public class CredentialService {
                         .profilePath(registerUserRequest.getProfilePath())
                         .build();
         userRepository.save(newUser);
+
+        userOptionService.initializeOption(newUser);
 
         String accessToken =
                 jwtTokenProvider.generateAccessToken(newUser.getId(), newUser.getAccountRole());
