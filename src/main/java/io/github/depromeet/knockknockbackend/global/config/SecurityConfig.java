@@ -40,6 +40,8 @@ public class SecurityConfig {
                 .permitAll()
                 .antMatchers("/api/v1/asset/version")
                 .permitAll()
+                .antMatchers("/api/v1/notifications/experience")
+                .permitAll()
                 .antMatchers("/api/v1/asset/profiles/**")
                 .permitAll()
                 .anyRequest()
