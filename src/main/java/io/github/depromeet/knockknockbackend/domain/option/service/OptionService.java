@@ -18,7 +18,8 @@ public class OptionService {
     public QueryOptionsResponse queryOptions() {
         Option option = queryOption();
 
-        return new QueryOptionsResponse(option.isNewOption(), option.isReactionOption(), option.isNightOption());
+        return new QueryOptionsResponse(
+                option.isNewOption(), option.isReactionOption(), option.isNightOption());
     }
 
     public void changeNewOption(boolean value) {
