@@ -63,18 +63,13 @@ public class NotificationService implements NotificationUtils {
 
     @Transactional(readOnly = true)
     public QueryNotificationListResponse queryListByGroupId(Pageable pageable, Long groupId) {
-        Slice<Notification> notifications =
-                notificationRepository.findAllByGroupIdAndDeleted(
-                        groupId, CREATED_DELETED_STATUS, pageable);
 
-        GroupBriefInfoDto groupBriefInfoDto =
-                notifications.stream()
-                        .findFirst()
-                        .map(
-                                notification ->
-                                        new GroupBriefInfoDto(
-                                                notification.getGroup().getGroupBaseInfoVo()))
-                        .orElse(null);
+        Slice<Notification> notifications =
+                notificationRepository.findSliceByGroupId(
+                        SecurityUtils.getCurrentUserId(),
+                        groupId,
+                        CREATED_DELETED_STATUS,
+                        pageable);
 
         List<NotificationReaction> myNotificationReactions =
                 retrieveMyReactions(notifications.getContent());
@@ -101,9 +96,7 @@ public class NotificationService implements NotificationUtils {
                         .collect(Collectors.toList());
 
         return new QueryNotificationListResponse(
-                groupBriefInfoDto,
-                queryReservationListResponseElements,
-                queryNotificationListResponseElements);
+                queryReservationListResponseElements, queryNotificationListResponseElements);
     }
 
     public QueryNotificationListResponseElement getQueryNotificationListResponseElements(
@@ -141,6 +134,7 @@ public class NotificationService implements NotificationUtils {
                 .imageUrl(notification.getImageUrl())
                 .createdDate(notification.getCreatedDate())
                 .sendUserId(notification.getSendUser().getId())
+                .groups(new GroupBriefInfoDto(notification.getGroup().getGroupBaseInfoVo()))
                 .reactions(notificationReactionResponseElement)
                 .build();
     }
@@ -232,8 +226,8 @@ public class NotificationService implements NotificationUtils {
     }
 
     public List<NotificationReaction> retrieveMyReactions(List<Notification> notifications) {
-        return notificationReactionRepository.findByUserIdAndNotificationIn(
-                SecurityUtils.getCurrentUserId(), notifications);
+        return notificationReactionRepository.findByUserAndNotificationIn(
+                User.of(SecurityUtils.getCurrentUserId()), notifications);
     }
 
     private void validateDeletePermission(Notification notification) {

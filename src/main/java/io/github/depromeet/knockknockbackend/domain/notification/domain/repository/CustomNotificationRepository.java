@@ -17,4 +17,7 @@ public interface CustomNotificationRepository {
             Long userId, Long groupId, Boolean nightOption);
 
     List<Notification> findSliceLatestByReceiver(Long receiveUserId);
+
+    Slice<Notification> findSliceByGroupId(
+            Long userId, Long groupId, boolean deleted, Pageable pageable);
 }
