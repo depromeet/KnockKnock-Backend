@@ -2,7 +2,7 @@ package io.github.depromeet.knockknockbackend.domain.notification.service;
 
 
 import io.github.depromeet.knockknockbackend.domain.group.domain.Group;
-import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupBriefInfoDto;
+import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupInfoForNotificationDto;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.*;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.Notification;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.repository.DeviceTokenRepository;
@@ -134,7 +134,9 @@ public class NotificationService implements NotificationUtils {
                 .imageUrl(notification.getImageUrl())
                 .createdDate(notification.getCreatedDate())
                 .sendUserId(notification.getSendUser().getId())
-                .groups(new GroupBriefInfoDto(notification.getGroup().getGroupBaseInfoVo()))
+                .groups(
+                        new GroupInfoForNotificationDto(
+                                notification.getGroup().getGroupBaseInfoVo()))
                 .reactions(notificationReactionResponseElement)
                 .build();
     }
