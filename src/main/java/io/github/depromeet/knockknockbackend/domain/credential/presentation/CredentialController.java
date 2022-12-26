@@ -153,4 +153,11 @@ public class CredentialController {
 
         return credentialService.tokenRefresh(tokenRefreshRequest.getRefreshToken());
     }
+
+    @SecurityRequirement(name = "access-token")
+    @Operation(summary = "로그아웃", description = "리프레쉬 토큰을 지웁니당., 알림 기능도끕니다.")
+    @PostMapping("/logout")
+    public void logout() {
+        credentialService.logoutUser();
+    }
 }

@@ -6,6 +6,7 @@ import io.github.depromeet.knockknockbackend.domain.notification.presentation.dt
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.response.QueryNotificationListResponse;
 import io.github.depromeet.knockknockbackend.domain.notification.service.NotificationService;
 import io.github.depromeet.knockknockbackend.domain.notification.service.ReservationService;
+import io.github.depromeet.knockknockbackend.global.annotation.DisableSecurity;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -66,6 +67,7 @@ public class NotificationController {
     @Operation(summary = "똑똑 미리체험하기 : 회원가입 전 자신에게 푸쉬알림 보내기")
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/experience")
+    @DisableSecurity
     public void sendInstanceToMeBeforeSignUp(
             @RequestBody SendInstanceToMeBeforeSignUpRequest request) {
         notificationService.sendInstanceToMeBeforeSignUp(request);

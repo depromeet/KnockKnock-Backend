@@ -35,11 +35,14 @@ public class CredentialService {
 
     private final UserUtils userUtils;
 
+    private final UserOptionService userOptionService;
+
     public String getOauthLink(OauthProvider oauthProvider) {
         OauthStrategy oauthStrategy = oauthFactory.getOauthstrategy(oauthProvider);
         return oauthStrategy.getOauthLink();
     }
 
+    @Transactional
     public AfterOauthResponse oauthCodeToUser(OauthProvider oauthProvider, String code) {
         OauthStrategy oauthStrategy = oauthFactory.getOauthstrategy(oauthProvider);
         String oauthAccessToken = oauthStrategy.getAccessToken(code);
@@ -143,6 +146,7 @@ public class CredentialService {
         return new AvailableRegisterResponse(isRegistered);
     }
 
+    @Transactional
     public AuthTokensResponse registerUserByOCIDToken(
             String token, RegisterRequest registerUserRequest, OauthProvider oauthProvider) {
         OauthStrategy oauthStrategy = oauthFactory.getOauthstrategy(oauthProvider);
@@ -159,6 +163,8 @@ public class CredentialService {
                         .profilePath(registerUserRequest.getProfilePath())
                         .build();
         userRepository.save(newUser);
+
+        userOptionService.initializeOption(newUser);
 
         String accessToken =
                 jwtTokenProvider.generateAccessToken(newUser.getId(), newUser.getAccountRole());
@@ -211,5 +217,12 @@ public class CredentialService {
         refreshTokenRedisEntityRepository.deleteById(user.getId().toString());
         user.softDeleteUser();
         oauthStrategy.unLink(oauthAccessToken);
+    }
+
+    @Transactional
+    public void logoutUser() {
+        User user = userUtils.getUserFromSecurityContext();
+        refreshTokenRedisEntityRepository.deleteById(user.getId().toString());
+        user.logout();
     }
 }

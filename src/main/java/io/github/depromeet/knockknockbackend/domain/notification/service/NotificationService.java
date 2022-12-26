@@ -33,7 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class NotificationService {
+public class NotificationService implements NotificationUtils {
 
     private static final boolean CREATED_DELETED_STATUS = false;
     private final EntityManager entityManager;
@@ -242,7 +242,8 @@ public class NotificationService {
         }
     }
 
-    private Notification queryNotificationById(Long notificationId) {
+    @Override
+    public Notification queryNotificationById(Long notificationId) {
         return notificationRepository
                 .findById(notificationId)
                 .orElseThrow(() -> NotificationNotFoundException.EXCEPTION);
