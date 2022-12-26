@@ -12,6 +12,7 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import io.github.depromeet.knockknockbackend.domain.group.domain.Group;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.DeviceToken;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.Notification;
 import java.time.LocalDate;
@@ -43,7 +44,7 @@ public class CustomNotificationRepositoryImpl implements CustomNotificationRepos
 
     @Override
     public Slice<Notification> findSliceFromStorage(
-            Long userId, Long groupId, Integer periodOfMonth, Pageable pageable) {
+            Long userId, List<Group> groups, Integer periodOfMonth, Pageable pageable) {
         List<Notification> notifications =
                 queryFactory
                         .select(notification)
@@ -51,7 +52,7 @@ public class CustomNotificationRepositoryImpl implements CustomNotificationRepos
                         .innerJoin(storage.notification, notification)
                         .where(
                                 storage.user.id.eq(userId),
-                                eqGroupId(groupId),
+                                eqGroupIdIn(groups),
                                 greaterEqualPeriodOfMonth(periodOfMonth))
                         .orderBy(sort("storage", pageable))
                         .offset(pageable.getOffset())
@@ -107,11 +108,11 @@ public class CustomNotificationRepositoryImpl implements CustomNotificationRepos
         return option.nightOption.eq(nightOption);
     }
 
-    private BooleanExpression eqGroupId(Long groupId) {
-        if (groupId == null) {
+    private BooleanExpression eqGroupIdIn(List<Group> groups) {
+        if (groups.isEmpty()) {
             return null;
         }
-        return notification.group.id.eq(groupId);
+        return notification.group.in(groups);
     }
 
     private BooleanExpression greaterEqualPeriodOfMonth(Integer periodOfMonth) {

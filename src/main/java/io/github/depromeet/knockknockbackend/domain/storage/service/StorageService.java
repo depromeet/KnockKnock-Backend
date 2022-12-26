@@ -1,6 +1,7 @@
 package io.github.depromeet.knockknockbackend.domain.storage.service;
 
 
+import io.github.depromeet.knockknockbackend.domain.group.domain.Group;
 import io.github.depromeet.knockknockbackend.domain.group.domain.repository.GroupUserRepository;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.Notification;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.repository.NotificationRepository;
@@ -15,8 +16,10 @@ import io.github.depromeet.knockknockbackend.domain.storage.domain.repository.St
 import io.github.depromeet.knockknockbackend.domain.storage.exception.StorageForbiddenException;
 import io.github.depromeet.knockknockbackend.domain.storage.exception.StorageNotFoundException;
 import io.github.depromeet.knockknockbackend.domain.storage.presentation.dto.request.DeleteStorage;
+import io.github.depromeet.knockknockbackend.domain.storage.presentation.dto.request.QueryStorageByGroupIds;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.global.utils.security.SecurityUtils;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -52,10 +55,15 @@ public class StorageService {
 
     @Transactional(readOnly = true)
     public QueryNotificationListInStorageResponse queryNotificationsInStorage(
-            Long groupId, Integer periodOfMonth, Pageable pageable) {
+            QueryStorageByGroupIds request, Integer periodOfMonth, Pageable pageable) {
+        List<Group> groups = new ArrayList<>();
+        if (request != null) {
+            groups = request.getGroupIds().stream().map(Group::of).collect(Collectors.toList());
+        }
+
         Slice<Notification> notifications =
                 notificationRepository.findSliceFromStorage(
-                        SecurityUtils.getCurrentUserId(), groupId, periodOfMonth, pageable);
+                        SecurityUtils.getCurrentUserId(), groups, periodOfMonth, pageable);
 
         List<NotificationReaction> myNotificationReactions =
                 notificationService.retrieveMyReactions(notifications.getContent());

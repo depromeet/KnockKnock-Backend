@@ -3,6 +3,7 @@ package io.github.depromeet.knockknockbackend.domain.storage.presentation;
 
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.response.QueryNotificationListInStorageResponse;
 import io.github.depromeet.knockknockbackend.domain.storage.presentation.dto.request.DeleteStorage;
+import io.github.depromeet.knockknockbackend.domain.storage.presentation.dto.request.QueryStorageByGroupIds;
 import io.github.depromeet.knockknockbackend.domain.storage.service.StorageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -26,11 +27,11 @@ public class StorageController {
     @Operation(summary = "보관함 푸쉬알림 리스트 조회")
     @GetMapping
     public QueryNotificationListInStorageResponse queryNotificationsInStorage(
-            @RequestParam(value = "groupId", required = false) Long groupId,
+            @RequestBody(required = false) QueryStorageByGroupIds request,
             @RequestParam(value = "periodOfMonth", required = false) Integer periodOfMonth,
             @PageableDefault(size = 20, sort = "createdDate", direction = Direction.DESC)
                     Pageable pageable) {
-        return storageService.queryNotificationsInStorage(groupId, periodOfMonth, pageable);
+        return storageService.queryNotificationsInStorage(request, periodOfMonth, pageable);
     }
 
     @Operation(summary = "보관함에 푸쉬알림 보관")
