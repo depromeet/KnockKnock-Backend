@@ -36,7 +36,6 @@ public class GroupBriefInfoDto {
         publicAccess = groupBaseInfoVo.getPublicAccess();
         thumbnailPath = groupBaseInfoVo.getThumbnailPath();
         groupType = groupBaseInfoVo.getGroupType();
-        category = new CategoryDto(groupBaseInfoVo.getCategory());
     }
 
     public GroupBriefInfoDto(GroupBaseInfoVo groupBaseInfoVo, Integer memberCount) {
