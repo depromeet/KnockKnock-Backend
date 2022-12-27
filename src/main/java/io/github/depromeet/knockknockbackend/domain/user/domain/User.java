@@ -89,6 +89,8 @@ public class User {
         this.accountState = AccountState.DELETED;
         DeleteUserEvent deleteUserEvent = DeleteUserEvent.builder().userId(this.id).build();
         Events.raise(deleteUserEvent);
+
+        handleDeleteDeviceToken();
     }
 
     @PostPersist
@@ -105,6 +107,10 @@ public class User {
         LogoutUserEvent logoutUserEvent = LogoutUserEvent.builder().userId(id).build();
         Events.raise(logoutUserEvent);
 
+        handleDeleteDeviceToken();
+    }
+
+    private void handleDeleteDeviceToken() {
         DeviceTokenEvent deviceTokenEvent = new DeviceTokenEvent(User.of(id));
         Events.raise(deviceTokenEvent);
     }
