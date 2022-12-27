@@ -2,6 +2,7 @@ package io.github.depromeet.knockknockbackend.domain.notification.domain.reposit
 
 
 import io.github.depromeet.knockknockbackend.domain.notification.domain.DeviceToken;
+import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.Query;
@@ -26,4 +27,6 @@ public interface DeviceTokenRepository extends CrudRepository<DeviceToken, Long>
             @Param("groupId") Long groupId,
             @Param("newOption") Boolean newOption,
             @Param("nightOption") Boolean nightOption);
+
+    void deleteByUser(User user);
 }
