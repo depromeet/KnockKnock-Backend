@@ -1,5 +1,6 @@
 package io.github.depromeet.knockknockbackend.domain.notification.domain.repository;
 
+import static io.github.depromeet.knockknockbackend.domain.group.domain.QGroup.group;
 import static io.github.depromeet.knockknockbackend.domain.group.domain.QGroupUser.groupUser;
 import static io.github.depromeet.knockknockbackend.domain.notification.domain.QDeviceToken.deviceToken;
 import static io.github.depromeet.knockknockbackend.domain.notification.domain.QNotification.notification;
@@ -12,6 +13,7 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import io.github.depromeet.knockknockbackend.domain.group.domain.Group;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.DeviceToken;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.Notification;
 import java.time.LocalDate;
@@ -32,18 +34,42 @@ public class CustomNotificationRepositoryImpl implements CustomNotificationRepos
     private static final int NUMBER_OF_LATEST_NOTIFICATIONS = 10;
     private final JPAQueryFactory queryFactory;
 
-    private boolean hasNext(List<Notification> notifications, Pageable pageable) {
+    private <T> boolean hasNext(List<T> list, Pageable pageable) {
         boolean hasNext = false;
-        if (notifications.size() > pageable.getPageSize()) {
-            notifications.remove(pageable.getPageSize());
+        if (list.size() > pageable.getPageSize()) {
+            list.remove(pageable.getPageSize());
             hasNext = true;
         }
         return hasNext;
     }
 
     @Override
+    public Slice<Notification> findSliceByGroupId(
+            Long userId, Long groupId, boolean deleted, Pageable pageable) {
+        List<Notification> notifications =
+                queryFactory
+                        .selectFrom(notification)
+                        .join(notification.group, group)
+                        .fetchJoin()
+                        .where(
+                                group.id.eq(groupId),
+                                notification.deleted.eq(deleted),
+                                JPAExpressions.selectFrom(blockUser)
+                                        .where(
+                                                blockUser.blockedUser.eq(notification.sendUser),
+                                                blockUser.user.id.eq(userId))
+                                        .notExists())
+                        .orderBy(sort("notification", pageable))
+                        .offset(pageable.getOffset())
+                        .limit(pageable.getPageSize() + NEXT_SLICE_CHECK)
+                        .fetch();
+
+        return new SliceImpl<>(notifications, pageable, hasNext(notifications, pageable));
+    }
+
+    @Override
     public Slice<Notification> findSliceFromStorage(
-            Long userId, Long groupId, Integer periodOfMonth, Pageable pageable) {
+            Long userId, List<Group> groups, Integer periodOfMonth, Pageable pageable) {
         List<Notification> notifications =
                 queryFactory
                         .select(notification)
@@ -51,7 +77,7 @@ public class CustomNotificationRepositoryImpl implements CustomNotificationRepos
                         .innerJoin(storage.notification, notification)
                         .where(
                                 storage.user.id.eq(userId),
-                                eqGroupId(groupId),
+                                eqGroupIdIn(groups),
                                 greaterEqualPeriodOfMonth(periodOfMonth))
                         .orderBy(sort("storage", pageable))
                         .offset(pageable.getOffset())
@@ -73,6 +99,7 @@ public class CustomNotificationRepositoryImpl implements CustomNotificationRepos
                 .on(groupUser.user.id.eq(option.userId))
                 .where(
                         groupUser.group.id.eq(groupId),
+                        deviceToken.user.id.ne(userId),
                         option.newOption.eq(true),
                         eqNightOption(nightOption),
                         JPAExpressions.selectFrom(blockUser)
@@ -87,6 +114,8 @@ public class CustomNotificationRepositoryImpl implements CustomNotificationRepos
     public List<Notification> findSliceLatestByReceiver(Long receiveUserId) {
         return queryFactory
                 .selectFrom(notification)
+                .join(notification.group, group)
+                .fetchJoin()
                 .where(
                         notification.deleted.eq(false),
                         JPAExpressions.selectFrom(notificationReceiver)
@@ -106,11 +135,11 @@ public class CustomNotificationRepositoryImpl implements CustomNotificationRepos
         return option.nightOption.eq(nightOption);
     }
 
-    private BooleanExpression eqGroupId(Long groupId) {
-        if (groupId == null) {
+    private BooleanExpression eqGroupIdIn(List<Group> groups) {
+        if (groups.isEmpty()) {
             return null;
         }
-        return notification.group.id.eq(groupId);
+        return notification.group.in(groups);
     }
 
     private BooleanExpression greaterEqualPeriodOfMonth(Integer periodOfMonth) {

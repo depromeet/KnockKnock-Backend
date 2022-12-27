@@ -15,12 +15,17 @@ import org.springframework.stereotype.Service;
 @Service
 public class FcmService {
 
-    private void sendGroupMessage(List<String> tokenList, String title, String content) {
+    public void sendGroupMessage(
+            List<String> tokenList, String title, String content, String imageUrl) {
         MulticastMessage multicast =
                 MulticastMessage.builder()
                         .addAllTokens(tokenList)
                         .setNotification(
-                                Notification.builder().setTitle(title).setBody(content).build())
+                                Notification.builder()
+                                        .setTitle(title)
+                                        .setBody(content)
+                                        .setImage(imageUrl)
+                                        .build())
                         .setApnsConfig(
                                 ApnsConfig.builder()
                                         .setAps(Aps.builder().setSound("default").build())
@@ -30,12 +35,11 @@ public class FcmService {
         FirebaseMessaging.getInstance().sendMulticastAsync(multicast);
     }
 
-    private void sendMessage(String token, String title, String content) {
+    public void sendMessage(String token, String content) {
         Message message =
                 Message.builder()
                         .setToken(token)
-                        .setNotification(
-                                Notification.builder().setTitle(title).setBody(content).build())
+                        .setNotification(Notification.builder().setBody(content).build())
                         .setApnsConfig(
                                 ApnsConfig.builder()
                                         .setAps(Aps.builder().setSound("default").build())

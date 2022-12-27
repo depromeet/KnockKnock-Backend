@@ -1,9 +1,8 @@
 package io.github.depromeet.knockknockbackend.domain.notification.service;
 
 
-import com.google.firebase.messaging.*;
 import io.github.depromeet.knockknockbackend.domain.group.domain.Group;
-import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupBriefInfoDto;
+import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupInfoForNotificationDto;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.*;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.Notification;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.repository.DeviceTokenRepository;
@@ -18,6 +17,8 @@ import io.github.depromeet.knockknockbackend.domain.reaction.domain.Notification
 import io.github.depromeet.knockknockbackend.domain.reaction.domain.repository.NotificationReactionRepository;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.global.utils.security.SecurityUtils;
+import io.github.depromeet.knockknockbackend.infrastructor.fcm.FcmService;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -35,12 +36,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class NotificationService implements NotificationUtils {
 
     private static final boolean CREATED_DELETED_STATUS = false;
+    private final EntityManager entityManager;
+    private final FcmService fcmService;
     private final NotificationRepository notificationRepository;
-    private final ReservationRepository reservationRepository;
-    private final NotificationExperienceRepository notificationExperienceRepository;
     private final DeviceTokenRepository deviceTokenRepository;
     private final NotificationReactionRepository notificationReactionRepository;
-    private final EntityManager entityManager;
+    private final ReservationRepository reservationRepository;
+    private final NotificationExperienceRepository notificationExperienceRepository;
 
     @Transactional(readOnly = true)
     public QueryNotificationListLatestResponse queryListLatest() {
@@ -61,17 +63,13 @@ public class NotificationService implements NotificationUtils {
 
     @Transactional(readOnly = true)
     public QueryNotificationListResponse queryListByGroupId(Pageable pageable, Long groupId) {
-        Slice<Notification> notifications =
-                notificationRepository.findAllByGroupIdAndDeleted(
-                        groupId, CREATED_DELETED_STATUS, pageable);
 
-        Optional<GroupBriefInfoDto> groupBriefInfoDto =
-                notifications.stream()
-                        .findFirst()
-                        .map(
-                                notification ->
-                                        new GroupBriefInfoDto(
-                                                notification.getGroup().getGroupBaseInfoVo()));
+        Slice<Notification> notifications =
+                notificationRepository.findSliceByGroupId(
+                        SecurityUtils.getCurrentUserId(),
+                        groupId,
+                        CREATED_DELETED_STATUS,
+                        pageable);
 
         List<NotificationReaction> myNotificationReactions =
                 retrieveMyReactions(notifications.getContent());
@@ -98,9 +96,7 @@ public class NotificationService implements NotificationUtils {
                         .collect(Collectors.toList());
 
         return new QueryNotificationListResponse(
-                groupBriefInfoDto.orElse(null),
-                queryReservationListResponseElements,
-                queryNotificationListResponseElements);
+                queryReservationListResponseElements, queryNotificationListResponseElements);
     }
 
     public QueryNotificationListResponseElement getQueryNotificationListResponseElements(
@@ -138,6 +134,9 @@ public class NotificationService implements NotificationUtils {
                 .imageUrl(notification.getImageUrl())
                 .createdDate(notification.getCreatedDate())
                 .sendUserId(notification.getSendUser().getId())
+                .groups(
+                        new GroupInfoForNotificationDto(
+                                notification.getGroup().getGroupBaseInfoVo()))
                 .reactions(notificationReactionResponseElement)
                 .build();
     }
@@ -171,63 +170,26 @@ public class NotificationService implements NotificationUtils {
     public void sendInstance(SendInstanceRequest request) {
         Long sendUserId = SecurityUtils.getCurrentUserId();
 
-        List<DeviceToken> deviceTokens = getDeviceTokens(request, sendUserId);
-        List<String> tokens = getTokens(deviceTokens);
-        MulticastMessage multicastMessage = makeMulticastMessageForFcm(request, tokens);
+        List<DeviceToken> deviceTokens = getDeviceTokens(request.getGroupId(), sendUserId);
+        List<String> tokens = getFcmTokens(deviceTokens);
 
-        try {
-            BatchResponse batchResponse =
-                    FirebaseMessaging.getInstance().sendMulticast(multicastMessage);
-            if (batchResponse.getFailureCount() >= 1) {
-                logFcmMessagingException(batchResponse);
-            }
-        } catch (FirebaseMessagingException e) {
-            log.error("[**FCM notification sending Error] {} ", e.getMessage());
-            throw FcmResponseException.EXCEPTION;
-        }
+        fcmService.sendGroupMessage(
+                tokens, request.getTitle(), request.getContent(), request.getImageUrl());
 
-        Notification notification =
-                Notification.of(
-                        request.getTitle(),
-                        request.getContent(),
-                        request.getImageUrl(),
-                        Group.of(request.getGroupId()),
-                        User.of(sendUserId));
-        notification.addReceivers(
-                deviceTokens.stream()
-                        .map(
-                                deviceToken ->
-                                        new NotificationReceiver(
-                                                notification,
-                                                User.of(deviceToken.getUserId()),
-                                                deviceToken.getToken()))
-                        .collect(Collectors.toList()));
-        notificationRepository.save(notification);
-    }
-
-    public void sendReservation(SendReservationRequest request) {
-        Long currentUserId = SecurityUtils.getCurrentUserId();
-
-        reservationRepository.save(
-                Reservation.of(
-                        request.getSendAt(),
-                        request.getTitle(),
-                        request.getContent(),
-                        request.getImageUrl(),
-                        Group.of(request.getGroupId()),
-                        User.of(currentUserId)));
+        recordNotification(
+                deviceTokens,
+                request.getTitle(),
+                request.getContent(),
+                request.getImageUrl(),
+                Group.of(request.getGroupId()),
+                User.of(sendUserId),
+                null);
     }
 
     public void sendInstanceToMeBeforeSignUp(SendInstanceToMeBeforeSignUpRequest request) {
-        Message message = makeMessageForFcm(request, request.getToken());
-        try {
-            FirebaseMessaging.getInstance().send(message);
-            notificationExperienceRepository.save(
-                    NotificationExperience.of(request.getToken(), request.getContent()));
-        } catch (FirebaseMessagingException e) {
-            log.error("[**FCM notification Experience sending Error] {} ", e.getMessage());
-            throw FcmResponseException.EXCEPTION;
-        }
+        fcmService.sendMessage(request.getToken(), request.getContent());
+        notificationExperienceRepository.save(
+                NotificationExperience.of(request.getToken(), request.getContent()));
     }
 
     public void deleteByNotificationId(Long notificationId) {
@@ -237,74 +199,37 @@ public class NotificationService implements NotificationUtils {
         notificationRepository.save(notification);
     }
 
-    public void changeSendAtReservation(ChangeSendAtReservationRequest request) {
-        Reservation reservation = queryReservationById(request.getReservationId());
-        reservation.changeSendAt(request.getSendAt());
-        reservationRepository.save(reservation);
-    }
-
-    @Transactional
-    public void deleteReservation(Long reservationId) {
-        Reservation reservation = queryReservationById(reservationId);
-        validateDeletePermissionReservation(reservation);
-        reservationRepository.delete(reservation);
-    }
-
-    private void logFcmMessagingException(BatchResponse batchResponse) {
-        log.error(
-                "[**FCM notification sending Error] successCount : {}, failureCount : {} ",
-                batchResponse.getSuccessCount(),
-                batchResponse.getFailureCount());
-        batchResponse.getResponses().stream()
-                .filter(sendResponse -> sendResponse.getException() != null)
-                .forEach(
-                        sendResponse ->
-                                log.error(
-                                        "[**FCM notification sending Error] errorCode: {}, errorMessage : {}",
-                                        sendResponse.getException().getErrorCode(),
-                                        sendResponse.getException().getMessage()));
-    }
-
-    private MulticastMessage makeMulticastMessageForFcm(
-            SendInstanceRequest request, List<String> tokens) {
-        return MulticastMessage.builder()
-                .setNotification(
-                        com.google.firebase.messaging.Notification.builder()
-                                .setTitle(request.getTitle())
-                                .setBody(request.getContent())
-                                .setImage(request.getImageUrl())
-                                .build())
-                .addAllTokens(tokens)
-                .build();
-    }
-
-    private Message makeMessageForFcm(SendInstanceToMeBeforeSignUpRequest request, String token) {
-        return Message.builder()
-                .setNotification(
-                        com.google.firebase.messaging.Notification.builder()
-                                .setBody(request.getContent())
-                                .build())
-                .setToken(token)
-                .build();
-    }
-
-    private List<DeviceToken> getDeviceTokens(SendInstanceRequest request, Long sendUserId) {
+    public List<DeviceToken> getDeviceTokens(Long groupId, Long sendUserId) {
         Boolean nightOption = null;
         if (NightCondition.isNight()) {
             nightOption = true;
         }
 
         return notificationRepository.findTokenByGroupAndOptionAndNonBlock(
-                sendUserId, request.getGroupId(), nightOption);
+                sendUserId, groupId, nightOption);
     }
 
-    private List<String> getTokens(List<DeviceToken> deviceTokens) {
+    public List<String> getFcmTokens(List<DeviceToken> deviceTokens) {
         return deviceTokens.stream().map(DeviceToken::getToken).collect(Collectors.toList());
     }
 
+    public void recordNotification(
+            List<DeviceToken> deviceTokens,
+            String title,
+            String content,
+            String imageUrl,
+            Group group,
+            User sendUser,
+            LocalDateTime createdDate) {
+        Notification notification =
+                Notification.makeNotificationWithReceivers(
+                        deviceTokens, title, content, imageUrl, group, sendUser, createdDate);
+        notificationRepository.save(notification);
+    }
+
     public List<NotificationReaction> retrieveMyReactions(List<Notification> notifications) {
-        return notificationReactionRepository.findByUserIdAndNotificationIn(
-                SecurityUtils.getCurrentUserId(), notifications);
+        return notificationReactionRepository.findByUserAndNotificationIn(
+                User.of(SecurityUtils.getCurrentUserId()), notifications);
     }
 
     private void validateDeletePermission(Notification notification) {
@@ -318,17 +243,5 @@ public class NotificationService implements NotificationUtils {
         return notificationRepository
                 .findById(notificationId)
                 .orElseThrow(() -> NotificationNotFoundException.EXCEPTION);
-    }
-
-    private Reservation queryReservationById(Long reservationId) {
-        return reservationRepository
-                .findById(reservationId)
-                .orElseThrow(() -> ReservationNotFoundException.EXCEPTION);
-    }
-
-    private void validateDeletePermissionReservation(Reservation reservation) {
-        if (!SecurityUtils.getCurrentUserId().equals(reservation.getSendUser().getId())) {
-            throw ReservationForbiddenException.EXCEPTION;
-        }
     }
 }

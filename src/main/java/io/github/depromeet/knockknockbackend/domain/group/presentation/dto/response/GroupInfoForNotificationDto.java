@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class GroupBriefInfoDto {
+public class GroupInfoForNotificationDto {
     private Long groupId;
 
     private String title;
@@ -21,22 +21,14 @@ public class GroupBriefInfoDto {
     @Schema(description = "공개 그룹 여부 ture 면 공개임")
     private Boolean publicAccess;
 
-    @Schema(description = "카테고리 디티오")
-    private CategoryDto category;
-
-    @Schema(description = "멤버들 숫자")
-    private Integer memberCount;
-
     private GroupType groupType;
 
-    public GroupBriefInfoDto(GroupBaseInfoVo groupBaseInfoVo, Integer memberCount) {
+    public GroupInfoForNotificationDto(GroupBaseInfoVo groupBaseInfoVo) {
         groupId = groupBaseInfoVo.getGroupId();
         title = groupBaseInfoVo.getTitle();
         description = groupBaseInfoVo.getDescription();
         publicAccess = groupBaseInfoVo.getPublicAccess();
         thumbnailPath = groupBaseInfoVo.getThumbnailPath();
         groupType = groupBaseInfoVo.getGroupType();
-        this.memberCount = memberCount;
-        category = new CategoryDto(groupBaseInfoVo.getCategory());
     }
 }
