@@ -3,6 +3,7 @@ package io.github.depromeet.knockknockbackend.domain.user.domain;
 
 import io.github.depromeet.knockknockbackend.domain.credential.event.DeleteUserEvent;
 import io.github.depromeet.knockknockbackend.domain.credential.event.LogoutUserEvent;
+import io.github.depromeet.knockknockbackend.domain.notification.event.DeviceTokenEvent;
 import io.github.depromeet.knockknockbackend.domain.user.domain.vo.UserInfoVO;
 import io.github.depromeet.knockknockbackend.domain.user.event.RegisterUserEvent;
 import io.github.depromeet.knockknockbackend.global.event.Events;
@@ -88,6 +89,8 @@ public class User {
         this.accountState = AccountState.DELETED;
         DeleteUserEvent deleteUserEvent = DeleteUserEvent.builder().userId(this.id).build();
         Events.raise(deleteUserEvent);
+
+        handleDeleteDeviceToken();
     }
 
     @PostPersist
@@ -101,7 +104,14 @@ public class User {
     }
 
     public void logout() {
-        LogoutUserEvent logoutUserEvent = LogoutUserEvent.builder().userId(this.id).build();
+        LogoutUserEvent logoutUserEvent = LogoutUserEvent.builder().userId(id).build();
         Events.raise(logoutUserEvent);
+
+        handleDeleteDeviceToken();
+    }
+
+    private void handleDeleteDeviceToken() {
+        DeviceTokenEvent deviceTokenEvent = new DeviceTokenEvent(User.of(id));
+        Events.raise(deviceTokenEvent);
     }
 }

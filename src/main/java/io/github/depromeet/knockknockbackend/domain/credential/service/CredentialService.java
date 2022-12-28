@@ -64,6 +64,8 @@ public class CredentialService {
                                                     .email(email)
                                                     .build();
                                     userRepository.save(newUser);
+                                    userOptionService.initializeOption(newUser);
+
                                     return newUser;
                                 });
 
