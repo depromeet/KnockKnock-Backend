@@ -54,7 +54,7 @@ public class OptionService implements UserOptionService {
 
     private Option queryOption() {
         return optionRepository
-                .findById(SecurityUtils.getCurrentUserId())
+                .findByUserId(SecurityUtils.getCurrentUserId())
                 .orElseThrow(() -> OptionNotFoundException.EXCEPTION);
     }
 }
