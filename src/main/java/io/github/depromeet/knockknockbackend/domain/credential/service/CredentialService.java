@@ -5,6 +5,7 @@ import io.github.depromeet.knockknockbackend.domain.credential.domain.RefreshTok
 import io.github.depromeet.knockknockbackend.domain.credential.domain.repository.RefreshTokenRedisEntityRepository;
 import io.github.depromeet.knockknockbackend.domain.credential.exception.AlreadySignUpUserException;
 import io.github.depromeet.knockknockbackend.domain.credential.exception.ForbiddenUserException;
+import io.github.depromeet.knockknockbackend.domain.credential.exception.RefreshTokenExpiredException;
 import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.request.RegisterRequest;
 import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.response.AfterOauthResponse;
 import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.response.AuthTokensResponse;
@@ -16,7 +17,6 @@ import io.github.depromeet.knockknockbackend.global.exception.InvalidTokenExcept
 import io.github.depromeet.knockknockbackend.global.exception.UserNotFoundException;
 import io.github.depromeet.knockknockbackend.global.security.JwtTokenProvider;
 import io.github.depromeet.knockknockbackend.global.utils.user.UserUtils;
-import java.util.Date;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -88,11 +88,11 @@ public class CredentialService {
     // 레디스 ttl
     private String generateRefreshToken(Long userId) {
         String refreshToken = jwtTokenProvider.generateRefreshToken(userId);
-        Date tokenExpiredAt = jwtTokenProvider.getTokenExpiredAt(refreshToken);
+        Long tokenExpiredAt = jwtTokenProvider.getRefreshTokenTTlSecond();
         RefreshTokenRedisEntity build =
                 RefreshTokenRedisEntity.builder()
                         .id(userId.toString())
-                        .ttl(tokenExpiredAt.getTime())
+                        .ttl(tokenExpiredAt)
                         .refreshToken(refreshToken)
                         .build();
         refreshTokenRedisEntityRepository.save(build);
@@ -101,13 +101,14 @@ public class CredentialService {
 
     // 토큰 리프레쉬 하기
     public AuthTokensResponse tokenRefresh(String requestRefreshToken) {
-        Long userId = jwtTokenProvider.parseRefreshToken(requestRefreshToken);
 
         Optional<RefreshTokenRedisEntity> entityOptional =
                 refreshTokenRedisEntityRepository.findByRefreshToken(requestRefreshToken);
 
         RefreshTokenRedisEntity refreshTokenRedisEntity =
-                entityOptional.orElseThrow(() -> InvalidTokenException.EXCEPTION);
+                entityOptional.orElseThrow(() -> RefreshTokenExpiredException.EXCEPTION);
+
+        Long userId = jwtTokenProvider.parseRefreshToken(requestRefreshToken);
 
         if (!userId.toString().equals(refreshTokenRedisEntity.getId())) {
             throw InvalidTokenException.EXCEPTION;
