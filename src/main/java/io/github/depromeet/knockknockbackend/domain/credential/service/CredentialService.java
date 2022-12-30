@@ -5,6 +5,7 @@ import io.github.depromeet.knockknockbackend.domain.credential.domain.RefreshTok
 import io.github.depromeet.knockknockbackend.domain.credential.domain.repository.RefreshTokenRedisEntityRepository;
 import io.github.depromeet.knockknockbackend.domain.credential.exception.AlreadySignUpUserException;
 import io.github.depromeet.knockknockbackend.domain.credential.exception.ForbiddenUserException;
+import io.github.depromeet.knockknockbackend.domain.credential.exception.RefreshTokenExpiredException;
 import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.request.RegisterRequest;
 import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.response.AfterOauthResponse;
 import io.github.depromeet.knockknockbackend.domain.credential.presentation.dto.response.AuthTokensResponse;
@@ -101,13 +102,14 @@ public class CredentialService {
 
     // 토큰 리프레쉬 하기
     public AuthTokensResponse tokenRefresh(String requestRefreshToken) {
-        Long userId = jwtTokenProvider.parseRefreshToken(requestRefreshToken);
 
         Optional<RefreshTokenRedisEntity> entityOptional =
                 refreshTokenRedisEntityRepository.findByRefreshToken(requestRefreshToken);
 
         RefreshTokenRedisEntity refreshTokenRedisEntity =
-                entityOptional.orElseThrow(() -> InvalidTokenException.EXCEPTION);
+                entityOptional.orElseThrow(() -> RefreshTokenExpiredException.EXCEPTION);
+
+        Long userId = jwtTokenProvider.parseRefreshToken(requestRefreshToken);
 
         if (!userId.toString().equals(refreshTokenRedisEntity.getId())) {
             throw InvalidTokenException.EXCEPTION;

@@ -13,6 +13,8 @@ public enum ErrorCode {
     ARGUMENT_NOT_VALID_ERROR(HttpStatus.BAD_REQUEST.value(), "GLOBAL-400-1", "validation error"),
 
     EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED.value(), "GLOBAL-401-1", "Expired Jwt Token."),
+    REGISTER_EXPIRED_TOKEN(HttpStatus.FORBIDDEN.value(), "GLOBAL-403-1", "refreshToken expired."),
+
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED.value(), "GLOBAL-401-1", "Invalid Jwt Token."),
 
     USER_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "GLOBAL-404-1", "User Not Found."),
