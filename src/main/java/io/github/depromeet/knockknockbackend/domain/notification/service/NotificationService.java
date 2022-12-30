@@ -172,6 +172,9 @@ public class NotificationService implements NotificationUtils {
 
         List<DeviceToken> deviceTokens = getDeviceTokens(request.getGroupId(), sendUserId);
         List<String> tokens = getFcmTokens(deviceTokens);
+        if (tokens.isEmpty()) {
+            return;
+        }
 
         fcmService.sendGroupMessage(
                 tokens, request.getTitle(), request.getContent(), request.getImageUrl());
