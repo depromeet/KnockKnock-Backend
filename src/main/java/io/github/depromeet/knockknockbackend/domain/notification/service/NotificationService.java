@@ -85,11 +85,10 @@ public class NotificationService implements NotificationUtils {
                                 getQueryNotificationListResponseElements(
                                         notification, myNotificationReactions));
 
-        List<Reservation> reservations =
-                reservationRepository.findByGroupAndSendUserOrderBySendAtAsc(
-                        Group.of(groupId), User.of(SecurityUtils.getCurrentUserId()));
-        List<QueryReservationListResponseElement> queryReservationListResponseElements =
-                reservations.stream()
+        QueryReservationListResponseElement queryReservationListResponseElement =
+                reservationRepository
+                        .findByGroupAndSendUser(
+                                Group.of(groupId), User.of(SecurityUtils.getCurrentUserId()))
                         .map(
                                 reservation ->
                                         QueryReservationListResponseElement.builder()
@@ -99,10 +98,10 @@ public class NotificationService implements NotificationUtils {
                                                 .imageUrl(reservation.getImageUrl())
                                                 .sendAt(reservation.getSendAt())
                                                 .build())
-                        .collect(Collectors.toList());
+                        .orElse(null);
 
         return new QueryNotificationListResponse(
-                queryReservationListResponseElements, queryNotificationListResponseElements);
+                queryReservationListResponseElement, queryNotificationListResponseElements);
     }
 
     public QueryNotificationListResponseElement getQueryNotificationListResponseElements(
@@ -175,8 +174,7 @@ public class NotificationService implements NotificationUtils {
     @Transactional
     public void sendInstance(SendInstanceRequest request) {
         Long currentUserId = SecurityUtils.getCurrentUserId();
-        validateSendNotificationPermission(
-                groupService.queryGroup((request.getGroupId())), currentUserId);
+        validateSendNotificationPermission(request.getGroupId(), currentUserId);
 
         List<DeviceToken> deviceTokens = getDeviceTokens(request.getGroupId(), currentUserId);
         List<String> tokens = getFcmTokens(deviceTokens);
@@ -249,7 +247,8 @@ public class NotificationService implements NotificationUtils {
         }
     }
 
-    private void validateSendNotificationPermission(Group group, Long userId) {
+    public void validateSendNotificationPermission(Long groupId, Long userId) {
+        Group group = groupService.queryGroup(groupId);
         // 홀로외침방이면 방장인지
         if (GroupType.OPEN.equals(group.getGroupType())) group.validUserIsHost(userId);
         // 친구방이면 그룹 소속원인지
