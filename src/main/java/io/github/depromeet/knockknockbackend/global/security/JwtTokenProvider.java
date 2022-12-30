@@ -104,7 +104,7 @@ public class JwtTokenProvider {
     public String generateRefreshToken(Long id) {
         final Date issuedAt = new Date();
         final Date refreshTokenExpiresIn =
-                new Date(issuedAt.getTime() + jwtProperties.getAccessExp() * 1000);
+                new Date(issuedAt.getTime() + jwtProperties.getRefreshExp() * 1000);
         return buildRefreshToken(id, issuedAt, refreshTokenExpiresIn);
     }
 
