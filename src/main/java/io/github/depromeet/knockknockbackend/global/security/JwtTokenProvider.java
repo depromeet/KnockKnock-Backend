@@ -1,6 +1,7 @@
 package io.github.depromeet.knockknockbackend.global.security;
 
 
+import io.github.depromeet.knockknockbackend.domain.credential.exception.RefreshTokenExpiredException;
 import io.github.depromeet.knockknockbackend.domain.user.domain.AccountRole;
 import io.github.depromeet.knockknockbackend.global.exception.ExpiredTokenException;
 import io.github.depromeet.knockknockbackend.global.exception.InvalidTokenException;
@@ -125,14 +126,18 @@ public class JwtTokenProvider {
     }
 
     public Long parseRefreshToken(String token) {
-        if (isRefreshToken(token)) {
-            Claims claims = getJws(token).getBody();
-            return Long.parseLong(claims.getSubject());
+        try {
+            if (isRefreshToken(token)) {
+                Claims claims = getJws(token).getBody();
+                return Long.parseLong(claims.getSubject());
+            }
+        } catch (ExpiredTokenException e) {
+            throw RefreshTokenExpiredException.EXCEPTION;
         }
         throw InvalidTokenException.EXCEPTION;
     }
 
-    public Date getTokenExpiredAt(String token) {
-        return getJws(token).getBody().getExpiration();
+    public Long getRefreshTokenTTlSecond() {
+        return jwtProperties.getRefreshExp();
     }
 }

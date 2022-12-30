@@ -17,7 +17,6 @@ import io.github.depromeet.knockknockbackend.global.exception.InvalidTokenExcept
 import io.github.depromeet.knockknockbackend.global.exception.UserNotFoundException;
 import io.github.depromeet.knockknockbackend.global.security.JwtTokenProvider;
 import io.github.depromeet.knockknockbackend.global.utils.user.UserUtils;
-import java.util.Date;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -89,11 +88,11 @@ public class CredentialService {
     // 레디스 ttl
     private String generateRefreshToken(Long userId) {
         String refreshToken = jwtTokenProvider.generateRefreshToken(userId);
-        Date tokenExpiredAt = jwtTokenProvider.getTokenExpiredAt(refreshToken);
+        Long tokenExpiredAt = jwtTokenProvider.getRefreshTokenTTlSecond();
         RefreshTokenRedisEntity build =
                 RefreshTokenRedisEntity.builder()
                         .id(userId.toString())
-                        .ttl(tokenExpiredAt.getTime())
+                        .ttl(tokenExpiredAt)
                         .refreshToken(refreshToken)
                         .build();
         refreshTokenRedisEntityRepository.save(build);
