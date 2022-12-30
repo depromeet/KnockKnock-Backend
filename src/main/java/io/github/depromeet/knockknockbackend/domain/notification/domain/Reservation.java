@@ -14,7 +14,9 @@ import org.hibernate.annotations.DynamicUpdate;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DynamicUpdate
-@Table(name = "tbl_reservation")
+@Table(
+        name = "tbl_reservation",
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"group_id", "send_user_id"})})
 @Entity
 public class Reservation extends BaseTimeEntity {
 
