@@ -40,18 +40,18 @@ ON DUPLICATE KEY UPDATE image_url = VALUES (image_url) , list_order = VALUES (li
 
 INSERT INTO tbl_profile_image(id, image_url, title, list_order)
 VALUES
-    (1,'https://user-images.githubusercontent.com/13329304/207663879-c2fd2833-5dcb-40b4-9b28-de81e7aa9d40.png','happy',100),
-    (2,'https://user-images.githubusercontent.com/13329304/207663927-150dd57b-4564-478b-8bb9-eb4ed5caf942.png','disgusting',200),
-    (3,'https://user-images.githubusercontent.com/13329304/207663952-191ab71f-b248-45ca-8b9a-959210817347.png','sad',300),
-    (4,'https://user-images.githubusercontent.com/13329304/207663972-4bd876ea-a5b7-4504-8d83-08cb764befee.png','angry',400),
-    (5,'https://user-images.githubusercontent.com/13329304/207663987-ff677fd6-6bf2-4022-838f-560e75f13567.png','sorry',500),
-    (6,'https://user-images.githubusercontent.com/13329304/207664012-b0c497d4-9ba7-4436-9f4a-dc138bfc026b.png','teasing',600),
-    (7,'https://user-images.githubusercontent.com/13329304/207664061-4ff9cac6-129a-43b8-8758-a3ccfea5a108.png','devil',700),
-    (8,'https://user-images.githubusercontent.com/13329304/207664084-5b70a239-9a75-464d-b006-0917f276e6ba.png','sunglasses',800),
-    (9,'https://user-images.githubusercontent.com/13329304/207664158-c547e4d6-8905-4e8e-a04b-1185d9f1f5d7.png','heart',900),
-    (10,'https://user-images.githubusercontent.com/13329304/207664176-f4090ed1-9c45-46c0-b315-f28f6782ddf3.png','fire',1000),
-    (11,'https://user-images.githubusercontent.com/13329304/207664192-f91c9508-ea3c-474e-8038-34c2da08eb77.png','party',1100),
-    (12,'https://user-images.githubusercontent.com/13329304/207664212-5dfdba3b-4de9-40c4-a564-f14f6474955e.png','eye',1200)
+    (1,'https://user-images.githubusercontent.com/13329304/210051685-8763a130-8640-49c8-aa99-eb1f0eced401.png','happy',100),
+    (2,'https://user-images.githubusercontent.com/13329304/210051679-36688f45-fbf0-4ff0-8660-a2d2f97555dd.png','disgusting',200),
+    (3,'https://user-images.githubusercontent.com/13329304/210051691-9823c7f0-1d4c-40b1-996b-2fc0bb4df3d5.png','sad',300),
+    (4,'https://user-images.githubusercontent.com/13329304/210051672-276dc489-1c10-4e77-b0c9-32b1b9adc782.png','angry',400),
+    (5,'https://user-images.githubusercontent.com/13329304/210051692-3e8489b8-ee7a-4007-b75a-3cc8feecae70.png','sorry',500),
+    (6,'https://user-images.githubusercontent.com/13329304/210051695-beeadaf0-cde8-4501-a1b3-a7a951148d81.png','teasing',600),
+    (7,'https://user-images.githubusercontent.com/13329304/210051676-04fb1c78-04ef-465c-b798-6d2163be4c35.png','devil',700),
+    (8,'https://user-images.githubusercontent.com/13329304/210051694-02e2b3d4-cbcc-4d3f-9ba1-24019bf77433.png','sunglasses',800),
+    (9,'https://user-images.githubusercontent.com/13329304/210051686-d2713215-ea1c-4574-b60a-4688b133d3c0.png','heart',900),
+    (10,'https://user-images.githubusercontent.com/13329304/210051684-cda1da2e-dcfe-4afb-b653-d8c28ac9c92e.png','fire',1000),
+    (11,'https://user-images.githubusercontent.com/13329304/210051688-b6006cc4-d773-4d65-89f2-fa398a44ac87.png','party',1100),
+    (12,'https://user-images.githubusercontent.com/13329304/210051682-07b5c0cf-96d5-417b-b616-a64bb6a09749.png','eye',1200)
     ON DUPLICATE KEY UPDATE image_url = VALUES (image_url),title = VALUES (title) ,list_order = VALUES (list_order) ;
 
 INSERT INTO tbl_reaction(id, image_url, title, list_order)
