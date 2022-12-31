@@ -79,7 +79,7 @@ public class RelationService implements UserRelationService {
     }
 
     public void deleteRelation(FriendRequest request) {
-        if(!getIsFriend(request.getUserId())) {
+        if (!getIsFriend(request.getUserId())) {
             throw NotFriendRelationException.EXCEPTION;
         }
 
