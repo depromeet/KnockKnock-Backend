@@ -28,6 +28,7 @@ public enum ErrorCode {
     ALREADY_SEND_REQUEST(400, "RELATION-400-1", "Already Send Request."),
     ALREADY_FRIEND_REQUEST(400, "RELATION-400-1", "Already Friend Request."),
     FRIEND_REQUEST_NOT_FOUND(404, "RELATION-404-1", "Friend Request Not Found."),
+    NOT_FRIEND_RELATION(404, "RELATION-404-2", "Not Friend Relation."),
 
     OPTION_NOT_FOUND(404, "OPTION-404-1", "Option Not Found."),
 

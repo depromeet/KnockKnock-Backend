@@ -55,6 +55,17 @@ public class CustomRelationRepositoryImpl implements CustomRelationRepository {
                 .fetchFirst();
     }
 
+    @Override
+    public Long getRelationIdByUserId(Long currentUserId, Long userId) {
+        return queryFactory
+                .select(relation.id)
+                .from(relation)
+                .where(
+                        friendPredicated(currentUserId, userId)
+                                .or(friendPredicated(userId, currentUserId)))
+                .fetchFirst();
+    }
+
     private BooleanExpression friendPredicated(Long senderUserId, Long receiveUserId) {
         return relation.sendUser.id.eq(senderUserId).and(relation.receiveUser.id.eq(receiveUserId));
     }

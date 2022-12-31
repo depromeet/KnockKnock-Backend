@@ -40,6 +40,13 @@ public class RelationController {
         return new ResponseEntity<>(relationService.sendFriendRequest(request));
     }
 
+    @Operation(summary = "친구를 삭제하는 Api입니다. - 친구목록")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping
+    public void deleteRelation(@RequestBody @Valid FriendRequest request) {
+        relationService.deleteRelation(request);
+    }
+
     @Operation(summary = "친구 요청을 수락하는 Api입니다. - 메인 알림")
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/requests")
