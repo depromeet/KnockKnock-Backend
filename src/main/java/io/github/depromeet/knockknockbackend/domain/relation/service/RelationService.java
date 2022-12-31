@@ -6,6 +6,7 @@ import io.github.depromeet.knockknockbackend.domain.relation.domain.repository.R
 import io.github.depromeet.knockknockbackend.domain.relation.exception.AlreadyFriendException;
 import io.github.depromeet.knockknockbackend.domain.relation.exception.AlreadySendRequestException;
 import io.github.depromeet.knockknockbackend.domain.relation.exception.FriendRequestNotFoundException;
+import io.github.depromeet.knockknockbackend.domain.relation.exception.NotFriendRelationException;
 import io.github.depromeet.knockknockbackend.domain.relation.presentation.dto.request.FriendRequest;
 import io.github.depromeet.knockknockbackend.domain.relation.presentation.dto.response.QueryFriendListResponse;
 import io.github.depromeet.knockknockbackend.domain.relation.presentation.dto.response.QueryFriendListResponseElement;
@@ -77,6 +78,14 @@ public class RelationService implements UserRelationService {
         return HttpStatus.CREATED;
     }
 
+    public void deleteRelation(FriendRequest request) {
+        if(!getIsFriend(request.getUserId())) {
+            throw NotFriendRelationException.EXCEPTION;
+        }
+
+        relationRepository.deleteById(getRelationId(request.getUserId()));
+    }
+
     public void acceptRequest(FriendRequest request) {
         updateIsFriendWithValidate(request, true);
     }
@@ -87,6 +96,10 @@ public class RelationService implements UserRelationService {
 
     public boolean getIsFriend(Long userId) {
         return relationRepository.isFriend(SecurityUtils.getCurrentUserId(), userId);
+    }
+
+    private Long getRelationId(Long userId) {
+        return relationRepository.getRelationIdByUserId(SecurityUtils.getCurrentUserId(), userId);
     }
 
     private void updateIsFriendWithValidate(FriendRequest request, boolean isFriend) {
