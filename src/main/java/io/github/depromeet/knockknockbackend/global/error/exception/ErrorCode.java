@@ -28,6 +28,7 @@ public enum ErrorCode {
     ALREADY_SEND_REQUEST(400, "RELATION-400-1", "Already Send Request."),
     ALREADY_FRIEND_REQUEST(400, "RELATION-400-1", "Already Friend Request."),
     FRIEND_REQUEST_NOT_FOUND(404, "RELATION-404-1", "Friend Request Not Found."),
+    NOT_FRIEND_RELATION(404, "RELATION-404-2", "Not Friend Relation."),
 
     OPTION_NOT_FOUND(404, "OPTION-404-1", "Option Not Found."),
 
@@ -64,12 +65,16 @@ public enum ErrorCode {
     NOTIFICATION_FCM_FAIL_SEND(
             HttpStatus.INTERNAL_SERVER_ERROR.value(), "NOTIFICATION-500-1", "FCM ERROR"),
 
-    RESERVATION_NOT_FOUND(
-            HttpStatus.NOT_FOUND.value(), "RESERVATION-404-1", "Reservation Not Found"),
     RESERVATION_FORBIDDEN(
             HttpStatus.FORBIDDEN.value(),
             "RESERVATION-403-1",
             "The user has no access to the reservation"),
+    RESERVATION_ALREADY_EXIST(
+            HttpStatus.FORBIDDEN.value(),
+            "RESERVATION-403-2",
+            "The user already registered reservation"),
+    RESERVATION_NOT_FOUND(
+            HttpStatus.NOT_FOUND.value(), "RESERVATION-404-1", "Reservation Not Found"),
 
     STORAGE_FORBIDDEN(
             HttpStatus.FORBIDDEN.value(), "STORAGE-403-1", "The user has no access to the storage"),

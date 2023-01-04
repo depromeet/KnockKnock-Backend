@@ -12,4 +12,6 @@ public interface CustomRelationRepository {
             Long sendUserId, Long receiveUserId);
 
     boolean isFriend(Long currentUserId, Long userId);
+
+    Long getRelationIdByUserId(Long currentUserId, Long userId);
 }

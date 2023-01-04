@@ -2,7 +2,11 @@ package io.github.depromeet.knockknockbackend.domain.notification.service;
 
 
 import io.github.depromeet.knockknockbackend.domain.group.domain.Group;
+import io.github.depromeet.knockknockbackend.domain.group.domain.GroupType;
+import io.github.depromeet.knockknockbackend.domain.group.domain.repository.GroupUserRepository;
+import io.github.depromeet.knockknockbackend.domain.group.exception.NotMemberException;
 import io.github.depromeet.knockknockbackend.domain.group.presentation.dto.response.GroupInfoForNotificationDto;
+import io.github.depromeet.knockknockbackend.domain.group.service.GroupService;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.*;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.Notification;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.repository.DeviceTokenRepository;
@@ -38,11 +42,13 @@ public class NotificationService implements NotificationUtils {
     private static final boolean CREATED_DELETED_STATUS = false;
     private final EntityManager entityManager;
     private final FcmService fcmService;
+    private final GroupService groupService;
     private final NotificationRepository notificationRepository;
     private final DeviceTokenRepository deviceTokenRepository;
     private final NotificationReactionRepository notificationReactionRepository;
     private final ReservationRepository reservationRepository;
     private final NotificationExperienceRepository notificationExperienceRepository;
+    private final GroupUserRepository groupUserRepository;
 
     @Transactional(readOnly = true)
     public QueryNotificationListLatestResponse queryListLatest() {
@@ -79,11 +85,10 @@ public class NotificationService implements NotificationUtils {
                                 getQueryNotificationListResponseElements(
                                         notification, myNotificationReactions));
 
-        List<Reservation> reservations =
-                reservationRepository.findByGroupAndSendUserOrderBySendAtAsc(
-                        Group.of(groupId), User.of(SecurityUtils.getCurrentUserId()));
-        List<QueryReservationListResponseElement> queryReservationListResponseElements =
-                reservations.stream()
+        QueryReservationListResponseElement queryReservationListResponseElement =
+                reservationRepository
+                        .findByGroupAndSendUser(
+                                Group.of(groupId), User.of(SecurityUtils.getCurrentUserId()))
                         .map(
                                 reservation ->
                                         QueryReservationListResponseElement.builder()
@@ -93,10 +98,10 @@ public class NotificationService implements NotificationUtils {
                                                 .imageUrl(reservation.getImageUrl())
                                                 .sendAt(reservation.getSendAt())
                                                 .build())
-                        .collect(Collectors.toList());
+                        .orElse(null);
 
         return new QueryNotificationListResponse(
-                queryReservationListResponseElements, queryNotificationListResponseElements);
+                queryReservationListResponseElement, queryNotificationListResponseElements);
     }
 
     public QueryNotificationListResponseElement getQueryNotificationListResponseElements(
@@ -168,9 +173,10 @@ public class NotificationService implements NotificationUtils {
 
     @Transactional
     public void sendInstance(SendInstanceRequest request) {
-        Long sendUserId = SecurityUtils.getCurrentUserId();
+        Long currentUserId = SecurityUtils.getCurrentUserId();
+        validateSendNotificationPermission(request.getGroupId(), currentUserId);
 
-        List<DeviceToken> deviceTokens = getDeviceTokens(request.getGroupId(), sendUserId);
+        List<DeviceToken> deviceTokens = getDeviceTokens(request.getGroupId(), currentUserId);
         List<String> tokens = getFcmTokens(deviceTokens);
         if (tokens.isEmpty()) {
             return;
@@ -185,7 +191,7 @@ public class NotificationService implements NotificationUtils {
                 request.getContent(),
                 request.getImageUrl(),
                 Group.of(request.getGroupId()),
-                User.of(sendUserId),
+                User.of(currentUserId),
                 null);
     }
 
@@ -238,6 +244,19 @@ public class NotificationService implements NotificationUtils {
     private void validateDeletePermission(Notification notification) {
         if (!SecurityUtils.getCurrentUserId().equals(notification.getSendUser().getId())) {
             throw NotificationForbiddenException.EXCEPTION;
+        }
+    }
+
+    public void validateSendNotificationPermission(Long groupId, Long userId) {
+        Group group = groupService.queryGroup(groupId);
+        // 홀로외침방이면 방장인지
+        if (GroupType.OPEN.equals(group.getGroupType())) group.validUserIsHost(userId);
+        // 친구방이면 그룹 소속원인지
+        if (GroupType.FRIEND.equals(group.getGroupType())) {
+            // group.validUserIsMemberOfGroup(userId); //todo: 해당 부분 호춣시 불필요한 쿼리 발생.
+            groupUserRepository
+                    .findByGroupAndUser(group, User.of(userId))
+                    .orElseThrow(() -> NotMemberException.EXCEPTION);
         }
     }
 

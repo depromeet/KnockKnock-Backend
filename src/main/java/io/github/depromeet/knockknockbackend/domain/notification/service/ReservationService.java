@@ -5,6 +5,7 @@ import io.github.depromeet.knockknockbackend.domain.group.domain.Group;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.DeviceToken;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.Reservation;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.repository.ReservationRepository;
+import io.github.depromeet.knockknockbackend.domain.notification.exception.ReservationAlreadyExistException;
 import io.github.depromeet.knockknockbackend.domain.notification.exception.ReservationForbiddenException;
 import io.github.depromeet.knockknockbackend.domain.notification.exception.ReservationNotFoundException;
 import io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.request.ChangeSendAtReservationRequest;
@@ -32,6 +33,16 @@ public class ReservationService {
 
     public void sendReservation(SendReservationRequest request) {
         Long currentUserId = SecurityUtils.getCurrentUserId();
+        notificationService.validateSendNotificationPermission(request.getGroupId(), currentUserId);
+        Reservation reservation =
+                reservationRepository
+                        .findByGroupAndSendUser(
+                                Group.of(request.getGroupId()), User.of(currentUserId))
+                        .orElse(null);
+
+        if (reservation != null) {
+            throw ReservationAlreadyExistException.EXCEPTION;
+        }
 
         reservationRepository.save(
                 Reservation.of(
