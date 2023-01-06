@@ -27,7 +27,7 @@ public class UserService {
 
     public QueryUserByNicknameResponse queryUserByNicknameResponse(String nickname) {
         List<QueryUserByNicknameResponseElement> result =
-                userRepository.findByNicknameLike(nickname).stream()
+                userRepository.findByNicknameContaining(nickname).stream()
                         .map(
                                 user ->
                                         new QueryUserByNicknameResponseElement(
