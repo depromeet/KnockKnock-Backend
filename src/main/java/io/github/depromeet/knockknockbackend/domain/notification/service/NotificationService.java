@@ -178,12 +178,6 @@ public class NotificationService implements NotificationUtils {
 
         List<DeviceToken> deviceTokens = getDeviceTokens(request.getGroupId(), currentUserId);
         List<String> tokens = getFcmTokens(deviceTokens);
-        if (tokens.isEmpty()) {
-            return;
-        }
-
-        fcmService.sendGroupMessage(
-                tokens, request.getTitle(), request.getContent(), request.getImageUrl());
 
         recordNotification(
                 deviceTokens,
@@ -193,6 +187,12 @@ public class NotificationService implements NotificationUtils {
                 Group.of(request.getGroupId()),
                 User.of(currentUserId),
                 null);
+
+        if (tokens.isEmpty()) {
+            return;
+        }
+        fcmService.sendGroupMessage(
+                tokens, request.getTitle(), request.getContent(), request.getImageUrl());
     }
 
     public void sendInstanceToMeBeforeSignUp(SendInstanceToMeBeforeSignUpRequest request) {
