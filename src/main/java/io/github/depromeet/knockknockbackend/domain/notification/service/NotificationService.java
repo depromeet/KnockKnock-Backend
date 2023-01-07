@@ -215,7 +215,6 @@ public class NotificationService {
         if (GroupType.OPEN.equals(group.getGroupType())) group.validUserIsHost(userId);
         // 친구방이면 그룹 소속원인지
         if (GroupType.FRIEND.equals(group.getGroupType())) {
-            // group.validUserIsMemberOfGroup(userId); //todo: 해당 부분 호춣시 불필요한 쿼리 발생.
             groupUserRepository
                     .findByGroupAndUser(group, User.of(userId))
                     .orElseThrow(() -> NotMemberException.EXCEPTION);
