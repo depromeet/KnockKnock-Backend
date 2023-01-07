@@ -37,11 +37,10 @@ public class NotificationUtilsImpl implements NotificationUtils {
             String content,
             String imageUrl,
             LocalDateTime reservedAt) {
-        // token 가져오기
+
         List<DeviceToken> deviceTokens = getDeviceTokens(groupId, sendUserId);
         List<String> tokens = getFcmTokens(deviceTokens);
 
-        // 알림 히스토리 저장
         recordNotification(
                 deviceTokens,
                 title,
@@ -51,7 +50,6 @@ public class NotificationUtilsImpl implements NotificationUtils {
                 User.of(sendUserId),
                 reservedAt);
 
-        // fcm 전송
         if (tokens.isEmpty()) {
             return;
         }
