@@ -8,7 +8,7 @@ import org.springframework.data.repository.CrudRepository;
 
 public interface UserRepository extends CrudRepository<User, Long> {
 
-    List<User> findByNicknameLike(String nickname);
+    List<User> findByNicknameContaining(String nickname);
 
     Optional<User> findByOauthIdAndOauthProvider(String oauthId, String oauthProvider);
 
