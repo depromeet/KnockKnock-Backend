@@ -22,7 +22,6 @@ import io.github.depromeet.knockknockbackend.domain.reaction.domain.repository.N
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.global.utils.security.SecurityUtils;
 import io.github.depromeet.knockknockbackend.infrastructor.fcm.FcmService;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -37,9 +36,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class NotificationService implements NotificationUtils {
+public class NotificationService {
 
     private static final boolean CREATED_DELETED_STATUS = false;
+    private final NotificationUtils notificationUtils;
     private final EntityManager entityManager;
     private final FcmService fcmService;
     private final GroupService groupService;
@@ -176,23 +176,13 @@ public class NotificationService implements NotificationUtils {
         Long currentUserId = SecurityUtils.getCurrentUserId();
         validateSendNotificationPermission(request.getGroupId(), currentUserId);
 
-        List<DeviceToken> deviceTokens = getDeviceTokens(request.getGroupId(), currentUserId);
-        List<String> tokens = getFcmTokens(deviceTokens);
-
-        recordNotification(
-                deviceTokens,
+        notificationUtils.sendNotification(
+                currentUserId,
+                request.getGroupId(),
                 request.getTitle(),
                 request.getContent(),
                 request.getImageUrl(),
-                Group.of(request.getGroupId()),
-                User.of(currentUserId),
                 null);
-
-        if (tokens.isEmpty()) {
-            return;
-        }
-        fcmService.sendGroupMessage(
-                tokens, request.getTitle(), request.getContent(), request.getImageUrl());
     }
 
     public void sendInstanceToMeBeforeSignUp(SendInstanceToMeBeforeSignUpRequest request) {
@@ -202,37 +192,9 @@ public class NotificationService implements NotificationUtils {
     }
 
     public void deleteByNotificationId(Long notificationId) {
-        Notification notification = queryNotificationById(notificationId);
+        Notification notification = notificationUtils.queryNotificationById(notificationId);
         validateDeletePermission(notification);
         notification.deleteNotification();
-        notificationRepository.save(notification);
-    }
-
-    public List<DeviceToken> getDeviceTokens(Long groupId, Long sendUserId) {
-        Boolean nightOption = null;
-        if (NightCondition.isNight()) {
-            nightOption = true;
-        }
-
-        return notificationRepository.findTokenByGroupAndOptionAndNonBlock(
-                sendUserId, groupId, nightOption);
-    }
-
-    public List<String> getFcmTokens(List<DeviceToken> deviceTokens) {
-        return deviceTokens.stream().map(DeviceToken::getToken).collect(Collectors.toList());
-    }
-
-    public void recordNotification(
-            List<DeviceToken> deviceTokens,
-            String title,
-            String content,
-            String imageUrl,
-            Group group,
-            User sendUser,
-            LocalDateTime createdDate) {
-        Notification notification =
-                Notification.makeNotificationWithReceivers(
-                        deviceTokens, title, content, imageUrl, group, sendUser, createdDate);
         notificationRepository.save(notification);
     }
 
@@ -258,12 +220,5 @@ public class NotificationService implements NotificationUtils {
                     .findByGroupAndUser(group, User.of(userId))
                     .orElseThrow(() -> NotMemberException.EXCEPTION);
         }
-    }
-
-    @Override
-    public Notification queryNotificationById(Long notificationId) {
-        return notificationRepository
-                .findById(notificationId)
-                .orElseThrow(() -> NotificationNotFoundException.EXCEPTION);
     }
 }

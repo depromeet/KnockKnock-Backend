@@ -2,7 +2,6 @@ package io.github.depromeet.knockknockbackend.domain.notification.service;
 
 
 import io.github.depromeet.knockknockbackend.domain.group.domain.Group;
-import io.github.depromeet.knockknockbackend.domain.notification.domain.DeviceToken;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.Reservation;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.repository.ReservationRepository;
 import io.github.depromeet.knockknockbackend.domain.notification.exception.ReservationAlreadyExistException;
@@ -26,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ReservationService {
 
+    private final NotificationUtils notificationUtils;
     private final FcmService fcmService;
     private final NotificationService notificationService;
 
@@ -80,31 +80,14 @@ public class ReservationService {
                 reservations.stream().map(Reservation::getId).collect(Collectors.toList()));
 
         reservations.forEach(
-                reservation -> {
-                    List<DeviceToken> deviceTokens =
-                            notificationService.getDeviceTokens(
-                                    reservation.getGroup().getId(),
-                                    reservation.getSendUser().getId());
-                    List<String> tokens = notificationService.getFcmTokens(deviceTokens);
-
-                    notificationService.recordNotification(
-                            deviceTokens,
-                            reservation.getTitle(),
-                            reservation.getContent(),
-                            reservation.getImageUrl(),
-                            reservation.getGroup(),
-                            reservation.getSendUser(),
-                            reservation.getCreatedDate());
-
-                    if(tokens.isEmpty()) {
-                        return;
-                    }
-                    fcmService.sendGroupMessage(
-                            tokens,
-                            reservation.getTitle(),
-                            reservation.getContent(),
-                            reservation.getImageUrl());
-                });
+                reservation ->
+                        notificationUtils.sendNotification(
+                                reservation.getSendUser().getId(),
+                                reservation.getGroup().getId(),
+                                reservation.getTitle(),
+                                reservation.getContent(),
+                                reservation.getImageUrl(),
+                                reservation.getCreatedDate()));
     }
 
     private List<Reservation> retrieveReservation() {
