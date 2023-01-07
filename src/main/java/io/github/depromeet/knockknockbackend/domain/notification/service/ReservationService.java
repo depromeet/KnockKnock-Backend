@@ -87,12 +87,6 @@ public class ReservationService {
                                     reservation.getSendUser().getId());
                     List<String> tokens = notificationService.getFcmTokens(deviceTokens);
 
-                    fcmService.sendGroupMessage(
-                            tokens,
-                            reservation.getTitle(),
-                            reservation.getContent(),
-                            reservation.getImageUrl());
-
                     notificationService.recordNotification(
                             deviceTokens,
                             reservation.getTitle(),
@@ -101,6 +95,15 @@ public class ReservationService {
                             reservation.getGroup(),
                             reservation.getSendUser(),
                             reservation.getCreatedDate());
+
+                    if(tokens.isEmpty()) {
+                        return;
+                    }
+                    fcmService.sendGroupMessage(
+                            tokens,
+                            reservation.getTitle(),
+                            reservation.getContent(),
+                            reservation.getImageUrl());
                 });
     }
 
