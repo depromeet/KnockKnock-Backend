@@ -15,10 +15,13 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 
 @Getter
+@NoArgsConstructor
 @Table(name = "tbl_alarm")
 @Entity
 public class Alarm {
@@ -46,6 +49,16 @@ public class Alarm {
     private boolean isActivate;
 
     @CreatedDate private LocalDateTime createdAt;
+
+    @Builder
+    public Alarm(User sendUser, User receiveUser, AlarmType type, String title, String content) {
+        this.sendUser = sendUser;
+        this.receiveUser = receiveUser;
+        this.type = type;
+        this.title = title;
+        this.content = content;
+        this.isActivate = true;
+    }
 
     public Long getSendUserId() {
         return this.sendUser.getId();

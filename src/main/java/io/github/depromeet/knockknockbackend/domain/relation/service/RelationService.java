@@ -1,6 +1,9 @@
 package io.github.depromeet.knockknockbackend.domain.relation.service;
 
 
+import io.github.depromeet.knockknockbackend.domain.alarm.domain.types.AlarmType;
+import io.github.depromeet.knockknockbackend.domain.alarm.service.CreateAlarmService;
+import io.github.depromeet.knockknockbackend.domain.alarm.service.dto.CreateAlarmDto;
 import io.github.depromeet.knockknockbackend.domain.relation.domain.Relation;
 import io.github.depromeet.knockknockbackend.domain.relation.domain.repository.RelationRepository;
 import io.github.depromeet.knockknockbackend.domain.relation.exception.AlreadyFriendException;
@@ -11,6 +14,7 @@ import io.github.depromeet.knockknockbackend.domain.relation.presentation.dto.re
 import io.github.depromeet.knockknockbackend.domain.relation.presentation.dto.response.QueryFriendListResponse;
 import io.github.depromeet.knockknockbackend.domain.relation.presentation.dto.response.QueryFriendListResponseElement;
 import io.github.depromeet.knockknockbackend.domain.user.UserRelationService;
+import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.global.utils.security.SecurityUtils;
 import io.github.depromeet.knockknockbackend.global.utils.user.UserUtils;
 import java.util.List;
@@ -25,6 +29,7 @@ public class RelationService implements UserRelationService {
 
     private final RelationRepository relationRepository;
     private final UserUtils userUtils;
+    private final CreateAlarmService createAlarmService;
 
     public QueryFriendListResponse queryFriendList() {
         List<Relation> relationList =
@@ -69,11 +74,19 @@ public class RelationService implements UserRelationService {
             return HttpStatus.NO_CONTENT;
         }
 
+        User sendUser = userUtils.getUserById(SecurityUtils.getCurrentUserId());
+        User receiveUser = userUtils.getUserById(request.getUserId());
+
         relationRepository.save(
-                Relation.builder()
-                        .sendUser(userUtils.getUserById(SecurityUtils.getCurrentUserId()))
-                        .receiveUser(userUtils.getUserById(request.getUserId()))
-                        .build());
+                Relation.builder().sendUser(sendUser).receiveUser(receiveUser).build());
+
+        createAlarmService.createAlarm(
+                new CreateAlarmDto(
+                        sendUser,
+                        receiveUser,
+                        "친구 추가 요청이 도착했어요!",
+                        sendUser.getNickname(),
+                        AlarmType.FRIEND_REQUEST));
 
         return HttpStatus.CREATED;
     }
@@ -109,16 +122,29 @@ public class RelationService implements UserRelationService {
 
         relationRepository
                 .findRelationBySendUserIdAndReceiveUserId(
-                        SecurityUtils.getCurrentUserId(), request.getUserId())
+                        request.getUserId(), SecurityUtils.getCurrentUserId())
                 .orElseThrow(() -> FriendRequestNotFoundException.EXCEPTION);
 
         Relation relation =
                 relationRepository
                         .findRelationBySendUserIdAndReceiveUserId(
-                                SecurityUtils.getCurrentUserId(), request.getUserId())
+                                request.getUserId(), SecurityUtils.getCurrentUserId())
                         .get();
 
         relation.updateFriend(isFriend);
         relationRepository.save(relation);
+
+        if (isFriend) {
+            User sendUser = userUtils.getUserById(request.getUserId());
+            User receiveUser = userUtils.getUserById(SecurityUtils.getCurrentUserId());
+
+            createAlarmService.createAlarm(
+                    new CreateAlarmDto(
+                            sendUser,
+                            receiveUser,
+                            sendUser.getNickname() + "님과 친구가 되었어요.",
+                            sendUser.getNickname(),
+                            AlarmType.FRIEND_ACCEPT));
+        }
     }
 }
