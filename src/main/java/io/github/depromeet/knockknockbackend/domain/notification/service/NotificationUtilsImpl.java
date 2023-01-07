@@ -77,10 +77,10 @@ public class NotificationUtilsImpl implements NotificationUtils {
             String imageUrl,
             Group group,
             User sendUser,
-            LocalDateTime createdDate) {
+            LocalDateTime reservedAt) {
         Notification notification =
                 Notification.makeNotificationWithReceivers(
-                        deviceTokens, title, content, imageUrl, group, sendUser, createdDate);
+                        deviceTokens, title, content, imageUrl, group, sendUser, reservedAt);
         notificationRepository.save(notification);
     }
 }
