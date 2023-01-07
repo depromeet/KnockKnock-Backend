@@ -46,13 +46,14 @@ public class CustomRelationRepositoryImpl implements CustomRelationRepository {
 
     @Override
     public boolean isFriend(Long currentUserId, Long userId) {
-        return queryFactory
-                .select(relation.isFriend.coalesce(false))
-                .from(relation)
-                .where(
-                        friendPredicated(currentUserId, userId)
-                                .or(friendPredicated(userId, currentUserId)))
-                .fetchFirst();
+        return Boolean.TRUE.equals(
+                queryFactory
+                        .select(relation.isFriend.coalesce(false))
+                        .from(relation)
+                        .where(
+                                friendPredicated(currentUserId, userId)
+                                        .or(friendPredicated(userId, currentUserId)))
+                        .fetchOne());
     }
 
     @Override
@@ -63,7 +64,7 @@ public class CustomRelationRepositoryImpl implements CustomRelationRepository {
                 .where(
                         friendPredicated(currentUserId, userId)
                                 .or(friendPredicated(userId, currentUserId)))
-                .fetchFirst();
+                .fetchOne();
     }
 
     private BooleanExpression friendPredicated(Long senderUserId, Long receiveUserId) {
