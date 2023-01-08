@@ -12,5 +12,6 @@ public class NotificationReactionCountInfoVo {
 
     private final Long notificationId;
     private final Long reactionId;
+    private final String reactionUrl;
     private final Long reactionCount;
 }
