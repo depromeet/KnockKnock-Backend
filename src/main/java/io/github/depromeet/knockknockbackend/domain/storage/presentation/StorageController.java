@@ -14,6 +14,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import javax.validation.Valid;
 
 @SecurityRequirement(name = "access-token")
 @Tag(name = "보관함 관련 컨트롤러", description = "")
@@ -44,7 +45,7 @@ public class StorageController {
     @Operation(summary = "보관함에 저장한 푸쉬알림 삭제")
     @ResponseStatus(HttpStatus.OK)
     @DeleteMapping
-    public void deleteNotificationFromStorage(@RequestBody DeleteStorage request) {
+    public void deleteNotificationFromStorage(@Valid @RequestBody DeleteStorage request) {
         storageService.deleteNotificationFromStorage(request);
     }
 }
