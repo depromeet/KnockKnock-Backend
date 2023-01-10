@@ -10,13 +10,13 @@ import io.github.depromeet.knockknockbackend.global.annotation.DisableSecurity;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import javax.validation.Valid;
 
 @SecurityRequirement(name = "access-token")
 @Tag(name = "푸쉬알림 관련 컨트롤러", description = "")
@@ -84,7 +84,8 @@ public class NotificationController {
     @Operation(summary = "예약 푸쉬알림 시간수정")
     @ResponseStatus(HttpStatus.OK)
     @PatchMapping("/reservation")
-    public void changeSendAtReservation(@Valid @RequestBody ChangeSendAtReservationRequest request) {
+    public void changeSendAtReservation(
+            @Valid @RequestBody ChangeSendAtReservationRequest request) {
         reservationService.changeSendAtReservation(request);
     }
 

@@ -3,16 +3,12 @@ package io.github.depromeet.knockknockbackend.domain.notification.presentation.d
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDateTime;
-import lombok.Getter;
 import javax.validation.constraints.Future;
 import javax.validation.constraints.NotNull;
+import lombok.Getter;
 
 @Getter
 public class ChangeSendAtReservationRequest {
-    @NotNull
-    private Long reservationId;
-    @Future
-    @NotNull
-    @JsonFormat
-    private LocalDateTime sendAt;
+    @NotNull private Long reservationId;
+    @Future @NotNull @JsonFormat private LocalDateTime sendAt;
 }
