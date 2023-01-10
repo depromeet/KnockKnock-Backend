@@ -70,7 +70,7 @@ public class NotificationController {
     @PostMapping("/experience")
     @DisableSecurity
     public void sendInstanceToMeBeforeSignUp(
-            @RequestBody SendInstanceToMeBeforeSignUpRequest request) {
+            @Valid @RequestBody SendInstanceToMeBeforeSignUpRequest request) {
         notificationService.sendInstanceToMeBeforeSignUp(request);
     }
 
