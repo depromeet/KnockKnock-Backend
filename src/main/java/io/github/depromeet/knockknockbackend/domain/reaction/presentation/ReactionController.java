@@ -39,7 +39,7 @@ public class ReactionController {
     @PatchMapping("{notification_reaction_id}")
     public void changeReaction(
             @PathVariable("notification_reaction_id") Long notificationReactionId,
-            @RequestBody RegisterReactionRequest request) {
+            @Valid @RequestBody RegisterReactionRequest request) {
         reactionService.changeReaction(notificationReactionId, request);
     }
 
