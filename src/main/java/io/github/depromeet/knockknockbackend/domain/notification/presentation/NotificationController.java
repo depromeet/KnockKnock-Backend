@@ -77,7 +77,7 @@ public class NotificationController {
     @Operation(summary = "예약 푸쉬알림 발송")
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/reservation")
-    public void sendReservation(@RequestBody SendReservationRequest request) {
+    public void sendReservation(@Valid @RequestBody SendReservationRequest request) {
         reservationService.sendReservation(request);
     }
 
