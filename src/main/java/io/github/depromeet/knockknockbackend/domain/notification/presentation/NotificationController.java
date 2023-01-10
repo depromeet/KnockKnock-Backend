@@ -10,6 +10,7 @@ import io.github.depromeet.knockknockbackend.global.annotation.DisableSecurity;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
@@ -36,14 +37,14 @@ public class NotificationController {
     @Operation(summary = "FCM 토큰 등록")
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/token")
-    public void registerFcmToken(@RequestBody RegisterFcmTokenRequest request) {
+    public void registerFcmToken(@Valid @RequestBody RegisterFcmTokenRequest request) {
         notificationService.registerFcmToken(request);
     }
 
     @Operation(summary = "즉시 푸쉬알림 발송")
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public void sendInstance(@RequestBody SendInstanceRequest request) {
+    public void sendInstance(@Valid @RequestBody SendInstanceRequest request) {
         notificationService.sendInstance(request);
     }
 
@@ -69,21 +70,22 @@ public class NotificationController {
     @PostMapping("/experience")
     @DisableSecurity
     public void sendInstanceToMeBeforeSignUp(
-            @RequestBody SendInstanceToMeBeforeSignUpRequest request) {
+            @Valid @RequestBody SendInstanceToMeBeforeSignUpRequest request) {
         notificationService.sendInstanceToMeBeforeSignUp(request);
     }
 
     @Operation(summary = "예약 푸쉬알림 발송")
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/reservation")
-    public void sendReservation(@RequestBody SendReservationRequest request) {
+    public void sendReservation(@Valid @RequestBody SendReservationRequest request) {
         reservationService.sendReservation(request);
     }
 
     @Operation(summary = "예약 푸쉬알림 시간수정")
     @ResponseStatus(HttpStatus.OK)
     @PatchMapping("/reservation")
-    public void changeSendAtReservation(@RequestBody ChangeSendAtReservationRequest request) {
+    public void changeSendAtReservation(
+            @Valid @RequestBody ChangeSendAtReservationRequest request) {
         reservationService.changeSendAtReservation(request);
     }
 

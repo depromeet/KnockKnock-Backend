@@ -1,13 +1,14 @@
 package io.github.depromeet.knockknockbackend.domain.notification.presentation.dto.request;
 
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import lombok.Getter;
 
 @Getter
 public class SendInstanceRequest {
-
-    private Long groupId;
+    @NotNull private Long groupId;
     private String title;
-    private String content;
+    @NotBlank private String content;
     private String imageUrl;
 }

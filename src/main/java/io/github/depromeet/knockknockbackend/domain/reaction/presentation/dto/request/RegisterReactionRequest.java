@@ -1,11 +1,11 @@
 package io.github.depromeet.knockknockbackend.domain.reaction.presentation.dto.request;
 
 
+import javax.validation.constraints.NotNull;
 import lombok.Getter;
 
 @Getter
 public class RegisterReactionRequest {
-
-    private Long notificationId;
-    private Long reactionId;
+    @NotNull private Long notificationId;
+    @NotNull private Long reactionId;
 }
