@@ -8,13 +8,13 @@ import io.github.depromeet.knockknockbackend.domain.storage.service.StorageServi
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import javax.validation.Valid;
 
 @SecurityRequirement(name = "access-token")
 @Tag(name = "보관함 관련 컨트롤러", description = "")
