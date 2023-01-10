@@ -84,7 +84,7 @@ public class NotificationController {
     @Operation(summary = "예약 푸쉬알림 시간수정")
     @ResponseStatus(HttpStatus.OK)
     @PatchMapping("/reservation")
-    public void changeSendAtReservation(@RequestBody ChangeSendAtReservationRequest request) {
+    public void changeSendAtReservation(@Valid @RequestBody ChangeSendAtReservationRequest request) {
         reservationService.changeSendAtReservation(request);
     }
 
