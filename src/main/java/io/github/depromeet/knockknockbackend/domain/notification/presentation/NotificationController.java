@@ -44,7 +44,7 @@ public class NotificationController {
     @Operation(summary = "즉시 푸쉬알림 발송")
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public void sendInstance(@RequestBody SendInstanceRequest request) {
+    public void sendInstance(@Valid @RequestBody SendInstanceRequest request) {
         notificationService.sendInstance(request);
     }
 
