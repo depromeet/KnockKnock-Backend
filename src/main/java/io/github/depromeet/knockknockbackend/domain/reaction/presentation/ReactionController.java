@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import javax.validation.Valid;
 
 @SecurityRequirement(name = "access-token")
 @Tag(name = "리액션 관련 컨트롤러", description = "")
@@ -29,7 +30,7 @@ public class ReactionController {
     @Operation(summary = "알림에 리액션 등록")
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public void registerReaction(@RequestBody RegisterReactionRequest request) {
+    public void registerReaction(@Valid @RequestBody RegisterReactionRequest request) {
         reactionService.registerReaction(request);
     }
 
