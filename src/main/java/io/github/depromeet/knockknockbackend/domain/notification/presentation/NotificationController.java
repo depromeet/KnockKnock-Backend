@@ -16,6 +16,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import javax.validation.Valid;
 
 @SecurityRequirement(name = "access-token")
 @Tag(name = "푸쉬알림 관련 컨트롤러", description = "")
@@ -36,7 +37,7 @@ public class NotificationController {
     @Operation(summary = "FCM 토큰 등록")
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/token")
-    public void registerFcmToken(@RequestBody RegisterFcmTokenRequest request) {
+    public void registerFcmToken(@Valid @RequestBody RegisterFcmTokenRequest request) {
         notificationService.registerFcmToken(request);
     }
 
