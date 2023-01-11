@@ -8,6 +8,7 @@ import io.github.depromeet.knockknockbackend.domain.storage.service.StorageServi
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
@@ -44,7 +45,7 @@ public class StorageController {
     @Operation(summary = "보관함에 저장한 푸쉬알림 삭제")
     @ResponseStatus(HttpStatus.OK)
     @DeleteMapping
-    public void deleteNotificationFromStorage(@RequestBody DeleteStorage request) {
+    public void deleteNotificationFromStorage(@Valid @RequestBody DeleteStorage request) {
         storageService.deleteNotificationFromStorage(request);
     }
 }

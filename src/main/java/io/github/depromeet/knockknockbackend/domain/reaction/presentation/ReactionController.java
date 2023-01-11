@@ -6,6 +6,7 @@ import io.github.depromeet.knockknockbackend.domain.reaction.service.ReactionSer
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -29,7 +30,7 @@ public class ReactionController {
     @Operation(summary = "알림에 리액션 등록")
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public void registerReaction(@RequestBody RegisterReactionRequest request) {
+    public void registerReaction(@Valid @RequestBody RegisterReactionRequest request) {
         reactionService.registerReaction(request);
     }
 
@@ -38,7 +39,7 @@ public class ReactionController {
     @PatchMapping("{notification_reaction_id}")
     public void changeReaction(
             @PathVariable("notification_reaction_id") Long notificationReactionId,
-            @RequestBody RegisterReactionRequest request) {
+            @Valid @RequestBody RegisterReactionRequest request) {
         reactionService.changeReaction(notificationReactionId, request);
     }
 

@@ -6,7 +6,6 @@ import io.github.depromeet.knockknockbackend.global.error.exception.ErrorCode;
 import io.github.depromeet.knockknockbackend.global.error.exception.KnockException;
 import java.io.IOException;
 import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -21,35 +20,36 @@ public class ExceptionFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(
             HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {
+            throws IOException {
         try {
             filterChain.doFilter(request, response);
         } catch (KnockException e) {
-            response.getWriter()
-                    .write(
-                            objectMapper.writeValueAsString(
-                                    getErrorResponse(
-                                            e.getErrorCode(), request.getRequestURL().toString())));
+            writeErrorResponse(response, e.getErrorCode(), request.getRequestURL().toString());
         } catch (Exception e) {
             if (e.getCause() instanceof KnockException) {
-                response.getWriter()
-                        .write(
-                                objectMapper.writeValueAsString(
-                                        getErrorResponse(
-                                                ((KnockException) e.getCause()).getErrorCode(),
-                                                request.getRequestURL().toString())));
+                writeErrorResponse(
+                        response,
+                        ((KnockException) e.getCause()).getErrorCode(),
+                        request.getRequestURL().toString());
             } else {
                 e.printStackTrace();
-                getErrorResponse(
-                        ErrorCode.INTERNAL_SERVER_ERROR, request.getRequestURL().toString());
+                writeErrorResponse(
+                        response,
+                        ErrorCode.INTERNAL_SERVER_ERROR,
+                        request.getRequestURL().toString());
             }
-        } finally {
-            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         }
     }
 
-    private ErrorResponse getErrorResponse(ErrorCode errorCode, String path) {
-        return new ErrorResponse(
-                errorCode.getStatus(), errorCode.getCode(), errorCode.getReason(), path);
+    private void writeErrorResponse(HttpServletResponse response, ErrorCode errorCode, String path)
+            throws IOException {
+        ErrorResponse errorResponse =
+                new ErrorResponse(
+                        errorCode.getStatus(), errorCode.getCode(), errorCode.getReason(), path);
+
+        response.setStatus(errorCode.getStatus());
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
     }
 }
