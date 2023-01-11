@@ -6,7 +6,6 @@ import io.github.depromeet.knockknockbackend.global.error.exception.ErrorCode;
 import io.github.depromeet.knockknockbackend.global.error.exception.KnockException;
 import java.io.IOException;
 import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -28,17 +27,25 @@ public class ExceptionFilter extends OncePerRequestFilter {
             writeErrorResponse(response, e.getErrorCode(), request.getRequestURL().toString());
         } catch (Exception e) {
             if (e.getCause() instanceof KnockException) {
-                writeErrorResponse(response,((KnockException) e.getCause()).getErrorCode(), request.getRequestURL().toString());
+                writeErrorResponse(
+                        response,
+                        ((KnockException) e.getCause()).getErrorCode(),
+                        request.getRequestURL().toString());
             } else {
                 e.printStackTrace();
-                writeErrorResponse(response, ErrorCode.INTERNAL_SERVER_ERROR, request.getRequestURL().toString());
+                writeErrorResponse(
+                        response,
+                        ErrorCode.INTERNAL_SERVER_ERROR,
+                        request.getRequestURL().toString());
             }
         }
     }
 
-    private void writeErrorResponse(HttpServletResponse response, ErrorCode errorCode, String path) throws IOException {
-        ErrorResponse errorResponse = new ErrorResponse(
-                errorCode.getStatus(), errorCode.getCode(), errorCode.getReason(), path);
+    private void writeErrorResponse(HttpServletResponse response, ErrorCode errorCode, String path)
+            throws IOException {
+        ErrorResponse errorResponse =
+                new ErrorResponse(
+                        errorCode.getStatus(), errorCode.getCode(), errorCode.getReason(), path);
 
         response.setStatus(errorCode.getStatus());
         response.setCharacterEncoding("UTF-8");
