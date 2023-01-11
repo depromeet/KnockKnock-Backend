@@ -34,14 +34,14 @@ public class CustomRelationRepositoryImpl implements CustomRelationRepository {
     @Override
     public Optional<Relation> findRelationBySendUserIdAndReceiveUserId(
             Long sendUserId, Long receiveUserId) {
-        return Optional.of(
+        return Optional.ofNullable(
                 queryFactory
                         .selectFrom(relation)
                         .where(
                                 relation.isFriend
                                         .eq(false)
                                         .and(friendPredicated(sendUserId, receiveUserId)))
-                        .fetchFirst());
+                        .fetchOne());
     }
 
     @Override
