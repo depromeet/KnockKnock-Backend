@@ -18,7 +18,8 @@
 
 <div align="center"><b>ERD</b></div>
 <br/>
-<div align="center"><img align="center" width="640" alt="ㄷㄱㅇ" src="https://user-images.githubusercontent.com/55780251/212339061-54e6576b-06cd-48e5-8dce-6fab9321dc26.jpg"></div>
+<div align="center"><img align="center" width="640" alt="ㄷㄱㅇ" src="https://user-images.githubusercontent.com/55780251/212340609-99759e40-c09b-423d-98ee-7fcae09537fb.png"></div>
+
 
 ---
 
