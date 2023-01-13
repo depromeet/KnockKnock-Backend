@@ -35,23 +35,24 @@ public class ReactionService {
         }
     }
 
+    @Transactional
     public void changeReaction(Long notificationReactionId, RegisterReactionRequest request) {
-        validateMyReactionTheNotification(notificationReactionId);
+        NotificationReaction notificationReaction =
+                queryNotificationReactionId(notificationReactionId);
+        validateMyReactionTheNotification(notificationReaction);
 
-        notificationReactionRepository.save(
-                NotificationReaction.of(
-                        notificationReactionId, Reaction.of(request.getReactionId())));
+        notificationReaction.changeReaction(Reaction.of(request.getReactionId()));
     }
 
     @Transactional
     public void deleteReaction(Long notificationReactionId) {
-        validateMyReactionTheNotification(notificationReactionId);
+        NotificationReaction notificationReaction =
+                queryNotificationReactionId(notificationReactionId);
+        validateMyReactionTheNotification(notificationReaction);
         notificationReactionRepository.deleteById(notificationReactionId);
     }
 
-    private void validateMyReactionTheNotification(Long notificationReactionId) {
-        NotificationReaction notificationReaction =
-                queryNotificationReactionId(notificationReactionId);
+    private void validateMyReactionTheNotification(NotificationReaction notificationReaction) {
         if (!notificationReaction.getUserId().equals(SecurityUtils.getCurrentUserId())) {
             throw ReactionForbiddenException.EXCEPTION;
         }
