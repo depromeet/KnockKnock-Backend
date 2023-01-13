@@ -46,6 +46,10 @@ public class NotificationReaction extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
+    public Long getUserId() {
+        return user.getId();
+    }
+
     public static NotificationReaction of(Long id, Reaction reaction) {
         return NotificationReaction.builder().id(id).reaction(reaction).build();
     }
