@@ -1,6 +1,5 @@
 <img width="1920" alt="readme banner" src="https://user-images.githubusercontent.com/13329304/212335772-3b8fbb62-cd37-40e0-84bb-c9d3d5bf16ce.png">
 <br/>
-<br/>
 
 <div align="center"><b>푸시알림 커스텀 서비스, Knocknock</b></div>
 <p align="center">
@@ -13,8 +12,19 @@
 ![readme 01](https://user-images.githubusercontent.com/13329304/212335758-eb4c093c-5370-45ec-a53b-bd4ae9081d1b.png)
 ![readme 2](https://user-images.githubusercontent.com/13329304/212335770-51689501-e3cc-4566-a8d5-9de641f614a2.png)
 ![readme 3](https://user-images.githubusercontent.com/13329304/212335774-5e68b3c5-1f7b-44b6-acba-459323b5b12d.png)
-
 ![readme 4](https://user-images.githubusercontent.com/13329304/212335762-d2ed252c-4932-4c9e-89e9-fa5281d314b4.png)
+
+---
+
+<div align="center"><b>ERD</b></div>
+<br/>
+<div align="center"><img align="center" width="640" alt="ㄷㄱㅇ" src="https://user-images.githubusercontent.com/55780251/212339061-54e6576b-06cd-48e5-8dce-6fab9321dc26.jpg"></div>
+
+---
+
+<div align="center"><b>아키텍쳐</b></div>
+<br/>
+<div align="center"><img align="center" width="640" alt="ㄷㄱㅇ" src="https://user-images.githubusercontent.com/13329304/212339699-dab9355f-668a-434b-b3b9-217c1756a707.png"></div>
 
 ---
 
