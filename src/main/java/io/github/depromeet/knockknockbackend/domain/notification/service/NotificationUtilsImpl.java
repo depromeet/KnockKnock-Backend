@@ -66,7 +66,7 @@ public class NotificationUtilsImpl implements NotificationUtils {
             return;
         }
         ApiFuture<BatchResponse> batchResponseApiFuture =
-                fcmService.sendGroupMessage(tokens, title, content, imageUrl);
+                fcmService.sendGroupMessageAsync(tokens, title, content, imageUrl);
         checkFcmResponse(deviceTokens, tokens, batchResponseApiFuture);
     }
 
