@@ -56,14 +56,15 @@ public enum ErrorCode {
     REACTION_FORBIDDEN(
             HttpStatus.FORBIDDEN.value(), "REACTION-403-1", "the user cannot change the reaction"),
 
+    NOTIFICATION_FCM_TOKEN_INVALID(
+            HttpStatus.BAD_REQUEST.value(), "NOTIFICATION-400-1", "FCM token invalid"),
     NOTIFICATION_FORBIDDEN(
             HttpStatus.FORBIDDEN.value(),
             "NOTIFICATION-403-1",
             "The user has no access to the notification"),
     NOTIFICATION_NOT_FOUND(
             HttpStatus.NOT_FOUND.value(), "NOTIFICATION-404-1", "Notification Not Found"),
-    NOTIFICATION_FCM_FAIL_SEND(
-            HttpStatus.INTERNAL_SERVER_ERROR.value(), "NOTIFICATION-500-1", "FCM ERROR"),
+
 
     RESERVATION_FORBIDDEN(
             HttpStatus.FORBIDDEN.value(),
