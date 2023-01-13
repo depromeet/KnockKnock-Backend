@@ -53,6 +53,10 @@ public enum ErrorCode {
             HttpStatus.BAD_REQUEST.value(),
             "REACTION-400-1",
             "reaction of the notification is already exist"),
+    REACTION_NOT_EXIST(
+            HttpStatus.BAD_REQUEST.value(),
+            "REACTION-400-2",
+            "reaction of the notification is not exist"),
     REACTION_FORBIDDEN(
             HttpStatus.FORBIDDEN.value(), "REACTION-403-1", "the user cannot change the reaction"),
 
