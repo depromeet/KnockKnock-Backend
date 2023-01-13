@@ -10,7 +10,6 @@ import io.github.depromeet.knockknockbackend.domain.group.service.GroupService;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.*;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.Notification;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.repository.DeviceTokenRepository;
-import io.github.depromeet.knockknockbackend.domain.notification.domain.repository.NotificationExperienceRepository;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.repository.NotificationRepository;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.repository.ReservationRepository;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.vo.NotificationReactionCountInfoVo;
@@ -48,7 +47,6 @@ public class NotificationService {
     private final NotificationReactionRepository notificationReactionRepository;
     private final ReservationRepository reservationRepository;
     private final GroupUserRepository groupUserRepository;
-    private final NotificationExperienceRepository notificationExperienceRepository;
 
     @Transactional(readOnly = true)
     public QueryNotificationListLatestResponse queryListLatest() {
@@ -186,10 +184,7 @@ public class NotificationService {
     }
 
     public void sendInstanceToMeBeforeSignUp(SendInstanceToMeBeforeSignUpRequest request) {
-        fcmService.sendMessageSync(request.getToken(), request.getContent());
-
-        notificationExperienceRepository.save(
-                NotificationExperience.of(request.getToken(), request.getContent()));
+        notificationUtils.sendExperienceNotification(request.getToken(), request.getContent());
     }
 
     public void deleteByNotificationId(Long notificationId) {
