@@ -1,19 +1,119 @@
-# KnockKnock-Backend
+<h1 align="center"><img  src="https://user-images.githubusercontent.com/69616347/212309860-f5e6ae5a-c087-48f4-84a2-3c694767983d.png" width="300"></h1>
+<p align="center"><b>푸시알림 커스텀 서비스, Knocknock</b></p>
+<p align="center">
+<!-- <a href="https://play.google.com/store/apps/">  <img src="https://img.shields.io/badge/Google_Play-Download-purple?logo=google-play&logoColor=white" style="height : auto; margin-left : 10px; margin-right : 10px;"/> </a>  -->
+</p>
 
-디프만 12기 칠면조 KnockKnock Backend입니다.
+---
 
-# KnockKnock 프로젝트를 시작하기전
+![Group 48095933](https://user-images.githubusercontent.com/13329304/212319564-fb9dc5ec-31e9-4e47-8034-cd5148cddb6b.png)
 
-## 목차
+---
 
-* [개발 프로세스](https://github.com/TEAM-XQUARE/README.md#개발-프로세스)
-* [이슈규칙](https://github.com/TEAM-XQUARE/README.md#이슈-규칙)
-* [커밋규칙](https://github.com/TEAM-XQUARE/README.md#커밋-규칙)
-* [브랜치규칙](https://github.com/TEAM-XQUARE/README.md#브랜치-규칙)
-* [버전규칙](https://github.com/TEAM-XQUARE/README.md#버전-규칙)
-* [Lisence](https://github.com/team-xquare/README.md/blob/main/README.md#license)
+### :computer: 개발자 선생님들 :computer:
 
+<table>
+    <tr align="center">
+        <td><B>백엔드, 팀장<B></td>
+        <td><B>백엔드<B></td>
+        <td><B>백엔드<B></td>
+    </tr>
+    <tr align="center">
+        <td><B>이서준<B></td>
+        <td><B>이찬진<B></td>
+        <td><B>배정은<B></td>
+    </tr>
+    <tr align="center">
+        <td>
+            <img width="100" src="https://user-images.githubusercontent.com/13329304/212317665-4a049d15-41df-4bba-a6af-bce850ef55e5.png">
+            <br>
+            <a href="https://github.com/leeseojune53"><I>leeseojune53</I></a>
+        </td>
+        <td>
+            <img width="100" src="https://user-images.githubusercontent.com/13329304/212317676-ba3895c7-2e2d-4ae9-bc35-cf342ce93d06.png">
+            <br>
+            <a href="https://github.com/ImNM"><I>ImNM</I></a>
+        </td>
+        <td>
+            <img width="100"  src="https://user-images.githubusercontent.com/13329304/212317656-6a6d8921-8a1b-4308-82a6-0228f32cb6b0.png">
+            <br>
+            <a href="https://github.com/mybloom"><I>mybloom</I></a>
+        </td>
+    </tr>
+</table>
 
+<table>
+    <tr align="center">
+        <td><B>AOS 팀장<B></td>
+        <td><B>AOS<B></td>
+        <td><B>AOS<B></td>
+        <td><B>AOS<B></td>
+    </tr>
+    <tr align="center">
+        <td><B>황규일<B></td>
+        <td><B>이영준<B></td>
+        <td><B>조준장<B></td>
+        <td><B>최현정<B></td>
+    </tr>
+    <tr align="center">
+        <td>
+            <img width="100" src="https://user-images.githubusercontent.com/13329304/212317688-990afa01-5913-4afe-8c1b-8b92d4a4cfe8.png">
+            <br>
+            <a href="https://github.com/Gyuil-Hwnag"><I>Gyuil-Hwnag</I></a>
+        </td>
+        <td>
+            <img width="100" src="https://user-images.githubusercontent.com/13329304/212317672-354d13b9-6ab4-42cf-bdb5-a394b4e4de7c.png">
+            <br>
+            <a href="https://github.com/leeyjwinter"><I>leeyjwinter</I></a>
+        </td>
+        <td>
+            <img width="100"  src="https://user-images.githubusercontent.com/13329304/212317678-cc962cb6-1a49-4cb2-a03a-11a3ca65ba47.png">
+            <br>
+            <a href="https://github.com/junjange"><I>junjange</I></a>
+        </td>
+        <td>
+            <img width="100"  src="https://user-images.githubusercontent.com/13329304/212317686-595cb18c-f6d5-41ff-9562-268d33fc29dc.png">
+            <br>
+            <a href="https://github.com/hyunjung-choi"><I>hyunjung-choi</I></a>
+        </td>
+    </tr>
+</table>
+
+### :art: 하늘같은 디자인 선생님들 :art:
+
+<table>
+    <tr align="center">
+        <td><B>디자인<B></td>
+        <td><B>디자인<B></td>
+        <td><B>디자인<B></td>
+    </tr>
+    <tr align="center">
+        <td><B>김나영<B></td>
+        <td><B>박수연<B></td>
+        <td><B>진승희<B></td>
+    </tr>
+    <tr align="center">
+        <td>
+            <img width="100"  src="https://user-images.githubusercontent.com/13329304/212317639-6330ff4a-cfd1-4a3a-a8f7-967039c5885b.png">
+            <br>
+            <a href="https://www.behance.net/402zzang"><I>김나영</I></a>
+        </td>
+        <td>
+            <img width="100" src="https://user-images.githubusercontent.com/13329304/212317647-b90031d3-44c2-4ba5-831c-5d7d181ed083.png">
+            <br>
+            <a href="https://www.behance.net/sypak120c57e"><I>박수연</I></a>
+        </td>
+        <td>
+            <img width="100" src="https://user-images.githubusercontent.com/13329304/212317684-7622f74d-a011-4481-9773-864aee3e28f6.png">
+            <br>
+            <a href="https://www.behance.net/kb1658280b"><I>진승희</I></a>
+        </td>
+    </tr>
+</table>
+
+---
+
+# KnockKnock 백엔드 팀의 규칙
 
 ## 개발 프로세스
 
@@ -28,69 +128,34 @@
 > 6. merge 후 feature branch 제거
 > 7. issue close
 
-
-
-## 이슈 규칙
-
-> 한 기능 당 하나의 issue 생성을 원칙으로 합니다.
->
-> 생성한 issue 성격이 맞는 label을 선택하여 추가한다.
-
-``` [Domain] Subject
-
-	Subject
-
-```
-
-위는 모든 이슈 메세지의 형식이다.
-
-### Labels
-
->  새 리포지토리를 생성하면 issue label을 위같이 설정한다.
-
-| Label         | Description                                | Color Code | 의미                                                         |
-| ------------- | ------------------------------------------ | ---------- | ------------------------------------------------------------ |
-| 버그          | Something isn't working                    | #d73a4a    | 예기치 않은 문제 또는 의도하지 않은 동작(버그)을 나타냅니다. |
-| 기능 추가     | New feature or request                     | #a2eeef    | 새로운 기능 요청을 나타냅니다.                               |
-| DOCS          | Improvements or additions to documentation | #cfd3d7    | 문서를 개선하거나 추가 할 필요가 있음을 나타냅니다.          |
-| Chore         |                                            | #0075ca    | 자잘한 수정들을 나타냅니다.                                  |
-| 리펙토링      | Refactoring is needed                      | #008672    | 리펙토링이 필요함을 나타냅니다.                              |
-| 프로젝트 설정 | Project setting is needed                  | #555303    | 프로젝트 설정이 필요함을 나타냅니다.                         |
-| 테스트 추가   | Request a new test                         | #CD7F57    | 새로운 테스트 요청을 나타냅니다.                             |
-
-
-
 ## 커밋 규칙
-> 프론트엔드라면 아래 링크를 확인해주세요!
-* [프론트엔드](https://github.com/team-xquare/README.md/tree/main/frontend)
 
 ### 커밋메세지
 
 > 다음은 커밋메세지의 형식입니다.
-``` 
+
+```
 
   CommitType :: (#issue number) Subject
-  
+
 ```
 
 ### Commit Type
 
- > 다음은 커밋타입 형식입니다.
+> 다음은 커밋타입 형식입니다.
 
-|CommitType|설명|
-|------|----------------------|
-|📑 ::|파일 생성 및 구조 변경|
-|⚡️ ::|기능 업데이트|
-|⚰️ ::|기능 삭제|
-|🐛 ::|버그 수정|
-|♻️ ::|코드 리펙토링|
-|📝 ::|문서 작성 및 수정|
-|⚙️ ::|프로젝트 세팅|
-|🧪 ::|테스트 코드 추가|
-|🚀 ::|새 버전 릴리즈 ( 커밋은 아니지만😏|
-|🔀 ::|Merge or PR|
-
-
+| CommitType | 설명                               |
+| ---------- | ---------------------------------- |
+| 📑 ::      | 파일 생성 및 구조 변경             |
+| ⚡️ ::     | 기능 업데이트                      |
+| ⚰️ ::      | 기능 삭제                          |
+| 🐛 ::      | 버그 수정                          |
+| ♻️ ::      | 코드 리펙토링                      |
+| 📝 ::      | 문서 작성 및 수정                  |
+| ⚙️ ::      | 프로젝트 세팅                      |
+| 🧪 ::      | 테스트 코드 추가                   |
+| 🚀 ::      | 새 버전 릴리즈 ( 커밋은 아니지만😏 |
+| 🔀 ::      | Merge or PR                        |
 
 ### issue number
 
@@ -108,9 +173,9 @@
 
 > 커밋메세지 형식의 Subject 부분에 기재
 
-* 50자를 넘기지 않게 명령형으로 작성한다.
-* 한국어로 작성한다.
-* ```어떻게``` 보단 ```무엇을```, ```왜``` 에 초점을 두고 작성한다.
+- 50자를 넘기지 않게 명령형으로 작성한다.
+- 한국어로 작성한다.
+- `어떻게` 보단 `무엇을`, `왜` 에 초점을 두고 작성한다.
 
 ```bash
 
@@ -125,17 +190,18 @@
 ```
 🐛 :: [MainPage] 헤더가 안보이는 버그 수정
 ```
+
 ```
 🐛 :: (#19)[FeedServiceImpl] 피드 버그 로직 수정
 ```
+
 ```
 🚀 :: v1.0.0
 ```
+
 ```
 📝 :: README 파일 수정
 ```
-
-
 
 ### 브랜치 규칙
 
@@ -144,45 +210,5 @@
 ### Feature Branch
 
 ```markdown
-
-Feature/{issue number}_{todo}
-
+Feature/{issue number}\_{todo}
 ```
-
-
-
-### 버전 규칙
-
-![버전 규칙](https://user-images.githubusercontent.com/67373938/119933978-0ac15300-bfc0-11eb-99cd-0198b1ee6f2d.png)
-
->  모든 버전은 01.00.00에서 시작한다.
-
-```jsx
-
-"01.01.09" 생략시 "1.1.9"
-
-"01.01.10" 생략시 "1.1.10"
-
-```
-
-### Major Version
-
-- 1로 시작한다.
-- 증가 시 나머지 버전 정보 초기화
-- 전체를 뒤엎었을때 변화한다.
-
-### Minor Version
-
-- 00으로 시작한다 
-- 없던 기능의 추가나 기존 기능의 수정 등의 변화가 발생했을때 이 수치를 올린다.
-
-### Patches
-
-+ 00으로 시작한다.
-
-- 자잘한 버그나 내부적 코드 보완 등의 변화가 발생했을때 이 수치를 올린다.
-
-
-## License
-> 해당 문서에 대한 라이센스는 대덕소프트웨어 마이스터 고등학교의 SEMICOLON; & XQUARE팀에 있습니다. 
-> 해당 문서는 출처만 남겨주신다면, 자유롭게 이용하실 수 있습니다!

@@ -14,4 +14,6 @@ public interface NotificationUtils {
             String content,
             String imageUrl,
             LocalDateTime reservedAt);
+
+    void sendExperienceNotification(String token, String content);
 }

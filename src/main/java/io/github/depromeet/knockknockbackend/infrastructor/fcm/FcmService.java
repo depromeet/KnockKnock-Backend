@@ -1,12 +1,8 @@
 package io.github.depromeet.knockknockbackend.infrastructor.fcm;
 
 
-import com.google.firebase.messaging.ApnsConfig;
-import com.google.firebase.messaging.Aps;
-import com.google.firebase.messaging.FirebaseMessaging;
-import com.google.firebase.messaging.Message;
-import com.google.firebase.messaging.MulticastMessage;
-import com.google.firebase.messaging.Notification;
+import com.google.api.core.ApiFuture;
+import com.google.firebase.messaging.*;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,7 +11,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class FcmService {
 
-    public void sendGroupMessage(
+    public ApiFuture<BatchResponse> sendGroupMessageAsync(
             List<String> tokenList, String title, String content, String imageUrl) {
         MulticastMessage multicast =
                 MulticastMessage.builder()
@@ -32,10 +28,10 @@ public class FcmService {
                                         .build())
                         .build();
 
-        FirebaseMessaging.getInstance().sendMulticastAsync(multicast);
+        return FirebaseMessaging.getInstance().sendMulticastAsync(multicast);
     }
 
-    public void sendMessage(String token, String content) {
+    public void sendMessageSync(String token, String content) throws FirebaseMessagingException {
         Message message =
                 Message.builder()
                         .setToken(token)
@@ -45,6 +41,7 @@ public class FcmService {
                                         .setAps(Aps.builder().setSound("default").build())
                                         .build())
                         .build();
-        FirebaseMessaging.getInstance().sendAsync(message);
+
+        FirebaseMessaging.getInstance().send(message);
     }
 }

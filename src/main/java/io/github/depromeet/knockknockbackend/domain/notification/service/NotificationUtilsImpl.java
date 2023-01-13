@@ -1,26 +1,44 @@
 package io.github.depromeet.knockknockbackend.domain.notification.service;
 
 
+import com.google.api.core.ApiFuture;
+import com.google.firebase.ErrorCode;
+import com.google.firebase.messaging.BatchResponse;
+import com.google.firebase.messaging.FirebaseMessagingException;
+import com.google.firebase.messaging.MessagingErrorCode;
+import com.google.firebase.messaging.SendResponse;
 import io.github.depromeet.knockknockbackend.domain.group.domain.Group;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.DeviceToken;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.NightCondition;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.Notification;
+import io.github.depromeet.knockknockbackend.domain.notification.domain.NotificationExperience;
+import io.github.depromeet.knockknockbackend.domain.notification.domain.repository.DeviceTokenRepository;
+import io.github.depromeet.knockknockbackend.domain.notification.domain.repository.NotificationExperienceRepository;
 import io.github.depromeet.knockknockbackend.domain.notification.domain.repository.NotificationRepository;
+import io.github.depromeet.knockknockbackend.domain.notification.exception.FcmServerException;
+import io.github.depromeet.knockknockbackend.domain.notification.exception.FcmTokenInvalidException;
 import io.github.depromeet.knockknockbackend.domain.notification.exception.NotificationNotFoundException;
 import io.github.depromeet.knockknockbackend.domain.user.domain.User;
 import io.github.depromeet.knockknockbackend.infrastructor.fcm.FcmService;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @RequiredArgsConstructor
 @Component
 public class NotificationUtilsImpl implements NotificationUtils {
 
     private final FcmService fcmService;
     private final NotificationRepository notificationRepository;
+    private final DeviceTokenRepository deviceTokenRepository;
+    private final NotificationExperienceRepository notificationExperienceRepository;
 
     @Override
     public Notification queryNotificationById(Long notificationId) {
@@ -53,7 +71,28 @@ public class NotificationUtilsImpl implements NotificationUtils {
         if (tokens.isEmpty()) {
             return;
         }
-        fcmService.sendGroupMessage(tokens, title, content, imageUrl);
+        ApiFuture<BatchResponse> batchResponseApiFuture =
+                fcmService.sendGroupMessageAsync(tokens, title, content, imageUrl);
+        checkFcmResponse(deviceTokens, tokens, batchResponseApiFuture);
+    }
+
+    @Override
+    public void sendExperienceNotification(String token, String content) {
+        try {
+            fcmService.sendMessageSync(token, content);
+        } catch (FirebaseMessagingException e) {
+            ErrorCode errorCode = e.getErrorCode();
+            log.error(
+                    "**[sendMessageSync] errorCode: {}, errorMessage: {}",
+                    errorCode,
+                    e.getMessage());
+            if (errorCode.equals(ErrorCode.INVALID_ARGUMENT)) {
+                throw FcmTokenInvalidException.EXCEPTION;
+            }
+            throw FcmServerException.EXCEPTION;
+        }
+
+        notificationExperienceRepository.save(NotificationExperience.of(token, content));
     }
 
     private List<DeviceToken> getDeviceTokens(Long groupId, Long sendUserId) {
@@ -82,5 +121,54 @@ public class NotificationUtilsImpl implements NotificationUtils {
                 Notification.makeNotificationWithReceivers(
                         deviceTokens, title, content, imageUrl, group, sendUser, reservedAt);
         notificationRepository.save(notification);
+    }
+
+    private void checkFcmResponse(
+            List<DeviceToken> deviceTokens,
+            List<String> tokens,
+            ApiFuture<BatchResponse> batchResponseApiFuture) {
+        try {
+            List<SendResponse> responses = batchResponseApiFuture.get().getResponses();
+            IntStream.iterate(0, i -> i + 1)
+                    .limit(responses.size())
+                    .filter(i -> responses.get(i).getException() != null)
+                    .filter(
+                            i ->
+                                    responses
+                                            .get(i)
+                                            .getException()
+                                            .getMessagingErrorCode()
+                                            .equals(MessagingErrorCode.INVALID_ARGUMENT))
+                    .forEach(
+                            i -> {
+                                String errorToken = tokens.get(i);
+                                String errorMessage = responses.get(i).getException().getMessage();
+                                MessagingErrorCode errorCode =
+                                        responses.get(i).getException().getMessagingErrorCode();
+
+                                Optional<DeviceToken> errorDeviceToken =
+                                        deviceTokens.stream()
+                                                .filter(
+                                                        deviceToken ->
+                                                                deviceToken
+                                                                        .getToken()
+                                                                        .equals(errorToken))
+                                                .findAny();
+                                Long IdOfErrorDeviceToken =
+                                        errorDeviceToken.map(DeviceToken::getId).orElse(null);
+                                Long userIdOfErrorDeviceToken =
+                                        errorDeviceToken.map(DeviceToken::getUserId).orElse(null);
+                                deviceTokenRepository.deleteById(IdOfErrorDeviceToken);
+
+                                log.error(
+                                        "**[sendGroupMessageAsync] errorUserId: {}, errorMessage: {}, errorCode: {}, errorToken: {}",
+                                        userIdOfErrorDeviceToken,
+                                        errorMessage,
+                                        errorCode,
+                                        errorToken);
+                            });
+        } catch (InterruptedException | ExecutionException e) {
+            throw FcmTokenInvalidException.EXCEPTION;
+        }
     }
 }
