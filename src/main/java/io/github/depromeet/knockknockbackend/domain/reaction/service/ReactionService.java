@@ -38,7 +38,7 @@ public class ReactionService {
     @Transactional
     public void changeReaction(Long notificationReactionId, RegisterReactionRequest request) {
         NotificationReaction notificationReaction =
-                queryNotificationReactionId(notificationReactionId);
+                queryNotificationReaction(notificationReactionId);
         validateMyReactionTheNotification(notificationReaction);
 
         notificationReaction.changeReaction(Reaction.of(request.getReactionId()));
@@ -47,7 +47,7 @@ public class ReactionService {
     @Transactional
     public void deleteReaction(Long notificationReactionId) {
         NotificationReaction notificationReaction =
-                queryNotificationReactionId(notificationReactionId);
+                queryNotificationReaction(notificationReactionId);
         validateMyReactionTheNotification(notificationReaction);
         notificationReactionRepository.deleteById(notificationReactionId);
     }
@@ -58,7 +58,7 @@ public class ReactionService {
         }
     }
 
-    private NotificationReaction queryNotificationReactionId(Long notificationReactionId) {
+    private NotificationReaction queryNotificationReaction(Long notificationReactionId) {
         return notificationReactionRepository
                 .findById(notificationReactionId)
                 .orElseThrow(() -> ReactionNotExistException.EXCEPTION);
