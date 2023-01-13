@@ -64,6 +64,8 @@ public enum ErrorCode {
             "The user has no access to the notification"),
     NOTIFICATION_NOT_FOUND(
             HttpStatus.NOT_FOUND.value(), "NOTIFICATION-404-1", "Notification Not Found"),
+    NOTIFICATION_FCM_SERVER_ERROR(
+            HttpStatus.INTERNAL_SERVER_ERROR.value(), "NOTIFICATION-500-1", "FCM server error"),
 
     RESERVATION_FORBIDDEN(
             HttpStatus.FORBIDDEN.value(),
