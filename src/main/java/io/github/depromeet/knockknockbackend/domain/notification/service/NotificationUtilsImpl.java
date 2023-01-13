@@ -136,7 +136,7 @@ public class NotificationUtilsImpl implements NotificationUtils {
                                 deviceTokenRepository.deleteById(IdOfErrorDeviceToken);
 
                                 log.error(
-                                        "**[validateFcmToken] errorUserId: {}, message: {}, messagingErrorCode: {}, errorToken: {}",
+                                        "**[sendGroupMessageAsync] errorUserId: {}, errorMessage: {}, errorCode: {}, errorToken: {}",
                                         userIdOfErrorDeviceToken,
                                         errorMessage,
                                         errorCode,
