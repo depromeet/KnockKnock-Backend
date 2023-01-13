@@ -21,7 +21,6 @@ import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -34,7 +33,6 @@ public class NotificationUtilsImpl implements NotificationUtils {
     private final FcmService fcmService;
     private final NotificationRepository notificationRepository;
     private final DeviceTokenRepository deviceTokenRepository;
-
 
     @Override
     public Notification queryNotificationById(Long notificationId) {
@@ -67,7 +65,8 @@ public class NotificationUtilsImpl implements NotificationUtils {
         if (tokens.isEmpty()) {
             return;
         }
-        ApiFuture<BatchResponse> batchResponseApiFuture = fcmService.sendGroupMessage(tokens, title, content, imageUrl);
+        ApiFuture<BatchResponse> batchResponseApiFuture =
+                fcmService.sendGroupMessage(tokens, title, content, imageUrl);
         checkFcmResponse(deviceTokens, tokens, batchResponseApiFuture);
     }
 
@@ -99,34 +98,50 @@ public class NotificationUtilsImpl implements NotificationUtils {
         notificationRepository.save(notification);
     }
 
-    private void checkFcmResponse(List<DeviceToken> deviceTokens, List<String> tokens, ApiFuture<BatchResponse> batchResponseApiFuture) {
+    private void checkFcmResponse(
+            List<DeviceToken> deviceTokens,
+            List<String> tokens,
+            ApiFuture<BatchResponse> batchResponseApiFuture) {
         try {
             List<SendResponse> responses = batchResponseApiFuture.get().getResponses();
             IntStream.iterate(0, i -> i + 1)
                     .limit(responses.size())
                     .filter(i -> responses.get(i).getException() != null)
-                    .filter(i -> responses.get(i).getException().getMessagingErrorCode().equals(MessagingErrorCode.INVALID_ARGUMENT))
-                    .forEach(i -> {
-                        String errorToken = tokens.get(i);
-                        String errorMessage = responses.get(i).getException().getMessage();
-                        MessagingErrorCode errorCode = responses.get(i).getException().getMessagingErrorCode();
+                    .filter(
+                            i ->
+                                    responses
+                                            .get(i)
+                                            .getException()
+                                            .getMessagingErrorCode()
+                                            .equals(MessagingErrorCode.INVALID_ARGUMENT))
+                    .forEach(
+                            i -> {
+                                String errorToken = tokens.get(i);
+                                String errorMessage = responses.get(i).getException().getMessage();
+                                MessagingErrorCode errorCode =
+                                        responses.get(i).getException().getMessagingErrorCode();
 
-                        Optional<DeviceToken> errorDeviceToken = deviceTokens.stream()
-                                .filter(deviceToken -> deviceToken.getToken().equals(errorToken))
-                                .findAny();
-                        Long IdOfErrorDeviceToken = errorDeviceToken
-                                .map(DeviceToken::getId)
-                                .orElse(null);
-                        Long userIdOfErrorDeviceToken = errorDeviceToken.map(DeviceToken::getUserId)
-                                .orElse(null);
-                        deviceTokenRepository.deleteById(IdOfErrorDeviceToken);
+                                Optional<DeviceToken> errorDeviceToken =
+                                        deviceTokens.stream()
+                                                .filter(
+                                                        deviceToken ->
+                                                                deviceToken
+                                                                        .getToken()
+                                                                        .equals(errorToken))
+                                                .findAny();
+                                Long IdOfErrorDeviceToken =
+                                        errorDeviceToken.map(DeviceToken::getId).orElse(null);
+                                Long userIdOfErrorDeviceToken =
+                                        errorDeviceToken.map(DeviceToken::getUserId).orElse(null);
+                                deviceTokenRepository.deleteById(IdOfErrorDeviceToken);
 
-                        log.error("**[validateFcmToken] errorUserId: {}, message: {}, messagingErrorCode: {}, errorToken: {}",
-                                userIdOfErrorDeviceToken,
-                                errorMessage,
-                                errorCode,
-                                errorToken);
-                    });
+                                log.error(
+                                        "**[validateFcmToken] errorUserId: {}, message: {}, messagingErrorCode: {}, errorToken: {}",
+                                        userIdOfErrorDeviceToken,
+                                        errorMessage,
+                                        errorCode,
+                                        errorToken);
+                            });
         } catch (InterruptedException | ExecutionException e) {
             throw FcmTokenInvalidException.EXCEPTION;
         }

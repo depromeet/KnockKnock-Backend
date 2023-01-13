@@ -65,7 +65,6 @@ public enum ErrorCode {
     NOTIFICATION_NOT_FOUND(
             HttpStatus.NOT_FOUND.value(), "NOTIFICATION-404-1", "Notification Not Found"),
 
-
     RESERVATION_FORBIDDEN(
             HttpStatus.FORBIDDEN.value(),
             "RESERVATION-403-1",
