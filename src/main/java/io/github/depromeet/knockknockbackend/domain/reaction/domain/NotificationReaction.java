@@ -50,6 +50,10 @@ public class NotificationReaction extends BaseTimeEntity {
         return user.getId();
     }
 
+    public void changeReaction(Reaction reaction) {
+        this.reaction = reaction;
+    }
+
     public static NotificationReaction of(Long id, Reaction reaction) {
         return NotificationReaction.builder().id(id).reaction(reaction).build();
     }
