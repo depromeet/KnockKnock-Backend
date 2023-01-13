@@ -2,16 +2,11 @@ package io.github.depromeet.knockknockbackend.infrastructor.fcm;
 
 
 import com.google.api.core.ApiFuture;
-import com.google.firebase.ErrorCode;
 import com.google.firebase.messaging.*;
-import io.github.depromeet.knockknockbackend.domain.notification.exception.FcmServerException;
-import io.github.depromeet.knockknockbackend.domain.notification.exception.FcmTokenInvalidException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-@Slf4j
 @RequiredArgsConstructor
 @Service
 public class FcmService {
@@ -36,7 +31,7 @@ public class FcmService {
         return FirebaseMessaging.getInstance().sendMulticastAsync(multicast);
     }
 
-    public void sendMessageSync(String token, String content) {
+    public void sendMessageSync(String token, String content) throws FirebaseMessagingException {
         Message message =
                 Message.builder()
                         .setToken(token)
@@ -46,18 +41,7 @@ public class FcmService {
                                         .setAps(Aps.builder().setSound("default").build())
                                         .build())
                         .build();
-        try {
-            FirebaseMessaging.getInstance().send(message);
-        } catch (FirebaseMessagingException e) {
-            ErrorCode errorCode = e.getErrorCode();
-            log.error(
-                    "**[sendMessageSync] errorCode: {}, errorMessage: {}, messagingErrorCode: {}",
-                    errorCode,
-                    e.getMessage());
-            if (errorCode.equals(ErrorCode.INVALID_ARGUMENT)) {
-                throw FcmTokenInvalidException.EXCEPTION;
-            }
-            throw FcmServerException.EXCEPTION;
-        }
+
+        FirebaseMessaging.getInstance().send(message);
     }
 }
