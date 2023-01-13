@@ -1,12 +1,20 @@
-<h1 align="center"><img  src="https://user-images.githubusercontent.com/69616347/212309860-f5e6ae5a-c087-48f4-84a2-3c694767983d.png" width="300"></h1>
-<p align="center"><b>푸시알림 커스텀 서비스, Knocknock</b></p>
+<img width="1920" alt="readme banner" src="https://user-images.githubusercontent.com/13329304/212335772-3b8fbb62-cd37-40e0-84bb-c9d3d5bf16ce.png">
+<br/>
+<br/>
+
+<div align="center"><b>푸시알림 커스텀 서비스, Knocknock</b></div>
 <p align="center">
 <!-- <a href="https://play.google.com/store/apps/">  <img src="https://img.shields.io/badge/Google_Play-Download-purple?logo=google-play&logoColor=white" style="height : auto; margin-left : 10px; margin-right : 10px;"/> </a>  -->
 </p>
 
 ---
 
-![Group 48095933](https://user-images.githubusercontent.com/13329304/212319564-fb9dc5ec-31e9-4e47-8034-cd5148cddb6b.png)
+![readme 0](https://user-images.githubusercontent.com/13329304/212335734-461d63bb-3296-4f88-8d84-839bee723b38.png)
+![readme 01](https://user-images.githubusercontent.com/13329304/212335758-eb4c093c-5370-45ec-a53b-bd4ae9081d1b.png)
+![readme 2](https://user-images.githubusercontent.com/13329304/212335770-51689501-e3cc-4566-a8d5-9de641f614a2.png)
+![readme 3](https://user-images.githubusercontent.com/13329304/212335774-5e68b3c5-1f7b-44b6-acba-459323b5b12d.png)
+
+![readme 4](https://user-images.githubusercontent.com/13329304/212335762-d2ed252c-4932-4c9e-89e9-fa5281d314b4.png)
 
 ---
 
@@ -50,21 +58,21 @@
         <td><B>AOS<B></td>
     </tr>
     <tr align="center">
-        <td><B>황규일<B></td>
         <td><B>이영준<B></td>
+        <td><B>황규일<B></td>
         <td><B>조준장<B></td>
         <td><B>최현정<B></td>
     </tr>
     <tr align="center">
         <td>
-            <img width="100" src="https://user-images.githubusercontent.com/13329304/212317688-990afa01-5913-4afe-8c1b-8b92d4a4cfe8.png">
-            <br>
-            <a href="https://github.com/Gyuil-Hwnag"><I>Gyuil-Hwnag</I></a>
-        </td>
-        <td>
             <img width="100" src="https://user-images.githubusercontent.com/13329304/212317672-354d13b9-6ab4-42cf-bdb5-a394b4e4de7c.png">
             <br>
             <a href="https://github.com/leeyjwinter"><I>leeyjwinter</I></a>
+        </td>
+        <td>
+            <img width="100" src="https://user-images.githubusercontent.com/13329304/212317688-990afa01-5913-4afe-8c1b-8b92d4a4cfe8.png">
+            <br>
+            <a href="https://github.com/Gyuil-Hwnag"><I>Gyuil-Hwnag</I></a>
         </td>
         <td>
             <img width="100"  src="https://user-images.githubusercontent.com/13329304/212317678-cc962cb6-1a49-4cb2-a03a-11a3ca65ba47.png">
@@ -77,6 +85,7 @@
             <a href="https://github.com/hyunjung-choi"><I>hyunjung-choi</I></a>
         </td>
     </tr>
+
 </table>
 
 ### :art: 하늘같은 디자인 선생님들 :art:
