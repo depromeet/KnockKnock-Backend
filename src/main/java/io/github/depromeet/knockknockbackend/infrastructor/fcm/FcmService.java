@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class FcmService {
 
-    public ApiFuture<BatchResponse> sendGroupMessage(
+    public ApiFuture<BatchResponse> sendGroupMessageAsync(
             List<String> tokenList, String title, String content, String imageUrl) {
         MulticastMessage multicast =
                 MulticastMessage.builder()
@@ -31,7 +31,7 @@ public class FcmService {
         return FirebaseMessaging.getInstance().sendMulticastAsync(multicast);
     }
 
-    public void sendMessage(String token, String content) {
+    public void sendMessageSync(String token, String content) throws FirebaseMessagingException {
         Message message =
                 Message.builder()
                         .setToken(token)
@@ -41,6 +41,7 @@ public class FcmService {
                                         .setAps(Aps.builder().setSound("default").build())
                                         .build())
                         .build();
-        FirebaseMessaging.getInstance().sendAsync(message);
+
+        FirebaseMessaging.getInstance().send(message);
     }
 }
