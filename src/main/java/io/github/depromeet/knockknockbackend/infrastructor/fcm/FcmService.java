@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class FcmService {
 
-    public ApiFuture<BatchResponse> sendGroupMessage(
+    public ApiFuture<BatchResponse> sendGroupMessageAsync(
             List<String> tokenList, String title, String content, String imageUrl) {
         MulticastMessage multicast =
                 MulticastMessage.builder()
