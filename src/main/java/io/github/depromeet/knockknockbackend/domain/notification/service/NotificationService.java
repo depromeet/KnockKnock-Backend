@@ -47,8 +47,8 @@ public class NotificationService {
     private final DeviceTokenRepository deviceTokenRepository;
     private final NotificationReactionRepository notificationReactionRepository;
     private final ReservationRepository reservationRepository;
-    private final NotificationExperienceRepository notificationExperienceRepository;
     private final GroupUserRepository groupUserRepository;
+    private final NotificationExperienceRepository notificationExperienceRepository;
 
     @Transactional(readOnly = true)
     public QueryNotificationListLatestResponse queryListLatest() {
@@ -186,7 +186,8 @@ public class NotificationService {
     }
 
     public void sendInstanceToMeBeforeSignUp(SendInstanceToMeBeforeSignUpRequest request) {
-        fcmService.sendMessage(request.getToken(), request.getContent());
+        fcmService.sendMessageSync(request.getToken(), request.getContent());
+
         notificationExperienceRepository.save(
                 NotificationExperience.of(request.getToken(), request.getContent()));
     }
