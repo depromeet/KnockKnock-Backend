@@ -7,6 +7,7 @@ import io.github.depromeet.knockknockbackend.domain.reaction.domain.Notification
 import io.github.depromeet.knockknockbackend.domain.reaction.domain.repository.NotificationReactionRepository;
 import io.github.depromeet.knockknockbackend.domain.reaction.exception.ReactionAlreadyExistException;
 import io.github.depromeet.knockknockbackend.domain.reaction.exception.ReactionForbiddenException;
+import io.github.depromeet.knockknockbackend.domain.reaction.exception.ReactionNotExistException;
 import io.github.depromeet.knockknockbackend.domain.reaction.presentation.dto.request.RegisterReactionRequest;
 import io.github.depromeet.knockknockbackend.global.utils.security.SecurityUtils;
 import io.github.depromeet.knockknockbackend.global.utils.user.UserUtils;
@@ -49,15 +50,16 @@ public class ReactionService {
     }
 
     private void validateMyReactionTheNotification(Long notificationReactionId) {
-        notificationReactionRepository
+        NotificationReaction notificationReaction =
+                queryNotificationReactionId(notificationReactionId);
+        if (!notificationReaction.getUserId().equals(SecurityUtils.getCurrentUserId())) {
+            throw ReactionForbiddenException.EXCEPTION;
+        }
+    }
+
+    private NotificationReaction queryNotificationReactionId(Long notificationReactionId) {
+        return notificationReactionRepository
                 .findById(notificationReactionId)
-                .ifPresent(
-                        notificationReaction -> {
-                            if (!notificationReaction
-                                    .getUser()
-                                    .getId()
-                                    .equals(SecurityUtils.getCurrentUserId()))
-                                throw ReactionForbiddenException.EXCEPTION;
-                        });
+                .orElseThrow(() -> ReactionNotExistException.EXCEPTION);
     }
 }
